@@ -26,4 +26,7 @@ dependencies = [
     "pynput",
     "scipy",
     "tensorboard",
+    "onnx",
+    "onnxruntime",
+    "opencv-python"
 ]
