@@ -155,17 +155,9 @@ Create a virtual environment with python 3.10.
 mamba create -n hsim python=3.10
 mamba activate 
 ```
-Install IsaacSim following instructions [here](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/binaries_installation.html#installing-isaac-lab)
+Install IsaacSim following instructions [here](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/binaries_installation.html#installing-isaac-sim)
 
-Install IsaacLab:
-
-```bash
-cd ../
-git clone https://github.com/isaac-sim/IsaacLab.git
-cd IsaacLab
-sudo apt install cmake build-essential
-./isaaclab.sh --install
-```
+Install IsaacLab following instructions [here](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/binaries_installation.html#installing-isaac-lab)
 
 Install HumanoidVerse:
 
