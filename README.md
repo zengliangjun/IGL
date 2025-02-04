@@ -427,6 +427,20 @@ This project is made possible thanks to our amazing team members at [LeCAR Lab](
 
 Special thanks to [Guanya Shi](https://www.gshi.me/) for his invaluable support and unwavering guidance throughout the project.
 
+# Citation
+Please use the following bibtex if you find this repo helpful and would like to cite:
+
+```bibtex
+@misc{HumanoidVerse,
+  author = {CMU LeCAR Lab},
+  title = {HumanoidVerse: A Multi-Simulator Framework for Humanoid Robot Sim-to-Real Learning},
+  year = {2025},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/LeCAR-Lab/HumanoidVerse}},
+}
+```
+
 # License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
