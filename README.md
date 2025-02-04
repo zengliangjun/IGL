@@ -31,7 +31,7 @@ We compared the scope of HumanoidVerse with other sim-to-real frameworks and sum
 | --- | --- | --- |
 | HumanoidVerse | :white_check_mark: | :white_check_mark: |
 | [Mujoco Playground](https://playground.mujoco.org/#) | :x: | :white_check_mark: |
-| [ProtoMotions](https://github.com/NVlabs/ProtoMotions) | :x: | :x: |
+| [ProtoMotions](https://github.com/NVlabs/ProtoMotions) | :white_check_mark: | :x: |
 | [Humanoid Gym](https://github.com/roboterax/humanoid-gym) | :x: | :white_check_mark: |
 | [Unitree RL Gym](https://github.com/unitreerobotics/unitree_rl_gym) | :x: | :white_check_mark: |
 | [Legged Gym](https://github.com/leggedrobotics/legged_gym) | :x: | :x: |
@@ -389,7 +389,8 @@ num_envs=4096 \
 project_name=HumanoidLocomotion \
 experiment_name=H110dof_loco_Genesis \
 headless=True \
-rewards.reward
+rewards.reward_penalty_curriculum=True \
+rewards.reward_initial_penalty_scale=0.5
 ```
 </details>
 
