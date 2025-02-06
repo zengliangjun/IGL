@@ -40,7 +40,7 @@ We compared the scope of HumanoidVerse with other sim-to-real frameworks and sum
 
 ## TODO
 - [x] Support for multiple simulators: (Currently) IsaacGym, Genesis, IsaacLab.
-- [x] Support for multiple embodiments: (Currently) Unitree H1 Humanoid, H1-2 Humanoid, G1 Humanoid.
+- [x] Support for multiple embodiments: (Currently) Unitree Humanoid H1-10DoF, H1-19DoF, G1-12DoF, G1-23DoF.
 - [ ] Sim-to-Sim and Sim-to-Real pipelines.
 - [ ] Motion tracking tasks.
 
