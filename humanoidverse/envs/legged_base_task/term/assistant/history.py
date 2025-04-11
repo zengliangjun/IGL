@@ -1,0 +1,60 @@
+from humanoidverse.envs.base_task.term import base
+from humanoidverse.envs.env_utils.history_handler import HistoryHandler
+import torch
+
+class LeggedHistoryManager(base.BaseManager):
+    def __init__(self, _task):
+        super(LeggedHistoryManager, self).__init__(_task)
+        self.history_handler = HistoryHandler(self.num_envs,
+                                              self.config.obs.obs_auxiliary,
+                                              self.config.obs.obs_dims,
+                                              self.device)
+
+    # stage 3
+    def reset(self, env_ids):
+        if len(env_ids) == 0:
+            return
+        self.history_handler.reset(env_ids)
+
+    def post_compute(self):
+        _observations_manager = self.task.observations_manager
+
+        for key in self.history_handler.history.keys():
+            self.history_handler.add(key, _observations_manager.hist_obs_dict[key])
+
+    ######################### Observations #########################
+    def _get_obs_history(self,):
+        assert "history" in self.config.obs.obs_auxiliary.keys()
+        history_config = self.config.obs.obs_auxiliary['history']
+        history_key_list = history_config.keys()
+        history_tensors = []
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
+
+    def _get_obs_short_history(self,):
+        assert "short_history" in self.config.obs.obs_auxiliary.keys()
+        history_config = self.config.obs.obs_auxiliary['short_history']
+        history_key_list = history_config.keys()
+        history_tensors = []
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
+
+    def _get_obs_long_history(self,):
+        assert "long_history" in self.config.obs.obs_auxiliary.keys()
+        history_config = self.config.obs.obs_auxiliary['long_history']
+        history_key_list = history_config.keys()
+        history_tensors = []
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
