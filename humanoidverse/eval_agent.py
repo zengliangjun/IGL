@@ -2,6 +2,10 @@ import os
 import sys
 from pathlib import Path
 
+_root = Path(__file__).absolute().parent.parent
+print(_root.__str__())
+sys.path.append(_root.__str__())
+
 import hydra
 from hydra.utils import instantiate
 from hydra.core.hydra_config import HydraConfig

@@ -20,7 +20,8 @@ from loguru import logger
 
 from utils.config_utils import *  # noqa: E402, F403
 
-@hydra.main(config_path="config", config_name="base", version_base="1.1")
+import hydra_main
+@hydra_main.main(config_path="config", config_name="base", version_base="1.1")
 def main(config: OmegaConf):
     # import ipdb; ipdb.set_trace()
     simulator_type = config.simulator['_target_'].split('.')[-1]
@@ -88,8 +89,8 @@ def main(config: OmegaConf):
                 config=unresolved_conf,
                 dir=wandb_dir)
 
-    device = "cuda:1" if torch.cuda.is_available() else "cpu"
-
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    
     pre_process_config(config)
 
     # torch.set_float32_matmul_precision("medium")

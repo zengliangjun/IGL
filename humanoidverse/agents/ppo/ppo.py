@@ -167,8 +167,8 @@ class PPO(BaseAlgo):
         
     def learn(self):
         if self.init_at_random_ep_len:
-            self.env.episode_length_buf = torch.randint_like(self.env.episode_length_buf, high=int(self.env.max_episode_length))
-        
+            self.env.rand_episode_length()
+
         obs_dict = self.env.reset_all()
         for obs_key in obs_dict.keys():
             obs_dict[obs_key] = obs_dict[obs_key].to(self.device)
@@ -250,7 +250,11 @@ class PPO(BaseAlgo):
                 actions = policy_state_dict["actions"]
                 actor_state = {}
                 actor_state["actions"] = actions
-                obs_dict, rewards, dones, infos = self.env.step(actor_state)
+                _items = self.env.step(actor_state)
+                obs_dict = _items['obs_dict']
+                rewards = _items['rewards']
+                dones = _items['dones']
+                infos = _items['infos']
                 # critic_obs = privileged_obs if privileged_obs is not None else obs
                 for obs_key in obs_dict.keys():
                     obs_dict[obs_key] = obs_dict[obs_key].to(self.device)
@@ -562,7 +566,12 @@ class PPO(BaseAlgo):
     ##########################################################################################
 
     def env_step(self, actor_state):
-        obs_dict, rewards, dones, extras = self.env.step(actor_state)
+        _items = self.env.step(actor_state)
+        obs_dict = _items['obs_dict']
+        rewards = _items['rewards']
+        dones = _items['dones']
+        extras = _items['infos']
+
         actor_state.update(
             {"obs": obs_dict, "rewards": rewards, "dones": dones, "extras": extras}
         )
