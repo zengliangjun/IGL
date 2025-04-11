@@ -102,6 +102,9 @@ class LeggedRobotBase(BaseTask):
         assert hasattr(self, "episode_manager")
         if _env_ids is None:
             _env_ids = self.episode_manager.reset_env_ids
+        if 0 == len(_env_ids):
+            return
+
         self.need_to_refresh_envs[_env_ids] = True
         for _key in self.managers:
             self.managers[_key].reset(_env_ids)

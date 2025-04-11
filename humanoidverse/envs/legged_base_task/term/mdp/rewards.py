@@ -120,6 +120,9 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
         # if not hasattr(self.task, "extras_manager") or not hasattr(self.task, "episode_manager"):
         #     return
         #
+        if len(env_ids) == 0:
+            return
+
         assert hasattr(self.task, "extras_manager")
         assert hasattr(self.task, "episode_manager")
         extras_manager = self.task.extras_manager
