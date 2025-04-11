@@ -22,15 +22,15 @@ class LeggedObservations(observations.BaseObservations):
     def compute(self):
         """ Computes observations
         """
-        # super().compute_observations()
-
         # compute Algo observations
         for obs_key, obs_config in self.config.obs.obs_dict.items():
             self.obs_buf_dict_raw[obs_key] = dict()
             parse_observation(self, obs_config, self.obs_buf_dict_raw[obs_key], self.config.obs.obs_scales, self.config.obs.noise_scales)
 
+        history_manager = self.task.history_manager
+
         # Compute history observations
-        history_obs_list = self.history_handler.history.keys()
+        history_obs_list = history_manager.history_handler.history.keys()
         parse_observation(self, history_obs_list, self.hist_obs_dict, self.config.obs.obs_scales, self.config.obs.noise_scales)
 
         self._post_config_observation_callback()

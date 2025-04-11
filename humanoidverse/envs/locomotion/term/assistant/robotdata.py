@@ -8,4 +8,4 @@ class LocomotionRobotDataManager(robotdata.LeggedRobotDataManager):
 
     def post_init(self):
         if self.config.robot.motion.get("hips_link", None):
-            self.hips_dof_id = [self.simulator._body_list.index(link) - 1 for link in self.config.robot.motion.hips_link] # Yuanhang: -1 for the base link (pelvis)
+            self.hips_dof_id = [self.task.simulator._body_list.index(link) - 1 for link in self.config.robot.motion.hips_link] # Yuanhang: -1 for the base link (pelvis)

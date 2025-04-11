@@ -3,7 +3,7 @@ from humanoidverse.utils.spatial_utils.rotations import get_euler_xyz_in_tensor
 from humanoidverse.envs.base_task.term import base
 import torch
 
-class LeggedStatusManager(base.BaseRobotDataManager):
+class LeggedStatusManager(base.BaseManager):
 
     def __init__(self, _task):
         super(LeggedStatusManager, self).__init__(_task)
@@ -53,4 +53,4 @@ class LeggedStatusManager(base.BaseRobotDataManager):
         return self.projected_gravity
 
     def _get_obs_dof_vel(self,):
-        return self.simulator.dof_vel
+        return self.task.simulator.dof_vel

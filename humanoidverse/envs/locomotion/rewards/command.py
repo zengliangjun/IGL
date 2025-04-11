@@ -12,9 +12,9 @@ class CommandRewards(base.BaseManager):
             return None
 
         command_manager = self.task.command_manager
-        robotdata_manager = self.task.robotdata_manager
+        robotstatus_manager = self.task.robotstatus_manager
 
-        lin_vel_error = torch.sum(torch.square(command_manager.commands[:, :2] - robotdata_manager.base_lin_vel[:, :2]), dim=1)
+        lin_vel_error = torch.sum(torch.square(command_manager.commands[:, :2] - robotstatus_manager.base_lin_vel[:, :2]), dim=1)
         return torch.exp(-lin_vel_error / self.config.rewards.reward_tracking_sigma.lin_vel)
 
     def _reward_tracking_ang_vel(self):
@@ -23,6 +23,6 @@ class CommandRewards(base.BaseManager):
             return None
 
         command_manager = self.task.command_manager
-        robotdata_manager = self.task.robotdata_manager
-        ang_vel_error = torch.square(command_manager.commands[:, 2] - robotdata_manager.base_ang_vel[:, 2])
+        robotstatus_manager = self.task.robotstatus_manager
+        ang_vel_error = torch.square(command_manager.commands[:, 2] - robotstatus_manager.base_ang_vel[:, 2])
         return torch.exp(-ang_vel_error / self.config.rewards.reward_tracking_sigma.ang_vel)

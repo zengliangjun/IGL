@@ -8,6 +8,7 @@ class LeggedEpisode(episode.BaseEpisode):
     # stage 1
     def init(self):
         super(LeggedEpisode, self).init()
+        self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
 
         self.common_step_counter = 0
         # for reward penalty curriculum
@@ -52,6 +53,7 @@ class LeggedEpisode(episode.BaseEpisode):
     def _update_reset_buf(self):
 
         robotdata_manager = self.task.robotdata_manager
+        robotstatus_manager = self.task.robotstatus_manager
         task = self.task
 
         if self.config.termination.terminate_by_contact:
@@ -80,9 +82,9 @@ class LeggedEpisode(episode.BaseEpisode):
         # if self.config.termination.terminate_by_ang_vel:
         #     self.reset_buf |= torch.any(torch.norm(self.base_ang_vel, dim=-1, keepdim=True) > self.config.termination_scales.termination_max_base_ang_vel, dim=1)
         if self.config.termination.terminate_by_gravity:
-            # print(self.projected_gravity)
-            self.reset_buf |= torch.any(torch.abs(self.projected_gravity[:, 0:1]) > self.config.termination_scales.termination_gravity_x, dim=1)
-            self.reset_buf |= torch.any(torch.abs(self.projected_gravity[:, 1:2]) > self.config.termination_scales.termination_gravity_y, dim=1)
+            # print(robotstatus_manager.projected_gravity)
+            self.reset_buf |= torch.any(torch.abs(robotstatus_manager.projected_gravity[:, 0:1]) > self.config.termination_scales.termination_gravity_x, dim=1)
+            self.reset_buf |= torch.any(torch.abs(robotstatus_manager.projected_gravity[:, 1:2]) > self.config.termination_scales.termination_gravity_y, dim=1)
         if self.config.termination.terminate_by_low_height:
             # import ipdb; ipdb.set_trace()
             self.reset_buf |= torch.any(task.simulator.robot_root_states[:, 2:3] < self.config.termination_scales.termination_min_base_height, dim=1)

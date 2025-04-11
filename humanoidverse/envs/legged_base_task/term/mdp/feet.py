@@ -33,7 +33,7 @@ class LeggedFeetManager(base.BaseManager):
         self.feet_air_time += self.task.dt  ## TODO update here
         ## max_height
         self.feet_air_max_height = torch.max(self.feet_air_max_height, \
-                                             self.task.simulator._rigid_body_pos[:, self.feet_indices, 2])
+                                             self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2])
 
     def post_compute(self):
         self.feet_air_time *= ~self.contact_filt

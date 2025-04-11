@@ -41,4 +41,4 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
 
     ######################### Observations #########################
     def _get_obs_dof_pos(self,):
-        return self.simulator.dof_pos - self.default_dof_pos
+        return self.task.simulator.dof_pos - self.default_dof_pos

@@ -8,7 +8,7 @@ class FeetRewards(base.BaseManager):
     ########################### PENALTY REWARDS ###########################
     #def _reward_penalty_slippage(self):
     def _reward_penalty_feet_slippage(self):
-        # assert self.simulator._rigid_body_vel.shape[1] == 20
+        # assert self.task.simulator._rigid_body_vel.shape[1] == 20
         robotdata_manager = self.task.robotdata_manager
         #feet_manager = self.task.feet_manager
 

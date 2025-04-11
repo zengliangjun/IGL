@@ -1,9 +1,9 @@
 import numpy as np
-from humanoidverse.utils.torch_utils import to_torch
 from humanoidverse.envs.base_task.term.mdp import rewards
 from loguru import logger
 from termcolor import colored
 import torch
+import copy
 
 class LeggedRewardsManager(rewards.BaseRewardsManager):
     def __init__(self, _task):
@@ -12,7 +12,7 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
     # stage 1
     def init(self):
         super(LeggedRewardsManager, self).init()
-        self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
+        #self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
         #self.forward_vec = to_torch([1., 0., 0.], device=self.device).repeat((self.num_envs, 1))
 
         self._collect_rewards()
@@ -34,7 +34,7 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
 
 
         ### step 2
-        self.reward_scales = self.config.rewards.reward_scales
+        self.reward_scales = copy.deepcopy(self.config.rewards.reward_scales)
         # remove zero scales + multiply non-zero ones by dt
         for key in list(self.reward_scales.keys()):
             logger.info(f"Scale: {key} = {self.reward_scales[key]}")
@@ -58,9 +58,9 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
         # prepare list of functions
         self.reward_functions = []
         self.reward_names = []
-        for name, scale in self.reward_scales.items():
+        for key_name, scale in self.reward_scales.items():
 
-            name = '_reward_' + name
+            name = '_reward_' + key_name
             _function = None
             if name in _rewards_functions:
                 _function = _rewards_functions[name]
@@ -69,11 +69,11 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
                 logger.warning(f"Reward invalid: {name}")
                 continue
 
-            if name=="termination":
+            if key_name=="termination":
                 self.reward_termination = _function
                 continue
 
-            self.reward_names.append(name)
+            self.reward_names.append(key_name)
             self.reward_functions.append(_function)
 
         # reward episode sums

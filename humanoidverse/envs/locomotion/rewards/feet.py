@@ -19,12 +19,12 @@ class FeetRewards(feet.FeetRewards):
         # Reward long steps
         # Need to filter the contacts because the contact reporting of PhysX is unreliable on meshes
         feet_manager = self.task.feet_manager
-        commands_manager = self.task.commands_manager
+        command_manager = self.task.command_manager
 
         first_contact = (feet_manager.feet_air_time > self.task.dt) * feet_manager.contact_filt
 
         rew_airTime = torch.sum((feet_manager.feet_air_time - 0.5) * first_contact, dim=1) # reward only on first contact with the ground
-        rew_airTime *= torch.norm(commands_manager.commands[:, :2], dim=1) > 0.1 #no reward for zero command
+        rew_airTime *= torch.norm(command_manager.commands[:, :2], dim=1) > 0.1 #no reward for zero command
 
         return rew_airTime
 
@@ -49,8 +49,8 @@ class FeetRewards(feet.FeetRewards):
         robotdata_manager = self.task.robotdata_manager
         command_manager = self.task.command_manager
 
-        left_quat = self.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[0]]
-        right_quat = self.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[1]]
+        left_quat = self.task.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[0]]
+        right_quat = self.task.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[1]]
 
         forward_left_feet = quat_apply(left_quat, command_manager.forward_vec)
         heading_left_feet = torch.atan2(forward_left_feet[:, 1], forward_left_feet[:, 0])
@@ -70,9 +70,9 @@ class FeetRewards(feet.FeetRewards):
         robotdata_manager = self.task.robotdata_manager
         robotstatus_manager = self.task.robotstatus_manager
 
-        left_quat = self.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[0]]
+        left_quat = self.task.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[0]]
         left_gravity = quat_rotate_inverse(left_quat, robotstatus_manager.gravity_vec)
-        right_quat = self.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[1]]
+        right_quat = self.task.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[1]]
         right_gravity = quat_rotate_inverse(right_quat, robotstatus_manager.gravity_vec)
         return torch.sum(torch.square(left_gravity[:, :2]), dim=1)**0.5 + torch.sum(torch.square(right_gravity[:, :2]), dim=1)**0.5 
 
@@ -80,7 +80,7 @@ class FeetRewards(feet.FeetRewards):
         # Penalize base height away from target
         robotdata_manager = self.task.robotdata_manager
 
-        feet_height = self.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2]
+        feet_height = self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2]
         dif = torch.abs(feet_height - self.config.rewards.feet_height_target)
         dif = torch.min(dif, dim=1).values # [num_env], # select the foot closer to target 
         return torch.clip(dif - 0.02, min=0.) # target - 0.02 ~ target + 0.02 is acceptable 
@@ -90,8 +90,8 @@ class FeetRewards(feet.FeetRewards):
         # returns 1 if two feet are too close
         robotdata_manager = self.task.robotdata_manager
 
-        left_foot_xy = self.simulator._rigid_body_pos[:, robotdata_manager.feet_indices[0], :2]
-        right_foot_xy = self.simulator._rigid_body_pos[:, robotdata_manager.feet_indices[1], :2]
+        left_foot_xy = self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices[0], :2]
+        right_foot_xy = self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices[1], :2]
         feet_distance_xy = torch.norm(left_foot_xy - right_foot_xy, dim=1)
         return (feet_distance_xy < self.config.rewards.close_feet_threshold) * 1.0
 
@@ -99,8 +99,8 @@ class FeetRewards(feet.FeetRewards):
         # returns 1 if two knees are too close
         robotdata_manager = self.task.robotdata_manager
 
-        left_knee_xy = self.simulator._rigid_body_pos[:, robotdata_manager.knee_indices[0], :2]
-        right_knee_xy = self.simulator._rigid_body_pos[:, robotdata_manager.knee_indices[1], :2]
+        left_knee_xy = self.task.simulator._rigid_body_pos[:, robotdata_manager.knee_indices[0], :2]
+        right_knee_xy = self.task.simulator._rigid_body_pos[:, robotdata_manager.knee_indices[1], :2]
         self.knee_distance_xy = torch.norm(left_knee_xy - right_knee_xy, dim=1)
         return (self.knee_distance_xy < self.config.rewards.close_knees_threshold)* 1.0
 

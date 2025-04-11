@@ -20,10 +20,10 @@ class BaseTerrainManager(base.BaseManager):
             self.terrain_levels = torch.randint(0, max_init_level+1, (self.num_envs,), device=self.device)
             self.terrain_types = torch.div(torch.arange(self.num_envs, device=self.device), (self.num_envs/self.config.terrain.num_cols), rounding_mode='floor').to(torch.long)
             self.max_terrain_level = self.config.terrain.num_rows
-            if isinstance(self.simulator.terrain.env_origins, np.ndarray):
-                self.terrain_origins = torch.from_numpy(self.simulator.terrain.env_origins).to(self.device).to(torch.float)
+            if isinstance(self.task.simulator.terrain.env_origins, np.ndarray):
+                self.terrain_origins = torch.from_numpy(self.task.simulator.terrain.env_origins).to(self.device).to(torch.float)
             else:
-                self.terrain_origins = self.simulator.terrain.env_origins.to(self.device).to(torch.float)   
+                self.terrain_origins = self.task.simulator.terrain.env_origins.to(self.device).to(torch.float)   
             self.env_origins[:] = self.terrain_origins[self.terrain_levels, self.terrain_types]
             # import ipdb; ipdb.set_trace()
             # print(self.terrain_origins.shape)

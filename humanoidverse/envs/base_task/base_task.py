@@ -55,29 +55,17 @@ class BaseTask():
         if self.headless == False:
             self.viewer = self.simulator.viewer
 
-    def _init(self):
-        for _key in self.managers:
-            self.managers[_key].init()
-
-    def _post_init(self):
-        for _key in self.managers:
-            self.managers[_key].post_init()
-
-    def _refresh_sim_tensors(self):
-        self.simulator.refresh_sim_tensors()
-        return
-
     def reset_all(self):
         """ Reset all robots"""
-        self.reset_envs_idx(torch.arange(self.num_envs, device=self.device))
+        self._reset(torch.arange(self.num_envs, device=self.device))
         self.simulator.set_actor_root_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.all_root_states)
         self.simulator.set_dof_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.dof_state)
         # self._refresh_env_idx_tensors(torch.arange(self.num_envs, device=self.device))
         assert hasattr(self, "actions_manager")
         actor_state = self.actions_manager.zeros()
         items = self.step(actor_state)
-        assert ('obs_buf_dict' in items)
-        return items['obs_buf_dict']
+        assert ('obs_dict' in items)
+        return items['obs_dict']
 
     # def _refresh_env_idx_tensors(self, env_ids):
     #     env_ids_int32 = env_ids.to(dtype=torch.int32)
@@ -92,9 +80,25 @@ class BaseTask():
         if self.viewer:
             self.simulator.render(sync_frame_time)
 
+    def rand_episode_length(self):
+        if hasattr(self, "episode_manager"):
+            self.episode_manager.rand_episode_length()
+
     ###########################################################################
     #### Helper functions
     ###########################################################################
+    def _init(self):
+        for _key in self.managers:
+            self.managers[_key].init()
+
+    def _post_init(self):
+        for _key in self.managers:
+            self.managers[_key].post_init()
+
+    def _refresh_sim_tensors(self):
+        self.simulator.refresh_sim_tensors()
+        return
+
     def _get_env_origins(self):
         self.terrain_manager.pre_init()
 

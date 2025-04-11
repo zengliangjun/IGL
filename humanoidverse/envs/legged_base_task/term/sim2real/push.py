@@ -5,7 +5,7 @@ import torch
 # from isaacgym import gymtorch, gymapi, gymutil
 from humanoidverse.envs.env_utils.visualization import Point
 
-class LeggedPushManager(base.BaseRobotDataManager):
+class LeggedPushManager(base.BaseManager):
 
     def __init__(self, _task):
         super(LeggedPushManager, self).__init__(_task)

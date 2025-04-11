@@ -1,9 +1,9 @@
-from humanoidverse.envs.legged_base_task.term.mdp import actions
+from humanoidverse.envs.legged_base_task.term.mdp import command
 from humanoidverse.utils.torch_utils import quat_apply, to_torch, torch_rand_float
 from humanoidverse.utils.spatial_utils.rotations import wrap_to_pi
 import torch
 
-class VelocityCommand(actions.LeggedCommandManager):
+class VelocityCommand(command.LeggedCommandManager):
     def __init__(self, _task):
         super(VelocityCommand, self).__init__(_task)
 

@@ -53,7 +53,7 @@ class LeggedActuatorsManager(base.BaseManager):
             [torch.Tensor]: Torques sent to the simulation
         """
         # actions *= 0.
-        # print("self.simulator.dof_vel", self.simulator.dof_vel)
+        # print("self.task.simulator.dof_vel", self.task.simulator.dof_vel)
         # print("actions", actions)
         robotdata_manager = self.task.robotdata_manager
         task = self.task

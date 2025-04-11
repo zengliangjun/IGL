@@ -1,7 +1,7 @@
 from humanoidverse.envs.base_task.term import base
 import torch
 
-class LeggedCommandManager(base.BaseRobotDataManager):
+class LeggedCommandManager(base.BaseManager):
 
     def __init__(self, _task):
         super(LeggedCommandManager, self).__init__(_task)

@@ -13,3 +13,6 @@ class BaseEpisode(base.BaseManager):
         self.episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
         self.time_out_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.bool)
 
+    ## help function
+    def rand_episode_length(self):
+        self.episode_length_buf = torch.randint_like(self.episode_length_buf, high=int(self.max_episode_length))

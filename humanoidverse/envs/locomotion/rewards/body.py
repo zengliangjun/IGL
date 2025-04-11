@@ -13,7 +13,7 @@ class UpperBodyRewards(base.BaseManager):
         robotdata_manager = self.task.robotdata_manager
 
         torso_ang_vel = quat_rotate_inverse(self.task.simulator._rigid_body_rot[:, robotdata_manager.torso_index],
-                                            self.simulator._rigid_body_ang_vel[:, robotdata_manager.torso_index])
+                                            self.task.simulator._rigid_body_ang_vel[:, robotdata_manager.torso_index])
         return torch.sum(torch.square(torso_ang_vel[:, :2]), dim=1)
     
     def _reward_upperbody_joint_angle_freeze(self):
@@ -26,7 +26,7 @@ class UpperBodyRewards(base.BaseManager):
 
     def _reward_base_height(self):
         # Penalize base height away from target
-        base_height = self.simulator.robot_root_states[:, 2]
+        base_height = self.task.simulator.robot_root_states[:, 2]
         return torch.square(base_height - self.config.rewards.desired_base_height)
 
     def _reward_penalty_hip_pos(self):
@@ -35,5 +35,5 @@ class UpperBodyRewards(base.BaseManager):
         robotdata_manager = self.task.robotdata_manager
 
         hips_roll_yaw_indices = robotdata_manager.hips_dof_id[1:3] + robotdata_manager.hips_dof_id[4:6]
-        hip_pos = self.simulator.dof_pos[:, hips_roll_yaw_indices]
+        hip_pos = self.task.simulator.dof_pos[:, hips_roll_yaw_indices]
         return torch.sum(torch.square(hip_pos), dim=1)

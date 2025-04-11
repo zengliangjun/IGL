@@ -31,23 +31,23 @@ class LeggedRobotBase(BaseTask):
         self._post_physics_step()
 
         # stage 3
-        self._compute()
+        self._compute3()
 
         # stage 4
         self._draw_debug_vis()
 
         items = {}
         if hasattr(self, "observations_manager"):
-            items['obs_buf_dict'] = self.observations_manager.obs_buf_dict
+            items['obs_dict'] = self.observations_manager.obs_buf_dict
 
         if hasattr(self, "rewards_manager"):
-            items['rew_buf'] = self.rewards_manager.rew_buf
+            items['rewards'] = self.rewards_manager.rew_buf
 
         if hasattr(self, "episode_manager"):
-            items['reset_buf'] = self.episode_manager.reset_buf
+            items['dones'] = self.episode_manager.reset_buf
 
         if hasattr(self, "extras_manager"):
-            items['extras'] = self.extras_manager.extras
+            items['infos'] = self.extras_manager.extras
 
         return items
 
@@ -70,7 +70,7 @@ class LeggedRobotBase(BaseTask):
         pass
 
     # stage 3
-    def _compute(self):
+    def _compute3(self):
         self._refresh_sim_tensors()
 
         ## 3.1
@@ -98,12 +98,13 @@ class LeggedRobotBase(BaseTask):
         for _key in self.managers:
             self.managers[_key].pre_compute()
 
-    def _reset(self):
+    def _reset(self, _env_ids = None):
         assert hasattr(self, "episode_manager")
-        env_ids = self.episode_manager.reset_env_ids
-        self.need_to_refresh_envs[env_ids] = True
+        if _env_ids is None:
+            _env_ids = self.episode_manager.reset_env_ids
+        self.need_to_refresh_envs[_env_ids] = True
         for _key in self.managers:
-            self.managers[_key].reset(env_ids)
+            self.managers[_key].reset(_env_ids)
 
     def _compute(self):
         for _key in self.managers:
