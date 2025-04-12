@@ -19,7 +19,7 @@ class LeggedActuatorsManager(base.BaseManager):
         ### only for robotdata_manager init
         robotdata_manager = self.task.robotdata_manager
 
-        for i in range(robotdata_manager.num_dofs):
+        for i in range(robotdata_manager.num_dof):
             name = robotdata_manager.dof_names[i]
 
             found = False
@@ -89,12 +89,12 @@ class LeggedActuatorsManager(base.BaseManager):
         if self.config.domain_rand.randomize_pd_gain:
             self._kp_scale[env_ids] = torch_rand_float(self.config.domain_rand.kp_range[0],
                                                        self.config.domain_rand.kp_range[1],
-                                                       (len(env_ids), robotdata_manager.num_dofs), device=self.device)
+                                                       (len(env_ids), robotdata_manager.num_dof), device=self.device)
             self._kd_scale[env_ids] = torch_rand_float(self.config.domain_rand.kd_range[0],
                                                        self.config.domain_rand.kd_range[1],
-                                                       (len(env_ids), robotdata_manager.num_dofs), device=self.device)
+                                                       (len(env_ids), robotdata_manager.num_dof), device=self.device)
 
         if self.config.domain_rand.randomize_rfi_lim:
             self._rfi_lim_scale[env_ids] = torch_rand_float(self.config.domain_rand.rfi_lim_range[0],
                                                             self.config.domain_rand.rfi_lim_range[1],
-                                                            (len(env_ids), robotdata_manager.num_dofs), device=self.device)
+                                                            (len(env_ids), robotdata_manager.num_dof), device=self.device)

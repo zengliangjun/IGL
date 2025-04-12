@@ -13,7 +13,7 @@ class BaseTask():
         # self.simulator = instantiate(config=self.config.simulator, device=device)
         SimulatorClass = get_class(self.config.simulator._target_)
         self.simulator: BaseSimulator = SimulatorClass(config=self.config, device=device)
-        
+
         self.headless = config.headless
         self.simulator.set_headless(self.headless)
         self.simulator.setup()
@@ -31,7 +31,7 @@ class BaseTask():
         # create envs, sim and viewer
         self._load_assets()
         self._get_env_origins()
-        self._create_envs()        
+        self._create_envs()
         # self._create_sim()
         self.simulator.prepare_sim()
         # if running with a viewer, set up keyboard shortcuts and camera
@@ -61,8 +61,14 @@ class BaseTask():
         self.simulator.set_actor_root_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.all_root_states)
         self.simulator.set_dof_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.dof_state)
         # self._refresh_env_idx_tensors(torch.arange(self.num_envs, device=self.device))
-        assert hasattr(self, "actions_manager")
-        actor_state = self.actions_manager.zeros()
+
+        if not hasattr(self, "actions_manager"):
+            actor_state = self.actions_manager.zeros()
+        else:
+            actions = torch.zeros(self.num_envs, self.robotdata_manager.num_dof, device=self.device, requires_grad=False)
+            actor_state = {}
+            actor_state["actions"] = actions
+
         items = self.step(actor_state)
         assert ('obs_dict' in items)
         return items['obs_dict']
@@ -110,14 +116,14 @@ class BaseTask():
         """ Creates environments:
              1. loads the robot URDF/MJCF asset,
              2. For each environment
-                2.1 creates the environment, 
+                2.1 creates the environment,
                 2.2 calls DOF and Rigid shape properties callbacks,
                 2.3 create actor with these properties and add them to the env
              3. Store indices of different bodies of the robot
         """
         # env_config = self.config
-        self.simulator.create_envs(self.num_envs, 
-                                    self.terrain_manager.env_origins, 
+        self.simulator.create_envs(self.num_envs,
+                                    self.terrain_manager.env_origins,
                                     self.robotdata_manager.base_init_state)
     @property
     def namespace(self):

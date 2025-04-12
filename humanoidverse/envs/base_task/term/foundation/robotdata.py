@@ -12,11 +12,13 @@ class BaseRobotDataManager(base.BaseManager):
         self.dof_names = self.task.simulator.dof_names
         self.body_names = self.task.simulator.body_names
         # check dimensions
-        self.task.actions_manager.check(self.num_dof)
+        if hasattr(self.task, "actions_manager"):
+            self.task.actions_manager.check(self.num_dof)
 
         # other properties
         self.num_bodies = len(self.body_names)
-        self.num_dofs = len(self.dof_names)
+        #self.num_dofs = len(self.dof_names)
+        assert len(self.dof_names) == self.num_dof
         base_init_state_list = self.config.robot.init_state.pos + \
                                self.config.robot.init_state.rot + \
                                self.config.robot.init_state.lin_vel + \
@@ -42,20 +44,20 @@ class BaseRobotDataManager(base.BaseManager):
         self.feet_indices = torch.zeros(len(feet_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(feet_names)):
             self.feet_indices[i] = self.task.simulator.find_rigid_body_indice(feet_names[i])
-        
+
         self.knee_indices = torch.zeros(len(knee_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(knee_names)):
             self.knee_indices[i] = self.task.simulator.find_rigid_body_indice(knee_names[i])
 
         self.penalised_contact_indices = torch.zeros(len(penalized_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(penalized_contact_names)):
-            
+
             self.penalised_contact_indices[i] = self.task.simulator.find_rigid_body_indice(penalized_contact_names[i])
 
         self.termination_contact_indices = torch.zeros(len(termination_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(termination_contact_names)):
             self.termination_contact_indices[i] = self.task.simulator.find_rigid_body_indice(termination_contact_names[i])
-            
+
         if self.config.robot.has_upper_body_dof:
             # maintain upper/lower dof idxs
             self.upper_dof_names = self.config.robot.upper_dof_names
