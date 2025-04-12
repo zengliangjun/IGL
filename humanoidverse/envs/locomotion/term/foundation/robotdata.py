@@ -1,5 +1,5 @@
 import torch
-from humanoidverse.envs.legged_base_task.term.assistant import robotdata
+from humanoidverse.envs.legged_base_task.term.foundation import robotdata
 
 
 class LocomotionRobotDataManager(robotdata.LeggedRobotDataManager):

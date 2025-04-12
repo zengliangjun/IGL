@@ -1,5 +1,5 @@
 import torch
-from humanoidverse.envs.base_task.term.statistics import episode
+from humanoidverse.envs.base_task.term.foundation import episode
 
 class LeggedEpisode(episode.BaseEpisode):
     def __init__(self, _task):

@@ -3,33 +3,38 @@ import copy
 
 legged_base_registry = copy.deepcopy(register.registry[register.current_namespace]) #copy.deepcopy(register.baseregistry)
 
-from humanoidverse.envs.legged_base_task.term.assistant import history, robotdata
-legged_base_registry["history_manager"] = history.LeggedHistoryManager
+# level 0
+from humanoidverse.envs.legged_base_task.term.foundation import actuators, episode, robotdata
+legged_base_registry["actuators_manager"] = actuators.LeggedActuatorsManager  # core
+legged_base_registry["episode_manager"] = episode.LeggedEpisode              # core
 legged_base_registry["robotdata_manager"] = robotdata.LeggedRobotDataManager  # core
 
+# level 1
+from humanoidverse.envs.legged_base_task.term.status import feet, robotstatus # status
+legged_base_registry["feet_manager"] = feet.LeggedFeetManager
+legged_base_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
+
+from humanoidverse.envs.legged_base_task.term.assistant import history # assistant
+legged_base_registry["history_manager"] = history.LeggedHistoryManager
+
+
 from humanoidverse.envs.legged_base_task.term.mdp import actions, \
-    actuators, command, contacts, feet, observations, rewards, robotstatus
+    command, observations, rewards                                     # mdp
 
 legged_base_registry["command_manager"] = command.LeggedCommandManager
 legged_base_registry["actions_manager"] = actions.LeggedActionsManager
-legged_base_registry["actuators_manager"] = actuators.LeggedActuatorsManager  # core
-legged_base_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager # core
-
-legged_base_registry["contacts_manager"] = contacts.LeggedContactsManager
-legged_base_registry["feet_manager"] = feet.LeggedFeetManager
-
 legged_base_registry["observations_manager"] = observations.LeggedObservations
 legged_base_registry["rewards_manager"] = rewards.LeggedRewardsManager
 
-
+# level 2
 from humanoidverse.envs.legged_base_task.term.sim2real import push
 legged_base_registry["push_manager"] = push.LeggedPushManager
 
-from humanoidverse.envs.legged_base_task.term.statistics import episode, extras
-legged_base_registry["episode_manager"] = episode.LeggedEpisode              # core
+# level 3
+from humanoidverse.envs.legged_base_task.term.statistics import extras
 legged_base_registry["extras_manager"] = extras.LeggedExtrasManager          # core
 
-######
+
 current_namespace: str  = "legged_base_task"
 register.registry[current_namespace] = legged_base_registry
 

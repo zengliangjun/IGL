@@ -7,7 +7,6 @@ class VelocityCommand(command.LeggedCommandManager):
     def __init__(self, _task):
         super(VelocityCommand, self).__init__(_task)
 
-
     # stage 1
     def init(self):
         super(VelocityCommand, self).init()
@@ -43,6 +42,7 @@ class VelocityCommand(command.LeggedCommandManager):
         )
 
     def reset(self, env_ids):
+        ## TODO need this check?
         #if self.is_evaluating:
         #    return
         self._resample(env_ids)

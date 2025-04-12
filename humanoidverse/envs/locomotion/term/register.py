@@ -3,12 +3,12 @@ from humanoidverse.envs.legged_base_task.term import register as legged_register
 import copy
 
 locomotion_registry = copy.deepcopy(base_register.registry[legged_register.current_namespace])
-
-from humanoidverse.envs.locomotion.term.mdp import command
-locomotion_registry["command_manager"] = command.VelocityCommand
-
-from humanoidverse.envs.locomotion.term.assistant import robotdata
+# level 0
+from humanoidverse.envs.locomotion.term.foundation import robotdata
 locomotion_registry["robotdata_manager"] = robotdata.LocomotionRobotDataManager  # core
+# level 1
+from humanoidverse.envs.locomotion.term.mdp import command  # mdp
+locomotion_registry["command_manager"] = command.VelocityCommand
 
 ######
 current_namespace: str  = "locomotion_task"

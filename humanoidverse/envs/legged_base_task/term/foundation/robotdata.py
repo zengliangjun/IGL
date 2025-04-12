@@ -1,5 +1,5 @@
 import torch
-from humanoidverse.envs.base_task.term.assistant import robotdata
+from humanoidverse.envs.base_task.term.foundation import robotdata
 from humanoidverse.utils.torch_utils import torch_rand_float
 
 class LeggedRobotDataManager(robotdata.BaseRobotDataManager):

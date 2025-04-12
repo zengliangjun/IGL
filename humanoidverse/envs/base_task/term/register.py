@@ -1,6 +1,6 @@
 from humanoidverse.envs.base_task.term import base
-from humanoidverse.envs.base_task.term.statistics import episode, extras
-from humanoidverse.envs.base_task.term.assistant import robotdata, terrain
+from humanoidverse.envs.base_task.term.statistics import extras
+from humanoidverse.envs.base_task.term.foundation import episode, robotdata, terrain
 from humanoidverse.envs.base_task.term.mdp import actions, observations, rewards
 
 baseregistry: dict = {} # [str, base.BaseManager] = {}
