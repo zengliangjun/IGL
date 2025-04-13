@@ -1,6 +1,7 @@
 import torch
 from humanoidverse.simulator.base_simulator.base_simulator import BaseSimulator
 from hydra.utils import instantiate, get_class
+from loguru import logger
 
 # Base class for RL tasks
 class BaseTask():
@@ -46,7 +47,8 @@ class BaseTask():
 
         self._init()
         self._post_init()
-
+        ## flags for policy evaluating
+        self.is_evaluating = False
         ###########################################################################
         #### Jiawei: Should be removed
         ###########################################################################
@@ -87,8 +89,15 @@ class BaseTask():
             self.simulator.render(sync_frame_time)
 
     def rand_episode_length(self):
+        if self.is_evaluating:
+            return
+
         if hasattr(self, "episode_manager"):
             self.episode_manager.rand_episode_length()
+
+    def set_is_evaluating(self):
+        logger.info("Setting Env is evaluating")
+        self.is_evaluating = True
 
     ###########################################################################
     #### Helper functions

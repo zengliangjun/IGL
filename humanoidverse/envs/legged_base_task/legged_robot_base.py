@@ -1,12 +1,10 @@
 import torch
 from humanoidverse.envs.base_task.base_task import BaseTask
-from loguru import logger
 
 class LeggedRobotBase(BaseTask):
     def __init__(self, config, device):
         self.init_done = False
         super().__init__(config, device)
-        self.is_evaluating = False
         self.init_done = True
 
     def _init(self):
@@ -15,9 +13,6 @@ class LeggedRobotBase(BaseTask):
         super()._init()
         self.need_to_refresh_envs = torch.ones(self.num_envs, dtype=torch.bool, device=self.device, requires_grad=False)
 
-    def set_is_evaluating(self):
-        logger.info("Setting Env is evaluating")
-        self.is_evaluating = True
 
     def step(self, actor_state):
         """ Apply actions, simulate, call self.post_physics_step()
