@@ -72,10 +72,15 @@ def main(
                         '+robot=h1/h1_10dof',
                         '+terrain=terrain_locomotion_plane',
                         '+obs=loco/leggedloco_obs_singlestep_withlinvel',
-                        'num_envs=1',
-                        'project_name=TESTInstallation',
                         'experiment_name=H110dof_loco_IsaacGym',
                         'headless=True',
+
+                        #'num_envs=1',
+                        #'project_name=TESTInstallation',
+
+                        'num_envs=4096',
+                        'project_name=HumanoidLocomotion',
+                        'checkpoint=logs/HumanoidLocomotion/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt'
                     ]
                 else:
                     args.overrides = [

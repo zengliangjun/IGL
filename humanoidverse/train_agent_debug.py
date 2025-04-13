@@ -31,7 +31,7 @@ def main(config: OmegaConf):
         import argparse
         parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
         AppLauncher.add_app_launcher_args(parser)
-        
+
         args_cli, hydra_args = parser.parse_known_args()
         sys.argv = [sys.argv[0]] + hydra_args
         args_cli.num_envs = config.num_envs
@@ -39,10 +39,10 @@ def main(config: OmegaConf):
         args_cli.env_spacing = config.env.config.env_spacing # config.env_spacing
         args_cli.output_dir = config.output_dir
         args_cli.headless = config.headless
-        
+
         app_launcher = AppLauncher(args_cli)
-        simulation_app = app_launcher.app  
-        
+        simulation_app = app_launcher.app
+
         # import ipdb; ipdb.set_trace()
     if simulator_type == 'IsaacGym':
         import isaacgym  # noqa: F401
@@ -56,7 +56,7 @@ def main(config: OmegaConf):
     from humanoidverse.agents.base_algo.base_algo import BaseAlgo  # noqa: E402
     from humanoidverse.utils.helpers import pre_process_config
     from humanoidverse.utils.logging import HydraLoggerBridge
-        
+
     # resolve=False is important otherwise overrides
     # at inference time won't work properly
     # also, I believe this must be done before instantiation
@@ -82,15 +82,15 @@ def main(config: OmegaConf):
         wandb_dir = Path(config.wandb.wandb_dir)
         wandb_dir.mkdir(exist_ok=True, parents=True)
         logger.info(f"Saving wandb logs to {wandb_dir}")
-        wandb.init(project=project_name, 
+        wandb.init(project=project_name,
                 entity=config.wandb.wandb_entity,
                 name=run_name,
                 sync_tensorboard=True,
                 config=unresolved_conf,
                 dir=wandb_dir)
 
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    
+    device = "cuda:1" if torch.cuda.is_available() else "cpu"
+
     pre_process_config(config)
 
     # torch.set_float32_matmul_precision("medium")

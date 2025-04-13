@@ -17,7 +17,7 @@ class BaseManager():
         self.task = _task                 # 任务/环境实例对像 （BaseTask 子类）
         self.num_envs = _task.num_envs    # 环境实例数
         self.device = _task.device        # 仿真环境运行设备
-        self.config = _task.config        # 
+        self.config = _task.config        #
 
     # 第一阶段，初始化阶段
     def pre_init(self):
@@ -94,7 +94,7 @@ class BaseManager():
         '''
         pass
 
-    # 第四阶段，运行计算阶段
+    # 第四阶段，调试显示阶段
     def draw_debug_vis(self):
     	'''
         子模块绘制debug显示实现
@@ -106,39 +106,39 @@ class BaseManager():
 
 <details>
 <summary>生命周期不同阶段</summary>
- 
-- init 初始化阶段    
-- physics_step 仿真运行阶段  
-- compute 计算阶段  
-  
+
+- init 初始化阶段
+- physics_step 仿真运行阶段
+- compute 计算阶段
+
 </details>
 
 <details>
 <summary>依赖情况分别处理</summary>
- 
-- pre 被依赖，提前处理  
--  不依赖(依赖)  
-- post 依赖,最后处理  
-  
-将模块互相关系错开，尽可能不产生冲突  
+
+- pre 被依赖，提前处理
+-  不依赖(依赖)
+- post 依赖,最后处理
+
+将模块互相关系错开，尽可能不产生冲突
 </details>
 
 <details>
 <summary>特殊接口</summary>
- 
-- check_termination 仅被 episode模块实现，用于计算环境是否终止 
+
+- check_termination 仅被 episode模块实现，用于计算环境是否终止
 - compute_reward 目前仅被 rewards模块实现，用于计算reward
 </details>
 
 
 ## register
 
-所有子模块均通过注册的方式被 [BaseTask](humanoidverse/envs/base_task/base_task.py)创建  
-如 [register](humanoidverse/envs/locomotion/term/register.py) 
+所有子模块均通过注册的方式被 [BaseTask](humanoidverse/envs/base_task/base_task.py)创建
+如 [register](humanoidverse/envs/locomotion/term/register.py)
 
 <details>
 <summary>子模块管理</summary>
- 
+
 - foundation 核心类子模块 最高级别
 - status 状态类子模块
 - assistant 输助类子模块
@@ -187,7 +187,7 @@ class BaseComponent():
         pass
 
     # 第二阶段
-    # level 0 
+    # level 0
     def pre_loop(self, _inputs = None):
     	'''
         循环前处理调用
@@ -253,7 +253,7 @@ class BaseComponent():
     '''
     def write(self, writer, _it):
         pass
-        
+
 
     '''
     仅适用于需要输出日志的组件
@@ -268,8 +268,8 @@ class BaseComponent():
 <details>
 
 <summary>生命周期不同阶段</summary>
- 
-- init 初始化阶段    
+
+- init 初始化阶段
 - loop 第一级循环
 - epoch 第二级循环（一个训练周期)
 - step  第三级（一个训练/数据收集步)
@@ -278,14 +278,14 @@ class BaseComponent():
 
 ## register
 
-所有子模块均通过注册的方式被 [BaseAlgo](humanoidverse/agents/base_algo/base_algo.py)创建  
-如 [register](humanoidverse/agents/ppo/register.py) 
-  
-目前分为以下类  
+所有子模块均通过注册的方式被 [BaseAlgo](humanoidverse/agents/base_algo/base_algo.py)创建
+如 [register](humanoidverse/agents/ppo/register.py)
+
+目前分为以下类
 
 <details>
 <summary>logic</summary>
- 
+
 - evaluater 评估子模块
 - rollout 回放子模块
 - statistics 输助(统计)子模块
@@ -295,7 +295,7 @@ class BaseComponent():
 
 <details>
 <summary>component</summary>
- 
+
 - envwarp task封装子模块
 - modules 模型子模块
 - optimizer 优化器子模块
@@ -303,12 +303,21 @@ class BaseComponent():
 </details>
 
 
-  
-      
+
+
 # Citation
 Please use the following bibtex if you find this repo helpful and would like to cite:
 
 ```bibtex
+@misc{HumanoidVerse2,
+  author = {liangjun},
+  title = {HumanoidVerse2: A Multi-Simulator Framework with Modular Design for Humanoid Robot Sim-to-Real Learning},
+  year = {2025},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/zengliangjun/HumanoidVerse2}},
+}
+
 @misc{HumanoidVerse,
   author = {CMU LeCAR Lab},
   title = {HumanoidVerse: A Multi-Simulator Framework for Humanoid Robot Sim-to-Real Learning},
