@@ -13,17 +13,13 @@ class BaseManager():
         pass
 
     def init(self):
-        # init buffer data
         pass
 
-    #def init_domain_rand(self):
     def post_init(self):
-        # init domain rand data
         pass
 
     # stage 2
     def pre_physics_step(self, actions):
-        # actions, actuators
         pass
 
     def physics_step(self):
@@ -34,8 +30,6 @@ class BaseManager():
 
     # stage 3
     # compute
-    ## post_physics_step
-    #def pre_compute_observations(self):
     def pre_compute(self):
         pass
 
@@ -52,11 +46,9 @@ class BaseManager():
     def reset(self, env_ids):
         pass
 
-    #def compute_observations(self):
     def compute(self):
         pass
 
-    #def post_compute_observations(self):
     def post_compute(self):
         pass
 

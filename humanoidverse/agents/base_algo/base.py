@@ -60,7 +60,20 @@ class BaseComponent():
         pass
 
     '''
-    for save state
+    for write state
     '''
     def write(self, writer, _it):
         pass
+
+    '''
+    for write state
+    '''
+    def write(self, writer, _it):
+        pass
+
+    '''
+    only for omponent which need to output log
+    def log_epoch(self, width, pad):
+        pass
+
+    '''
