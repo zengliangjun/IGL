@@ -10,6 +10,9 @@ locomotion_registry["robotdata_manager"] = robotdata.LocomotionRobotDataManager 
 from humanoidverse.envs.locomotion.term.mdp import command  # mdp
 locomotion_registry["command_manager"] = command.VelocityCommand
 
+from humanoidverse.envs.locomotion.term.status import feet  # mdp
+locomotion_registry["feet_manager"] = feet.LeggedFeetManager
+
 ######
 current_namespace: str  = "locomotion_task"
 base_register.registry[current_namespace] = locomotion_registry

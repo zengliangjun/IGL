@@ -13,9 +13,6 @@ class LeggedFeetManager(base.BaseManager):
         self.contacts = torch.zeros(self.num_envs, len(robotdata_manager.feet_indices), dtype=torch.bool, device=self.device, requires_grad=False)
         self.contacts_filt = torch.zeros(self.num_envs, len(robotdata_manager.feet_indices), dtype=torch.bool, device=self.device, requires_grad=False)
 
-        ###
-        self.feet_air_time = torch.zeros(self.num_envs, robotdata_manager.feet_indices.shape[0],
-                                         dtype=torch.float, device=self.device, requires_grad=False)
 
         self.feet_air_max_height = torch.zeros(self.num_envs, robotdata_manager.feet_indices.shape[0],
                                                dtype=torch.float, device=self.device, requires_grad=False)
@@ -30,20 +27,14 @@ class LeggedFeetManager(base.BaseManager):
         self.contacts = contact
         self.contact_filt = contact_filt
 
-        self.feet_air_time += self.task.dt  ## TODO update here
         ## max_height
         self.feet_air_max_height = torch.max(self.feet_air_max_height, \
                                              self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2])
 
     def post_compute(self):
-        self.feet_air_time *= ~self.contact_filt
         self.feet_air_max_height *= ~self.contact_filt
         self.last_contacts_filt = self.contact_filt
 
-    def reset(self, env_ids):
-        if len(env_ids) == 0:
-            return
-        self.feet_air_time[env_ids] = 0.
 
     ######################### Observations #########################
     def _get_obs_feet_contact_force(self,):
