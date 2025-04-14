@@ -19,6 +19,7 @@ class LeggedStatusManager(base.BaseManager):
         self.base_ang_vel = quat_rotate_inverse(self.base_quat, self.task.simulator.robot_root_states[:, 10:13])
         self.projected_gravity = quat_rotate_inverse(self.base_quat, self.gravity_vec)
 
+        self.last_dof_pos = torch.zeros_like(self.task.simulator.dof_pos)
         self.last_dof_vel = torch.zeros_like(self.task.simulator.dof_vel)
         self.last_root_vel = torch.zeros_like(self.task.simulator.robot_root_states[:, 7:13])
 
@@ -36,9 +37,11 @@ class LeggedStatusManager(base.BaseManager):
     def reset(self, env_ids):
         if len(env_ids) == 0:
             return
+        self.last_dof_pos[env_ids] = 0.
         self.last_dof_vel[env_ids] = 0.
 
     def post_compute(self):
+        self.last_dof_pos[:] = self.task.simulator.dof_pos[:]
         self.last_dof_vel[:] = self.task.simulator.dof_vel[:]
         self.last_root_vel[:] = self.task.simulator.robot_root_states[:, 7:13]
 
@@ -54,3 +57,9 @@ class LeggedStatusManager(base.BaseManager):
 
     def _get_obs_dof_vel(self,):
         return self.task.simulator.dof_vel
+
+    def _get_obs_dof_pos(self,):
+        return self.task.simulator.dof_pos - self.default_dof_pos
+
+    def _get_obs_base_pos_z(self,):
+        return self.simulator.robot_root_states[:, 2:3]

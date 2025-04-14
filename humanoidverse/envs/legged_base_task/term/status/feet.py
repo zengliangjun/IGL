@@ -44,3 +44,8 @@ class LeggedFeetManager(base.BaseManager):
         if len(env_ids) == 0:
             return
         self.feet_air_time[env_ids] = 0.
+
+    ######################### Observations #########################
+    def _get_obs_feet_contact_force(self,):
+        return self.simulator.contact_forces[:, self.feet_indices, :].view(self.num_envs, -1)
+

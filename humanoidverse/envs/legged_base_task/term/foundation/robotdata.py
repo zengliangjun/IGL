@@ -38,7 +38,3 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
 
         self.task.simulator.robot_root_states[env_ids, 7:13] = torch_rand_float(-0.5, 0.5, (len(env_ids), 6), device=str(self.device)) # [7:10]: lin vel, [10:13]: ang vel
 
-
-    ######################### Observations #########################
-    def _get_obs_dof_pos(self,):
-        return self.task.simulator.dof_pos - self.default_dof_pos
