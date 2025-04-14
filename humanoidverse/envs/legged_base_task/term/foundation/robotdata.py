@@ -19,6 +19,12 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
         self.default_dof_pos = self.default_dof_pos.unsqueeze(0)
 
         ### TODO
+        if self.config.robot.get("upper_left_arm_dof_names", None):
+            self.upper_left_arm_dof_names = self.config.robot.upper_left_arm_dof_names
+            self.upper_right_arm_dof_names = self.config.robot.upper_right_arm_dof_names
+            self.upper_left_arm_dof_indices = [self.dof_names.index(dof) for dof in self.upper_left_arm_dof_names]
+            self.upper_right_arm_dof_indices = [self.dof_names.index(dof) for dof in self.upper_right_arm_dof_names]
+
         if self.config.robot.motion.get("hips_link", None):
             self.hips_dof_id = [self.task.simulator._body_list.index(link) - 1 for link in self.config.robot.motion.hips_link] # Yuanhang: -1 for the base link (pelvis)
             logger.info("Yuanhang: -1 for the base link (pelvis)")

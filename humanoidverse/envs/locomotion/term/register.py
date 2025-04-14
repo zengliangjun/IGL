@@ -6,17 +6,12 @@ import copy
 locomotion_registry = copy.deepcopy(base_register.registry[legged_register.current_namespace])
 # level 0
 
-
 # level 1
 from humanoidverse.envs.locomotion.term.mdp import command  # mdp
 locomotion_registry["command_manager"] = command.VelocityCommand
 
 from humanoidverse.envs.locomotion.term.status import feet  # mdp
 locomotion_registry["feet_manager"] = feet.LeggedFeetManager
-
-######
-current_namespace: str  = "locomotion_task"
-base_register.registry[current_namespace] = locomotion_registry
 
 ############ REWARDS ############
 locomotion_rewards_registry = copy.deepcopy(base_register.rewards_registry[legged_register.current_namespace])
@@ -25,5 +20,19 @@ from humanoidverse.envs.locomotion.rewards import command, feet
 locomotion_rewards_registry['command_rewards'] = command.CommandRewards
 locomotion_rewards_registry['feet_rewards'] = feet.FeetRewards
 
+####################################
+current_namespace: str  = "locomotion_task"
+base_register.registry[current_namespace] = locomotion_registry
 base_register.rewards_registry[current_namespace] = locomotion_rewards_registry
 
+####################################
+gait_namespace: str  = "gait_locomotion_task"
+
+
+############ REWARDS ############
+gait_rewards_registry = copy.deepcopy(locomotion_rewards_registry)
+from humanoidverse.envs.locomotion.rewards import feet_gait
+gait_rewards_registry['gait_rewards'] = feet_gait.GaitRewards
+
+base_register.registry[gait_namespace] = locomotion_registry
+base_register.rewards_registry[gait_namespace] = gait_rewards_registry

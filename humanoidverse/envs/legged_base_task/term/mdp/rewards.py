@@ -128,8 +128,11 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
         if self.use_reward_penalty_curriculum:
             assert hasattr(self.task, "extras_manager")
             extras_manager = self.task.extras_manager
+            assert hasattr(self.task, "episode_manager")
+            episode_manager = self.task.episode_manager
+
             extras_manager.log_dict["penalty_scale"] = torch.tensor(self.reward_penalty_scale, dtype=torch.float)
-            extras_manager.log_dict["average_episode_length"] = self.average_episode_length
+            extras_manager.log_dict["average_episode_length"] = episode_manager.average_episode_length
 
     def reset(self, env_ids):
         # fill extras

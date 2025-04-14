@@ -93,3 +93,12 @@ class FeetRewards(base.BaseManager):
         dif = torch.abs(feet_height - self.config.rewards.feet_height_target)
         dif = torch.min(dif, dim=1).values # [num_env], # select the foot closer to target
         return torch.clip(dif - 0.02, min=0.) # target - 0.02 ~ target + 0.02 is acceptable
+
+    ## feet swing height
+    def _reward_penalty_feet_swing_height(self):
+        robotdata_manager = self.task.robotdata_manager
+
+        contact = torch.norm(self.task.simulator.contact_forces[:, robotdata_manager.feet_indices, :3], dim=2) > 1.
+        feet_height = self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2]
+        height_error = torch.square(feet_height - self.config.rewards.feet_height_target) * ~contact
+        return torch.sum(height_error, dim=(1))
