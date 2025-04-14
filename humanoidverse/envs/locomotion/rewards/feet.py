@@ -1,7 +1,7 @@
 import torch
 from humanoidverse.envs.legged_base_task.rewards import feet
 from humanoidverse.utils.torch_utils import quat_rotate_inverse, quat_apply
-from humanoidverse.utils.spatial_utils.rotations import wrap_to_pi
+from isaac_utils.rotations import wrap_to_pi
 
 class FeetRewards(feet.FeetRewards):
     def __init__(self, _task):
@@ -63,7 +63,7 @@ class FeetRewards(feet.FeetRewards):
 
         heading_diff_left = torch.abs(wrap_to_pi(heading_left_feet - heading_root))
         heading_diff_right = torch.abs(wrap_to_pi(heading_right_feet - heading_root))
-        
+
         return heading_diff_left + heading_diff_right
 
     def _reward_penalty_feet_ori(self):
@@ -74,7 +74,7 @@ class FeetRewards(feet.FeetRewards):
         left_gravity = quat_rotate_inverse(left_quat, robotstatus_manager.gravity_vec)
         right_quat = self.task.simulator._rigid_body_rot[:, robotdata_manager.feet_indices[1]]
         right_gravity = quat_rotate_inverse(right_quat, robotstatus_manager.gravity_vec)
-        return torch.sum(torch.square(left_gravity[:, :2]), dim=1)**0.5 + torch.sum(torch.square(right_gravity[:, :2]), dim=1)**0.5 
+        return torch.sum(torch.square(left_gravity[:, :2]), dim=1)**0.5 + torch.sum(torch.square(right_gravity[:, :2]), dim=1)**0.5
 
     def _reward_penalty_feet_height(self):
         # Penalize base height away from target
@@ -82,8 +82,8 @@ class FeetRewards(feet.FeetRewards):
 
         feet_height = self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2]
         dif = torch.abs(feet_height - self.config.rewards.feet_height_target)
-        dif = torch.min(dif, dim=1).values # [num_env], # select the foot closer to target 
-        return torch.clip(dif - 0.02, min=0.) # target - 0.02 ~ target + 0.02 is acceptable 
+        dif = torch.min(dif, dim=1).values # [num_env], # select the foot closer to target
+        return torch.clip(dif - 0.02, min=0.) # target - 0.02 ~ target + 0.02 is acceptable
 
     ## close
     def _reward_penalty_close_feet_xy(self):

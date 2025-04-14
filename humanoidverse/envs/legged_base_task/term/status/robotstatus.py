@@ -1,5 +1,5 @@
 from humanoidverse.utils.torch_utils import to_torch, get_axis_params, quat_rotate_inverse
-from humanoidverse.utils.spatial_utils.rotations import get_euler_xyz_in_tensor
+from isaac_utils.rotations import get_euler_xyz_in_tensor
 from humanoidverse.envs.base_task.term import base
 import torch
 

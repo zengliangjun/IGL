@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor
 import torch.nn.functional as F
-from humanoidverse.utils.spatial_utils.maths import (
+from isaac_utils.maths import (
     normalize,
     copysign,
 )
@@ -364,7 +364,10 @@ def quat_pos(x):
     return q
 
 
-
+@torch.jit.script
+def is_valid_quat(q):
+    x, y, z, w = q[..., 0], q[..., 1], q[..., 2], q[..., 3]
+    return (w * w + x * x + y * y + z * z).allclose(torch.ones_like(w))
 
 @torch.jit.script
 def quat_normalize(q):

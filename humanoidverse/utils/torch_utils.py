@@ -1,3 +1,13 @@
+"""
+Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.
+
+NVIDIA CORPORATION and its licensors retain all intellectual property
+and proprietary rights in and to this software, related documentation
+and any modifications thereto. Any use, reproduction, disclosure or
+distribution of this software and related documentation without an express
+license agreement from NVIDIA CORPORATION is strictly prohibited.
+"""
+
 import torch
 import numpy as np
 
@@ -58,7 +68,7 @@ def quat_rotate(q, v):
     return a + b + c
 
 
-@torch.jit.script
+# @torch.jit.script
 def quat_rotate_inverse(q, v):
     shape = q.shape
     q_w = q[:, -1]
@@ -66,8 +76,7 @@ def quat_rotate_inverse(q, v):
     a = v * (2.0 * q_w ** 2 - 1.0).unsqueeze(-1)
     b = torch.cross(q_vec, v, dim=-1) * q_w.unsqueeze(-1) * 2.0
     c = q_vec * \
-        torch.bmm(q_vec.view(shape[0], 1, 3), v.view(
-            shape[0], 3, 1)).squeeze(-1) * 2.0
+        torch.bmm(q_vec.view(shape[0], 1, 3), v.view(shape[0], 3, 1)).squeeze(-1) * 2.0
     return a - b + c
 
 

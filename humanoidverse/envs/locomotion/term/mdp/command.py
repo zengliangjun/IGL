@@ -1,6 +1,6 @@
 from humanoidverse.envs.legged_base_task.term.mdp import command
 from humanoidverse.utils.torch_utils import quat_apply, to_torch, torch_rand_float
-from humanoidverse.utils.spatial_utils.rotations import wrap_to_pi
+from isaac_utils.rotations import wrap_to_pi
 import torch
 
 class VelocityCommand(command.LeggedCommandManager):
@@ -23,7 +23,7 @@ class VelocityCommand(command.LeggedCommandManager):
         """ Callback called before computing terminations, rewards, and observations
             Default behaviour: Compute ang vel command based on target and heading, compute measured terrain heights and randomly push robots
         """
-        # 
+        #
         # commands
         episode_manager = self.task.episode_manager
         robotstatus_manager = self.task.robotstatus_manager
@@ -36,8 +36,8 @@ class VelocityCommand(command.LeggedCommandManager):
         forward = quat_apply(robotstatus_manager.base_quat, self.forward_vec)
         heading = torch.atan2(forward[:, 1], forward[:, 0])
         self.commands[:, 2] = torch.clip(
-            0.5 * wrap_to_pi(self.commands[:, 3] - heading), 
-            self.command_ranges["ang_vel_yaw"][0], 
+            0.5 * wrap_to_pi(self.commands[:, 3] - heading),
+            self.command_ranges["ang_vel_yaw"][0],
             self.command_ranges["ang_vel_yaw"][1]
         )
 
