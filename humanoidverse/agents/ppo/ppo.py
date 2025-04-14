@@ -6,7 +6,7 @@ import time
 import os
 from loguru import logger
 
-class PPO(base_algo.BaseAlgo):
+class BasePPO(base_algo.BaseAlgo):
 
     def __init__(self, env: BaseTask, config, log_dir=None, device='cpu'):
 
@@ -18,7 +18,7 @@ class PPO(base_algo.BaseAlgo):
         self.num_steps_per_env = config.num_steps_per_env
         self.num_learning_iterations = config.num_learning_iterations
 
-        super(PPO, self).__init__(env, config, device)
+        super(BasePPO, self).__init__(env, config, device)
 
     def setup(self):
         # import ipdb; ipdb.set_trace()
@@ -163,7 +163,25 @@ class PPO(base_algo.BaseAlgo):
             "critic": self.modules_component.critic
         }
 
+
+## for trainer
+class PPOTrainer(BasePPO):
+
+    def __init__(self, env: BaseTask, config, log_dir=None, device='cpu'):
+        super(PPOTrainer, self).__init__(env, config, log_dir, device)
+
     @property
     def namespace(self):
         from humanoidverse.agents.ppo import register
         return register.trainer_namespace
+
+## for evaluater
+class PPOEvaluater(BasePPO):
+
+    def __init__(self, env: BaseTask, config, log_dir=None, device='cpu'):
+        super(PPOEvaluater, self).__init__(env, config, log_dir, device)
+
+    @property
+    def namespace(self):
+        from humanoidverse.agents.ppo import register
+        return register.evaluater_namespace

@@ -21,5 +21,7 @@ ppo_evaluater_registry["envwarp_component"] = envwarp.EnvWarp
 ppo_evaluater_registry["modules_component"] = modules.Modules # moduler
 
 trainer_namespace: str  = "ppo_trainer"
+evaluater_namespace: str  = "ppo_evaluater"
 ################################################
 register.registry[trainer_namespace] = ppo_trainer_registry
+register.registry[evaluater_namespace] = ppo_evaluater_registry

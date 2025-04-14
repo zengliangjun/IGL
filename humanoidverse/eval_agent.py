@@ -106,7 +106,7 @@ def main(override_config: OmegaConf):
             config = OmegaConf.merge(config, eval_overrides)
         else:
             config = override_config
-            
+
     simulator_type = config.simulator['_target_'].split('.')[-1]
     if simulator_type == 'IsaacSim':
         from omni.isaac.lab.app import AppLauncher
@@ -128,7 +128,7 @@ def main(override_config: OmegaConf):
         sys.argv = [sys.argv[0]] + hydra_args
     if simulator_type == 'IsaacGym':
         import isaacgym
-        
+
     from humanoidverse.agents.base_algo.base_algo import BaseAlgo  # noqa: E402
     from humanoidverse.utils.helpers import pre_process_config
     import torch
@@ -154,6 +154,9 @@ def main(override_config: OmegaConf):
     key_listener_thread = threading.Thread(target=listen_for_keypress, args=(env,))
     key_listener_thread.daemon = True
     key_listener_thread.start()
+
+    ## update with postfix
+    config.algo._target_ = config.algo._target_ + "Evaluater"
 
     algo: BaseAlgo = instantiate(config.algo, env=env, device=device, log_dir=None)
     algo.setup()

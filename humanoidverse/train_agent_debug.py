@@ -115,6 +115,9 @@ def main(config: OmegaConf):
     with open(experiment_save_dir / "config.yaml", "w") as file:
         OmegaConf.save(unresolved_conf, file)
 
+    ## update with postfix
+    config.algo._target_ = config.algo._target_ + "Trainer"
+
     algo: BaseAlgo = instantiate(device=device, env=env, config=config.algo, log_dir=experiment_save_dir)
     algo.setup()
     # import ipdb;    ipdb.set_trace()
