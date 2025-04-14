@@ -304,6 +304,41 @@ class BaseComponent():
 
 
 
+```bash
+HYDRA_FULL_ERROR=1 humanoidverse/train_agent.py \
++simulator=isaacgym \
++exp=locomotion \
++domain_rand=NO_domain_rand \
++rewards=loco/reward_h1_locomotion \
++robot=h1/h1_10dof \
++terrain=terrain_locomotion_plane \
++obs=loco/leggedloco_obs_singlestep_withlinvel \
+num_envs=4096 \
+project_name=HumanoidLocomotion \
+experiment_name=H110dof_loco_IsaacGym \
+headless=True
+
+```
+  
+  
+  
+```bash
+HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
++simulator=isaacgym \
++exp=locomotion \
++domain_rand=NO_domain_rand \
++rewards=loco/reward_g1_locomotion \
++robot=g1/g1_29dof_anneal_23dof \
++terrain=terrain_locomotion_plane \
++obs=loco/leggedloco_obs_singlestep_withlinvel \
+num_envs=4096 \
+project_name=TestIsaacGymInstallation \
+experiment_name=G123dof_loco \
+headless=True \
+rewards.reward_penalty_curriculum=True \
+rewards.reward_initial_penalty_scale=0.1 \
+rewards.reward_penalty_degree=0.00003
+```
 
 # Citation
 Please use the following bibtex if you find this repo helpful and would like to cite:
