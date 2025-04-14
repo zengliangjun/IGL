@@ -1,6 +1,7 @@
 import torch
 from humanoidverse.envs.base_task.term.foundation import robotdata
 from humanoidverse.utils.torch_utils import torch_rand_float
+from loguru import logger
 
 class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
     def __init__(self, _task):
@@ -16,6 +17,11 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
             angle = self.config.robot.init_state.default_joint_angles[name]
             self.default_dof_pos[i] = angle
         self.default_dof_pos = self.default_dof_pos.unsqueeze(0)
+
+        ### TODO
+        if self.config.robot.motion.get("hips_link", None):
+            self.hips_dof_id = [self.task.simulator._body_list.index(link) - 1 for link in self.config.robot.motion.hips_link] # Yuanhang: -1 for the base link (pelvis)
+            logger.info("Yuanhang: -1 for the base link (pelvis)")
 
     # stage 3
     def reset(self, env_ids):

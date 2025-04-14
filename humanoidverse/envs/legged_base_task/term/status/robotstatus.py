@@ -52,14 +52,15 @@ class LeggedStatusManager(base.BaseManager):
     def _get_obs_base_ang_vel(self):
         return self.base_ang_vel
 
-    def _get_obs_projected_gravity(self,):
+    def _get_obs_projected_gravity(self):
         return self.projected_gravity
 
-    def _get_obs_dof_vel(self,):
+    def _get_obs_dof_vel(self):
         return self.task.simulator.dof_vel
 
-    def _get_obs_dof_pos(self,):
-        return self.task.simulator.dof_pos - self.default_dof_pos
+    def _get_obs_dof_pos(self):
+        robotdata_manager = self.task.robotdata_manager
+        return self.task.simulator.dof_pos - robotdata_manager.default_dof_pos
 
-    def _get_obs_base_pos_z(self,):
+    def _get_obs_base_pos_z(self):
         return self.simulator.robot_root_states[:, 2:3]

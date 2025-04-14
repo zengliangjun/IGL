@@ -46,12 +46,14 @@ register.registry[current_namespace] = legged_base_registry
 
 ############ REWARDS ############
 legged_base_rewards_registry = {}
-from humanoidverse.envs.legged_base_task.rewards import actions, actuators, episode, feet, robotdata, robotstatus
+from humanoidverse.envs.legged_base_task.rewards import actions, actuators, body, episode, feet, robotstatus
 legged_base_rewards_registry['actions_rewards'] = actions.ActionsRewards
 legged_base_rewards_registry['actuators_rewards'] = actuators.ActuatorsRewards
 legged_base_rewards_registry['episode_rewards'] = episode.EpisodeRewards
-legged_base_rewards_registry['feet_rewards'] = feet.FeetRewards
-legged_base_rewards_registry['robotdata_rewards'] = robotdata.RobotDataRewards
+
 legged_base_rewards_registry['robotstatus_rewards'] = robotstatus.StatusRewards
+legged_base_rewards_registry['feet_rewards'] = feet.FeetRewards
+legged_base_rewards_registry['body_rewards'] = body.UpperBodyRewards
+
 register.rewards_registry[current_namespace] = legged_base_rewards_registry
 
