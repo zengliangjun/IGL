@@ -68,7 +68,7 @@ class GaitRewards(base.BaseManager):
         phase_time = (episode_length_np * self.task.dt + self.phi_offset) % self.T / self.T
         return phase_time
 
-    def _reward_contact(self):
+    def _reward_gait_contact(self):
         robotdata_manager = self.task.robotdata_manager
 
         res = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)

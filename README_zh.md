@@ -339,6 +339,7 @@ rewards.reward_penalty_curriculum=True \
 rewards.reward_initial_penalty_scale=0.1 \
 rewards.reward_penalty_degree=0.00003
 ```
+  
 
 # Citation
 Please use the following bibtex if you find this repo helpful and would like to cite:
@@ -352,6 +353,16 @@ Please use the following bibtex if you find this repo helpful and would like to 
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/zengliangjun/HumanoidVerse2}},
 }
+
+
+bibtex
+@article{he2025asap,
+  title={ASAP: Aligning Simulation and Real-World Physics for Learning Agile Humanoid Whole-Body Skills},
+  author={He, Tairan and Gao, Jiawei and Xiao, Wenli and Zhang, Yuanhang and Wang, Zi and Wang, Jiashun and Luo, Zhengyi and He, Guanqi and Sobanbabu, Nikhil and Pan, Chaoyi and Yi, Zeji and Qu, Guannan and Kitani, Kris and Hodgins, Jessica and Fan, Linxi "Jim" and Zhu, Yuke and Liu, Changliu and Shi, Guanya},
+  journal={arXiv preprint arXiv:2502.01143},
+  year={2025}
+}
+
 
 @misc{HumanoidVerse,
   author = {CMU LeCAR Lab},

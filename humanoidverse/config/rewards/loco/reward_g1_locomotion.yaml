@@ -19,7 +19,7 @@ rewards:
       penalty_action_rate: -0.01
       # penalty_feet_contact_forces: -0.01
       # penalty_stumble: -10.0
-      penalty_slippage: -1.0
+      enalty_feet_slippage: -1.0
       penalty_feet_ori: -2.0
       limits_dof_pos: -10.0
       # limits_dof_vel: -5.0
@@ -95,7 +95,7 @@ rewards:
     "penalty_action_rate",
     "penalty_feet_contact_forces",
     "penalty_stumble",
-    "penalty_slippage",
+    "enalty_feet_slippage",
     "penalty_feet_ori",
     "penalty_in_the_air",
     "limits_dof_pos",
