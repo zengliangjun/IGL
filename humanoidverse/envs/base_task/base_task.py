@@ -30,8 +30,10 @@ class BaseTask():
 
         self._setup_manager()
         # create envs, sim and viewer
-        self._load_assets()
-        self._get_env_origins()
+        self.simulator.load_assets()
+
+        self._pre_init()
+
         self._create_envs()
         # self._create_sim()
         self.simulator.prepare_sim()
@@ -102,6 +104,10 @@ class BaseTask():
     ###########################################################################
     #### Helper functions
     ###########################################################################
+    def _pre_init(self):
+        for _key in self.managers:
+            self.managers[_key].pre_init()
+
     def _init(self):
         for _key in self.managers:
             self.managers[_key].init()
@@ -113,13 +119,6 @@ class BaseTask():
     def _refresh_sim_tensors(self):
         self.simulator.refresh_sim_tensors()
         return
-
-    def _get_env_origins(self):
-        self.terrain_manager.pre_init()
-
-    def _load_assets(self):
-        self.simulator.load_assets()
-        self.robotdata_manager.pre_init()
 
     def _create_envs(self):
         """ Creates environments:

@@ -9,19 +9,35 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
     def __init__(self, _task):
         super(LeggedRewardsManager, self).__init__(_task)
 
+
+    # stage 1
+    def pre_init(self):
+        super(LeggedRewardsManager, self).pre_init()
+        self._collect_rewards()
+        for _name in self.rewards_dict:
+            _rewards = self.rewards_dict[_name]
+            _rewards.pre_init()
+
     # stage 1
     def init(self):
         super(LeggedRewardsManager, self).init()
         #self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
         #self.forward_vec = to_torch([1., 0., 0.], device=self.device).repeat((self.num_envs, 1))
+        for _name in self.rewards_dict:
+            _rewards = self.rewards_dict[_name]
+            _rewards.init()
+            #setattr(self, _name, _rewards)
 
-        self._collect_rewards()
 
     def post_init(self):
         """ Prepares a list of reward functions, whcih will be called to compute the total reward.
             Looks for self._reward_<REWARD_NAME>, where <REWARD_NAME> are names of all non zero reward scales in the cfg.
         """
         logger.info(colored(f"{self.config.rewards.set_reward} set reward on {self.config.rewards.set_reward_date}", "green"))
+
+        for _name in self.rewards_dict:
+            _rewards = self.rewards_dict[_name]
+            _rewards.post_init()
 
         ### step 1 collect functions
         _rewards_functions = {}
@@ -171,4 +187,4 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
         for _name in _registry:
             _rewards = _registry[_name](self.task)
             self.rewards_dict[_name] = _rewards
-            #setattr(self, _name, _rewards)
+            setattr(self, _name, _rewards)
