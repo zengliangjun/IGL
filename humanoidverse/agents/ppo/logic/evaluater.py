@@ -16,18 +16,14 @@ class Evaluater(base.BaseComponent):
                 self.eval_callbacks.append(instantiate(self.config.eval_callbacks[cb], training_loop=self))
 
 
-    def pre_loop(self):
+    def pre_loop(self, _inputs):
+        assert _inputs is not None
+        assert isinstance(_inputs, dict)
+        assert 'context' in _inputs
+        assert _inputs['context'] == base.Context.EVAL.value
         # callback pre
         for c in self.eval_callbacks:
             c.on_pre_evaluate_policy()
-
-        ##
-        # envwarp_component
-        # modules_component suport pre_loop
-        _inputs = {'context': base.Context.EVAL.value }
-        for _key in self.components:
-            _component = self.components[_key]
-            _component.pre_loop(_inputs)
 
         self.eval_policy = self.algo.modules_component.actor.act_inference
         # env eval flag

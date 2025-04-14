@@ -150,9 +150,15 @@ class BasePPO(base_algo.BaseAlgo):
     ##########################################################################################
     # Code for Evaluation
     ##########################################################################################
-    def evaluater(self, actor_state):
+    def evaluate_policy(self):
         assert hasattr(self, "evaluater_component")
-        self.evaluater_component.pre_loop()
+        _inputs = {'context': base.Context.EVAL.value }
+        for _key in self.components:
+            _component = self.components[_key]
+            _component.pre_loop(_inputs)
+
+        #self.evaluater_component.pre_loop()
+
         self.evaluater_component.loop()
         self.evaluater_component.post_loop()
 
@@ -163,6 +169,20 @@ class BasePPO(base_algo.BaseAlgo):
             "critic": self.modules_component.critic
         }
 
+    @torch.no_grad()
+    def get_example_obs(self):
+
+        inputs = {'context': base.Context.EVAL.value}
+        self.envwarp_component.pre_loop(inputs)
+        self.envwarp_component.pre_step(inputs)
+        obs_dict = inputs["obs_dict"]
+
+        for obs_key in obs_dict.keys():
+            print(obs_key, sorted(self.env.config.obs.obs_dict[obs_key]))
+        # move to cpu
+        for k in obs_dict:
+            obs_dict[k] = obs_dict[k].cpu()
+        return obs_dict
 
 ## for trainer
 class PPOTrainer(BasePPO):
@@ -180,6 +200,7 @@ class PPOEvaluater(BasePPO):
 
     def __init__(self, env: BaseTask, config, log_dir=None, device='cpu'):
         super(PPOEvaluater, self).__init__(env, config, log_dir, device)
+
 
     @property
     def namespace(self):
