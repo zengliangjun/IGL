@@ -117,8 +117,8 @@ class IsaacGym(BaseSimulator):
         hf_params.row_scale = self.terrain.cfg.horizontal_scale
         hf_params.vertical_scale = self.terrain.cfg.vertical_scale
         hf_params.nbRows = self.terrain.tot_cols
-        hf_params.nbColumns = self.terrain.tot_rows
-        hf_params.transform.p.x = -self.terrain.cfg.border_size
+        hf_params.nbColumns = self.terrain.tot_rows 
+        hf_params.transform.p.x = -self.terrain.cfg.border_size 
         hf_params.transform.p.y = -self.terrain.cfg.border_size
         hf_params.transform.p.z = 0.0
         hf_params.static_friction = self.simulator_config.terrain.static_friction
@@ -136,22 +136,64 @@ class IsaacGym(BaseSimulator):
         tm_params.nb_vertices = self.terrain.vertices.shape[0]
         tm_params.nb_triangles = self.terrain.triangles.shape[0]
 
-        tm_params.transform.p.x = -self.terrain.cfg.border_size
+        tm_params.transform.p.x = -self.terrain.cfg.border_size 
         tm_params.transform.p.y = -self.terrain.cfg.border_size
         tm_params.transform.p.z = 0.0
         tm_params.static_friction = self.simulator_config.terrain.static_friction
         tm_params.dynamic_friction = self.simulator_config.terrain.dynamic_friction
         tm_params.restitution = self.simulator_config.terrain.restitution
-        self.gym.add_triangle_mesh(self.sim, self.terrain.vertices.flatten(order='C'), self.terrain.triangles.flatten(order='C'), tm_params)
+        self.gym.add_triangle_mesh(self.sim, self.terrain.vertices.flatten(order='C'), self.terrain.triangles.flatten(order='C'), tm_params)   
         self.height_samples = torch.tensor(self.terrain.heightsamples).view(self.terrain.tot_rows, self.terrain.tot_cols).to(self.device)
         logger.info('Created trimesh terrain')
 
+    def load_objects(self):
+        # Create table asset
+        self.init_tableA_states = [0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.init_tableB_states = [-2.0, -2.0, 0.6, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.tableA_thickness = 0.05
+        tableA_opts = gymapi.AssetOptions()
+        tableA_opts.fix_base_link = True
+        self.tableA_asset = self.gym.create_box(self.sim, *[1.2, 1.2, self.tableA_thickness], tableA_opts)
+        self.tableB_thickness = 0.05
+        tableB_opts = gymapi.AssetOptions()
+        tableB_opts.fix_base_link = True
+        self.tableB_asset = self.gym.create_box(self.sim, *[1.2, 1.2, self.tableB_thickness], tableB_opts)
+
+        # Create cube assets
+        self.cubeA_size = 0.2
+        self.cubeB_size = 0.2
+        # CubeA asset
+        cubeA_height = 0.7+0.5*(self.cubeA_size+self.tableA_thickness)
+        self.init_cubeA_states = [-2.0, -2.0, cubeA_height, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        cubeA_opts = gymapi.AssetOptions()
+        self.cubeA_asset = self.gym.create_box(self.sim, *([self.cubeA_size] * 3), cubeA_opts)
+        self.cubeA_color = gymapi.Vec3(1.0, 0.75, 0.6)
+        # CubeB asset
+        cubeB_height = 1.0+0.5*(self.cubeB_size+self.tableA_thickness)
+        self.init_cubeB_states = [-1.7, -1.6, cubeB_height, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        cubeB_opts = gymapi.AssetOptions()
+        self.cubeB_asset = self.gym.create_box(self.sim, *([self.cubeB_size] * 3), cubeB_opts)
+        self.cubeB_color = gymapi.Vec3(1.0, 0.95, 0.7)
+        # Load tote
+        asset_root = "humanoidverse/data/totes" 
+        urdf_file = "urdf/tote.urdf"  
+        asset_options = gymapi.AssetOptions()
+        asset_options.default_dof_drive_mode = gymapi.DOF_MODE_POS
+        self.tote_asset = self.gym.load_asset(self.sim, asset_root, urdf_file, asset_options)
+        self.tote_pose = gymapi.Transform()
+        self.tote_pose.p = gymapi.Vec3(0.3, 0.0, 0.8)  
+        self.tote_pose.r = gymapi.Quat(0, 0, 0, 1) 
+
     def load_assets(self):
+        # Create robot asset
         asset_root = self.robot_config.asset.asset_root
         asset_file = self.robot_config.asset.urdf_file
         self.robot_asset = self._setup_robot_asset_when_env_created(asset_root, asset_file, self.robot_config.asset)
         self.num_dof, self.num_bodies, self.dof_names, self.body_names = self._setup_robot_props_when_env_created()
 
+        # Create table and cube assets
+        self.load_objects()
+        
         # assert if  aligns with config
         assert self.num_dof == len(self.robot_config.dof_names), "Number of DOFs must be equal to number of actions"
         assert self.num_bodies == len(self.robot_config.body_names), "Number of bodies must be equal to number of body names"
@@ -191,7 +233,7 @@ class IsaacGym(BaseSimulator):
 
         self.robot_asset = self.gym.load_asset(self.sim, gym_asset_root, gym_asset_file, asset_options)
         return self.robot_asset
-
+    
     def _setup_robot_props_when_env_created(self):
         self.num_dof = self.gym.get_asset_dof_count(self.robot_asset)
         self.num_bodies = self.gym.get_asset_rigid_body_count(self.robot_asset)
@@ -211,10 +253,35 @@ class IsaacGym(BaseSimulator):
         self.base_init_state = base_init_state
         self.envs = []
         self.robot_handles = []
+
+        # Define start pose for table
+        self.tableA_start_pose = gymapi.Transform()
+        self.tableA_start_pose.p = gymapi.Vec3(*self.init_tableA_states[:3])
+        self.tableA_start_pose.r = gymapi.Quat(*self.init_tableA_states[3:7])
+        self._table_surface_pos = np.array(self.init_tableA_states[:3]) + np.array([0, 0, self.tableA_thickness / 2])
+        # self.reward_settings["table_height"] = self._tableA_surface_pos[2]
+        self.tableB_start_pose = gymapi.Transform()
+        self.tableB_start_pose.p = gymapi.Vec3(*self.init_tableB_states[:3])
+        self.tableB_start_pose.r = gymapi.Quat(*self.init_tableB_states[3:7])
+        self._table_surface_pos = np.array(self.init_tableB_states[:3]) + np.array([0, 0, self.tableB_thickness / 2])
+        # self.reward_settings["table_height"] = self._tableA_surface_pos[2]
+        # Define start pose for cubes (doesn't really matter since they're get overridden during reset() anyways)
+        self.cubeA_start_pose = gymapi.Transform()
+        self.cubeA_start_pose.p = gymapi.Vec3(*self.init_cubeA_states[:3])
+        self.cubeA_start_pose.r = gymapi.Quat(*self.init_cubeA_states[3:7])
+        self.cubeB_start_pose = gymapi.Transform()
+        self.cubeB_start_pose.p = gymapi.Vec3(*self.init_cubeB_states[:3])
+        self.cubeB_start_pose.r = gymapi.Quat(*self.init_cubeB_states[3:7])
+
         with Progress() as progress:
             task = progress.add_task(
                 f"Creating {self.num_envs} environments...", total=self.num_envs
             )
+            # compute aggregate size
+            num_robot_bodies = self.gym.get_asset_rigid_body_count(self.robot_asset)
+            num_robot_shapes = self.gym.get_asset_rigid_shape_count(self.robot_asset)
+            max_agg_bodies = num_robot_bodies + 4     # 1 for tableA/B, cubeA/B
+            max_agg_shapes = num_robot_shapes + 4     # 1 for tableA/B, cubeA/B
             for i in range(self.num_envs):
                 # create env instance
                 env_handle = self.gym.create_env(self.sim, env_lower, env_upper, int(np.sqrt(self.num_envs)))
@@ -222,6 +289,27 @@ class IsaacGym(BaseSimulator):
                 progress.update(task, advance=1)
 
         return self.envs, self.robot_handles
+
+    def _build_objects(self, env_id, env_ptr):
+        # Create table
+        self._tableA_id = self.gym.create_actor(env_ptr, self.tableA_asset, self.tableA_start_pose, "tableA", env_id, 0, 0)
+        self._tableB_id = self.gym.create_actor(env_ptr, self.tableB_asset, self.tableB_start_pose, "tableB", env_id, 0, 0)
+        # Create cubes
+        self._cubeA_id = self.gym.create_actor(env_ptr, self.cubeA_asset, self.cubeA_start_pose, "cubeA", env_id, 0, 0)
+        self._cubeB_id = self.gym.create_actor(env_ptr, self.cubeB_asset, self.cubeB_start_pose, "cubeB", env_id, 0, 0)
+        # Set colors
+        self.gym.set_rigid_body_color(env_ptr, self._cubeA_id, 0, gymapi.MESH_VISUAL, self.cubeA_color)
+        self.gym.set_rigid_body_color(env_ptr, self._cubeB_id, 0, gymapi.MESH_VISUAL, self.cubeB_color)
+        # Set mass
+        cubeA_body_props = self.gym.get_actor_rigid_body_properties(env_ptr, self._cubeA_id)
+        cubeA_body_props[0].mass = 0.2
+        self.gym.set_actor_rigid_body_properties(env_ptr, self._cubeA_id, cubeA_body_props)
+        # # Load tote
+        self._tote_id = self.gym.create_actor(env_ptr, self.tote_asset, self.tote_pose, "tote", 0, 0)
+        tote_props = self.gym.get_actor_rigid_body_properties(env_ptr, self._tote_id)
+        tote_props[0].mass = 0.2
+        self.gym.set_actor_rigid_body_properties(env_ptr, self._tote_id, tote_props)
+        # self.gym.set_actor_scale(env_ptr, self._tote_id, (1.0, 1.0, 2.0))
 
     def _build_each_env(self, env_id, env_ptr):
         start_pose = gymapi.Transform()
@@ -236,18 +324,22 @@ class IsaacGym(BaseSimulator):
 
         dof_props_asset = self.gym.get_asset_dof_properties(self.robot_asset)
 
-        robot_handle = self.gym.create_actor(env_ptr,
-                                             self.robot_asset,
-                                             start_pose,
-                                             self.env_config.robot.asset.robot_type,
-                                             env_id,
-                                             self.env_config.robot.asset.self_collisions, 0)
+        robot_handle = self.gym.create_actor(env_ptr, 
+                                             self.robot_asset, 
+                                             start_pose, 
+                                             self.env_config.robot.asset.robot_type, 
+                                             env_id, 
+                                             self.env_config.robot.asset.self_collisions, 1)
         self._body_list = self.gym.get_actor_rigid_body_names(env_ptr, robot_handle)
         dof_props = self._process_dof_props(dof_props_asset, env_id)
         self.gym.set_actor_dof_properties(env_ptr, robot_handle, dof_props)
         body_props = self.gym.get_actor_rigid_body_properties(env_ptr, robot_handle)
         body_props = self._process_rigid_body_props(body_props, env_id)
         self.gym.set_actor_rigid_body_properties(env_ptr, robot_handle, body_props, recomputeInertia=True)
+
+        # Build objects
+        self._build_objects(env_id, env_ptr)
+
         self.envs.append(env_ptr)
         self.robot_handles.append(robot_handle)
 
@@ -308,11 +400,8 @@ class IsaacGym(BaseSimulator):
             self.dof_pos_limits = torch.zeros(self.num_dof, 2, dtype=torch.float, device=self.device, requires_grad=False)
             self.dof_vel_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
             self.torque_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
-
-            self.dof_pos_limits_termination = torch.zeros(self.num_dof, 2, dtype=torch.float, device=self.device, requires_grad=False)
-
             for i in range(len(props)):
-
+                
                 self.hard_dof_pos_limits[i, 0] = props["lower"][i].item()
                 self.hard_dof_pos_limits[i, 1] = props["upper"][i].item()
                 self.dof_pos_limits[i, 0] = props["lower"][i].item()
@@ -324,9 +413,6 @@ class IsaacGym(BaseSimulator):
                 r = self.dof_pos_limits[i, 1] - self.dof_pos_limits[i, 0]
                 self.dof_pos_limits[i, 0] = m - 0.5 * r * self.env_config.rewards.reward_limit.soft_dof_pos_limit
                 self.dof_pos_limits[i, 1] = m + 0.5 * r * self.env_config.rewards.reward_limit.soft_dof_pos_limit
-
-                self.dof_pos_limits_termination[i, 0] = m - 0.5 * r * self.env_config.termination_scales.termination_close_to_dof_pos_limit
-                self.dof_pos_limits_termination[i, 1] = m + 0.5 * r * self.env_config.termination_scales.termination_close_to_dof_pos_limit
         return props
 
     def _process_rigid_body_props(self, props, env_id):
@@ -376,15 +462,10 @@ class IsaacGym(BaseSimulator):
 
         # randomize base mass
         if self.env_config.domain_rand.randomize_base_mass:
+            raise Exception("index 0 is for world, 13 is for torso!")
+            raise NotImplementedError
             rng = self.env_config.domain_rand.added_mass_range
-            try:
-                base_index = self._body_list.index("pelvis") # for fixed upper URDF we only have pelvis link
-            except:
-                base_index = self._body_list.index("torso_link")
-            assert base_index != -1
-            # raise Exception("index 0 is for world, 13 is for torso!")
-            # raise NotImplementedError
-            props[base_index].mass += np.random.uniform(rng[0], rng[1])
+            props[0].mass += np.random.uniform(rng[0], rng[1])
 
         if env_id<3:
             sum_mass = 0
@@ -410,7 +491,7 @@ class IsaacGym(BaseSimulator):
 
     def find_rigid_body_indice(self, body_name):
         return self.gym.find_actor_rigid_body_handle(self.envs[0], self.robot_handles[0], body_name)
-
+    
     def prepare_sim(self):
         self.gym.prepare_sim(self.sim)
         # Refresh tensors BEFORE we acquire them https://forums.developer.nvidia.com/t/isaacgym-preview-4-actor-root-state-returns-nans-with-isaacgymenvs-style-task/223738/4
@@ -422,14 +503,6 @@ class IsaacGym(BaseSimulator):
         rigid_body_state = self.gym.acquire_rigid_body_state_tensor(self.sim)
         self._rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
 
-        # jacobian and mass matrix
-        robot_name = self.env_config.robot.asset.robot_type
-        _jacobian = self.gym.acquire_jacobian_tensor(self.sim, robot_name)
-        _massmatrix = self.gym.acquire_mass_matrix_tensor(self.sim, robot_name)
-
-        self.jacobian = gymtorch.wrap_tensor(_jacobian)
-        self.massmatrix = gymtorch.wrap_tensor(_massmatrix)
-
         bodies_per_env = self._rigid_body_state.shape[0] // self.num_envs
         self._rigid_body_state_reshaped = self._rigid_body_state.view(self.num_envs, bodies_per_env, 13)
         self._rigid_body_pos = self._rigid_body_state_reshaped[..., :self.num_bodies, 0:3]
@@ -439,7 +512,7 @@ class IsaacGym(BaseSimulator):
 
         # sensor_tensor = self.gym.acquire_force_sensor_tensor(self.sim)
         # dof_force_tensor = self.gym.acquire_dof_force_tensor(self.sim)
-
+        
         self.refresh_sim_tensors()
 
         self.all_root_states: Tensor = gymtorch.wrap_tensor(actor_root_state)
@@ -448,6 +521,19 @@ class IsaacGym(BaseSimulator):
             self.num_envs, num_actors, actor_root_state.shape[-1]
         )[..., 0, :]
         self.base_quat = self.robot_root_states[..., 3:7] # isaacgym uses xyzws
+
+        self.tableA_state = self.all_root_states.view(
+            self.num_envs, num_actors, actor_root_state.shape[-1]
+        )[:, self._tableA_id, :]
+        self.tableB_state = self.all_root_states.view(
+            self.num_envs, num_actors, actor_root_state.shape[-1]
+        )[:, self._tableB_id, :]
+        self.cubeA_state = self.all_root_states.view(
+            self.num_envs, num_actors, actor_root_state.shape[-1]
+        )[:, self._cubeA_id, :]
+        self.cubeB_state = self.all_root_states.view(
+            self.num_envs, num_actors, actor_root_state.shape[-1]
+        )[:, self._cubeB_id, :]
 
         self.dof_state = gymtorch.wrap_tensor(dof_state_tensor)
         self.dof_pos = self.dof_state.view(self.num_envs, -1, 2)[..., 0]
@@ -463,9 +549,6 @@ class IsaacGym(BaseSimulator):
         self.gym.refresh_dof_force_tensor(self.sim)
         self.gym.refresh_net_contact_force_tensor(self.sim)
 
-        self.gym.refresh_jacobian_tensors(self.sim)
-        self.gym.refresh_mass_matrix_tensors(self.sim)
-
     def _get_num_actors_per_env(self):
         return self.all_root_states.shape[0] // self.num_envs
         # num_actors = (
@@ -478,23 +561,17 @@ class IsaacGym(BaseSimulator):
 
     def set_actor_root_state_tensor(self, set_env_ids, root_states):
         set_env_ids_int32 = set_env_ids.to(torch.int32)
-
-        self.gym.set_actor_root_state_tensor_indexed(self.sim,
-                                                    gymtorch.unwrap_tensor(root_states),
-                                                    gymtorch.unwrap_tensor(set_env_ids_int32),
+        
+        self.gym.set_actor_root_state_tensor_indexed(self.sim, 
+                                                    gymtorch.unwrap_tensor(root_states), 
+                                                    gymtorch.unwrap_tensor(set_env_ids_int32), 
                                                     len(set_env_ids_int32))
-
-    def apply_rigid_body_force_at_pos_tensor(self, force_tensor, pos_tensor):
-        self.gym.apply_rigid_body_force_at_pos_tensors(self.sim,
-                                                       gymtorch.unwrap_tensor(force_tensor),
-                                                       gymtorch.unwrap_tensor(pos_tensor),
-                                                       gymapi.ENV_SPACE)
 
     def set_dof_state_tensor(self, set_env_ids, dof_states):
         set_env_ids_int32 = set_env_ids.to(torch.int32)
-        self.gym.set_dof_state_tensor_indexed(self.sim,
-                                             gymtorch.unwrap_tensor(dof_states),
-                                             gymtorch.unwrap_tensor(set_env_ids_int32),
+        self.gym.set_dof_state_tensor_indexed(self.sim, 
+                                             gymtorch.unwrap_tensor(dof_states), 
+                                             gymtorch.unwrap_tensor(set_env_ids_int32), 
                                              len(set_env_ids_int32))
 
     def simulate_at_each_physics_step(self):
@@ -534,14 +611,33 @@ class IsaacGym(BaseSimulator):
         self.gym.subscribe_viewer_keyboard_event(
             self.viewer, gymapi.KEY_Z, "zero_command"
         )
+        # EE commands key
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_F, "ee_forward_command"
+        )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_H, "ee_backward_command"
+        )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_O, "ee_open_command"
+        )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_C, "ee_close_command"
+        )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_T, "ee_height_up_command"
+        )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_G, "ee_height_down_command"
+        )
 
         self.gym.subscribe_viewer_keyboard_event(
             self.viewer, gymapi.KEY_P, "push_robots"
         )
 
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_N, "next_task"
-        # )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_N, "next_task"
+        )
         self.gym.subscribe_viewer_keyboard_event(
                 self.viewer, gymapi.KEY_R, "toggle_video_record"
             )
@@ -549,28 +645,11 @@ class IsaacGym(BaseSimulator):
             self.viewer, gymapi.KEY_SEMICOLON, "cancel_video_record"
         )
         self.gym.subscribe_viewer_keyboard_event(
-            self.viewer, gymapi.KEY_X, "walk_stand_toggle"
+            self.viewer, gymapi.KEY_U, "height_up"
         )
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_U, "height_up"
-        # )
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_L, "height_down"
-        # )
-
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_UP, "force_left_up"
-        # )
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_DOWN, "force_left_down"
-        # )
-
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_LEFT, "force_right_down"
-        # )
-        # self.gym.subscribe_viewer_keyboard_event(
-        #     self.viewer, gymapi.KEY_RIGHT, "force_right_up"
-        # )
+        self.gym.subscribe_viewer_keyboard_event(
+            self.viewer, gymapi.KEY_L, "height_down"
+        )        
 
         sim_params = self.sim_params
         if sim_params.up_axis == gymapi.UP_AXIS_Z:
@@ -619,11 +698,30 @@ class IsaacGym(BaseSimulator):
             elif evt.action == "zero_command" and evt.value > 0:
                 self.commands[:, :4] = 0
                 logger.info(f"Current Command: {self.commands[:, ]}")
+            # EE commands
+            elif evt.action == "ee_forward_command" and evt.value > 0:
+                self.commands[:, 5] += 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
+            elif evt.action == "ee_backward_command" and evt.value > 0:
+                self.commands[:, 5] -= 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
+            elif evt.action == "ee_open_command" and evt.value > 0:
+                self.commands[:, 6] += 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
+            elif evt.action == "ee_close_command" and evt.value > 0:
+                self.commands[:, 6] -= 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
+            elif evt.action == "ee_height_up_command" and evt.value > 0:
+                self.commands[:, 7] += 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
+            elif evt.action == "ee_height_down_command" and evt.value > 0:
+                self.commands[:, 7] -= 0.05
+                logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "push_robots" and evt.value > 0:
                 logger.info("Push Robots")
                 self._push_robots(torch.arange(self.num_envs, device=self.device))
-            # elif evt.action == "next_task" and evt.value > 0:
-            #     self.next_task()
+            elif evt.action == "next_task" and evt.value > 0:
+                self.next_task()
             elif evt.action == "toggle_video_record" and evt.value > 0:
                 # https://github.com/NVlabs/ProtoMotions/blob/94059259ba2b596bf908828cc04e8fc6ff901114/phys_anim/envs/base_interface/isaacgym.py#L179
                 self.user_is_recording = not self.user_is_recording
@@ -633,27 +731,12 @@ class IsaacGym(BaseSimulator):
                 self.user_is_recording = False
                 self.user_recording_state_change = False
                 delete_user_viewer_recordings = True
-            elif evt.action == "walk_stand_toggle" and evt.value > 0:
-                self.commands[:, 4] = 1 - self.commands[:, 4]
-                logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "height_up" and evt.value > 0:
                 self.commands[:, 4] += 0.1
                 logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "height_down" and evt.value > 0:
                 self.commands[:, 4] -= 0.1
                 logger.info(f"Current Command: {self.commands[:, ]}")
-            elif evt.action == "force_left_up" and evt.value > 0:
-                self.apply_force_tensor[:, self.left_hand_link_index, 2] = 1.0
-                logger.info(f"Left hand force: {self.apply_force_tensor[:, self.left_hand_link_index, :]}")
-            elif evt.action == "force_left_down" and evt.value > 0:
-                self.apply_force_tensor[:, self.left_hand_link_index, 2] -= 1.0
-                logger.info(f"Left hand force: {self.apply_force_tensor[:, self.left_hand_link_index, :]}")
-            elif evt.action == "force_right_up" and evt.value > 0:
-                self.apply_force_tensor[:, self.right_hand_link_index, 2] += 1.0
-                logger.info(f"Right hand force: {self.apply_force_tensor[:, self.right_hand_link_index, :]}")
-            elif evt.action == "force_right_down" and evt.value > 0:
-                self.apply_force_tensor[:, self.right_hand_link_index, 2] -= 1.0
-                logger.info(f"Right hand force: {self.apply_force_tensor[:, self.right_hand_link_index, :]}")
 
         # fetch results
         if self.device != 'cpu':
@@ -752,7 +835,7 @@ class IsaacGym(BaseSimulator):
     def clear_lines(self):
         self.gym.clear_lines(self.viewer)
 
-    def draw_sphere(self, pos, radius, color, env_id, pos_id=None):
+    def draw_sphere(self, pos, radius, color, env_id):
         sphere_geom_marker = gymutil.WireframeSphereGeometry(radius, 20, 20, None, color=color)
         sphere_pose = gymapi.Transform(gymapi.Vec3(pos[0], pos[1], pos[2]), r=None)
         gymutil.draw_lines(sphere_geom_marker, self.gym, self.viewer, self.envs[env_id], sphere_pose)
