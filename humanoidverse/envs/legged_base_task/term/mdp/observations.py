@@ -1,10 +1,12 @@
 from humanoidverse.utils.helpers import parse_observation
 from humanoidverse.envs.base_task.term.mdp import observations
+import copy
 import torch
 
 class LeggedObservations(observations.BaseObservations):
     def __init__(self, _task):
         super(LeggedObservations, self).__init__(_task)
+        self.noise_scales = copy.deepcopy(self.config.obs.noise_scales)
 
     # stage 1
     def init(self):
@@ -25,13 +27,13 @@ class LeggedObservations(observations.BaseObservations):
         # compute Algo observations
         for obs_key, obs_config in self.config.obs.obs_dict.items():
             self.obs_buf_dict_raw[obs_key] = dict()
-            parse_observation(self, obs_config, self.obs_buf_dict_raw[obs_key], self.config.obs.obs_scales, self.config.obs.noise_scales)
+            parse_observation(self, obs_config, self.obs_buf_dict_raw[obs_key], self.config.obs.obs_scales, self.noise_scales)
 
         history_manager = self.task.history_manager
 
         # Compute history observations
         history_obs_list = history_manager.history_handler.history.keys()
-        parse_observation(self, history_obs_list, self.hist_obs_dict, self.config.obs.obs_scales, self.config.obs.noise_scales)
+        parse_observation(self, history_obs_list, self.hist_obs_dict, self.config.obs.obs_scales, self.noise_scales)
 
         self._post_config_observation_callback()
 

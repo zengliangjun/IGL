@@ -30,6 +30,10 @@ legged_base_registry["rewards_manager"] = rewards.LeggedRewardsManager
 from humanoidverse.envs.legged_base_task.term.sim2real import push
 legged_base_registry["push_manager"] = push.LeggedPushManager
 
+
+from humanoidverse.envs.legged_base_task.term.currculum import observations_noise_currculum
+legged_base_registry["observations_noise_currculum"] = observations_noise_currculum.NoiseCurrculum
+
 # level 3
 from humanoidverse.envs.legged_base_task.term.statistics import extras
 legged_base_registry["extras_manager"] = extras.LeggedExtrasManager          # core

@@ -27,15 +27,15 @@ def class_to_dict(obj) -> dict:
     return result
 
 def pre_process_config(config) -> None:
-    
+
     # compute observation_dim
     # config.robot.policy_obs_dim = -1
     # config.robot.critic_obs_dim = -1
-    
+
     obs_dim_dict = dict()
     _obs_key_list = config.env.config.obs.obs_dict
     _aux_obs_key_list = config.env.config.obs.obs_auxiliary
-    
+
     assert set(config.env.config.obs.noise_scales.keys()) == set(config.env.config.obs.obs_scales.keys())
 
     # convert obs_dims to list of dicts
@@ -53,7 +53,7 @@ def pre_process_config(config) -> None:
         obs_dim_dict[obs_key] = 0
         for key in obs_config:
             if key.endswith("_raw"): key = key[:-4]
-            if key in config.env.config.obs.obs_dims.keys(): 
+            if key in config.env.config.obs.obs_dims.keys():
                 obs_dim_dict[obs_key] += config.env.config.obs.obs_dims[key]
                 logger.info(f"{obs_key}: {key} has dim: {config.env.config.obs.obs_dims[key]}")
             else:
@@ -68,17 +68,17 @@ def pre_process_config(config) -> None:
     #         output_dim = config.algo.config.network_dict[agent][network].output_dim
     #         if output_dim == "action_dim":
     #             config.algo.config.network_dict[agent][network].output_dim = config.env.config.robot.actions_dim
-                
+
     # print the config
     logger.debug(f"PPO CONFIG")
     logger.debug(f"{config.algo.config.module_dict}")
     # logger.debug(f"{config.algo.config.network_dict}")
 
-def parse_observation(cls: Any, 
-                      key_list: List, 
-                      buf_dict: Dict, 
-                      obs_scales: Dict, 
-                      noise_scales: Dict ) -> None:
+def parse_observation(cls: Any,
+                      key_list: List,
+                      buf_dict: Dict,
+                      obs_scales: Dict,
+                      noise_scales: Dict) -> None:
     """ Parse observations for the legged_robot_base class
     """
 
@@ -88,10 +88,16 @@ def parse_observation(cls: Any,
             obs_noise = 0.
         else:
             obs_noise = noise_scales[obs_key]
-        
+
+        # print(f"obs_key: {obs_key}, obs_noise: {obs_noise}")
+
         actor_obs = getattr(cls, f"_get_obs_{obs_key}")().clone()
         obs_scale = obs_scales[obs_key]
-        buf_dict[obs_key] = actor_obs * obs_scale + (torch.randn_like(actor_obs)* 2. - 1.) * obs_noise
+        # Yuanhang: use rand_like (uniform 0-1) instead of randn_like (N~[0,1])
+        # buf_dict[obs_key] = actor_obs * obs_scale + (torch.randn_like(actor_obs)* 2. - 1.) * obs_noise
+        # print("noise_scales", noise_scales)
+        # print("obs_noise", obs_noise)
+        buf_dict[obs_key] = (actor_obs + (torch.rand_like(actor_obs)* 2. - 1.) * obs_noise) * obs_scale
 
 
 def export_policy_as_jit(actor_critic, path):
@@ -99,7 +105,7 @@ def export_policy_as_jit(actor_critic, path):
         # assumes LSTM: TODO add GRU
         exporter = PolicyExporterLSTM(actor_critic)
         exporter.export(path)
-    else: 
+    else:
         os.makedirs(path, exist_ok=True)
         path = os.path.join(path, 'policy_1.pt')
         model = copy.deepcopy(actor_critic.actor).to('cpu')
@@ -126,7 +132,7 @@ class PolicyExporterLSTM(torch.nn.Module):
     def reset_memory(self):
         self.hidden_state[:] = 0.
         self.cell_state[:] = 0.
- 
+
     def export(self, path):
         os.makedirs(path, exist_ok=True)
         path = os.path.join(path, 'policy_lstm_1.pt')

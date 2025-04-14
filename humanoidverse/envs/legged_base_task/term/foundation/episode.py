@@ -35,7 +35,7 @@ class LeggedEpisode(episode.BaseEpisode):
 
         self.reset_buf |= self.time_out_buf
 
-    def reset(self, env_ids):
+        env_ids = self.reset_env_ids
         if len(env_ids) == 0:
             return
         self.episode_length_buf[env_ids] = 0
@@ -45,6 +45,9 @@ class LeggedEpisode(episode.BaseEpisode):
         num = len(env_ids)
         current_average_episode_length = torch.mean(self.last_episode_length_buf[env_ids], dtype=torch.float)
         self.average_episode_length = self.average_episode_length * (1 - num / self.num_compute_average_epl) + current_average_episode_length * (num / self.num_compute_average_epl)
+
+    def reset(self, env_ids):
+        pass
 
     @property
     def reset_env_ids(self):
