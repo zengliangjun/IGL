@@ -71,6 +71,9 @@ class Statistics(base.BaseComponent):
             self.cur_reward_sum += rewards
             self.cur_episode_length += 1
             new_ids = (dones > 0).nonzero(as_tuple=False)
+            if 0 == len(new_ids):
+                return
+
             self.rewbuffer.extend(self.cur_reward_sum[new_ids][:, 0].cpu().numpy().tolist())
             self.lenbuffer.extend(self.cur_episode_length[new_ids][:, 0].cpu().numpy().tolist())
             self.cur_reward_sum[new_ids] = 0

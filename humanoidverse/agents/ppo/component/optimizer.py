@@ -22,41 +22,8 @@ class Optimizer(base.BaseComponent):
         self.actor_optimizer = optim.Adam(modules_component.actor.parameters(), lr=self.actor_learning_rate)
         self.critic_optimizer = optim.Adam(modules_component.critic.parameters(), lr=self.critic_learning_rate)
 
-    def pre_step(self, _inputs):
-        # update lr with kl
-        # KL
-        if self.desired_kl == None or self.schedule != 'adaptive':
-            return
-
-        policy_state_dict = _inputs['policy_state_dict']
-        old_mu_batch = policy_state_dict['action_mean']
-        old_sigma_batch = policy_state_dict['action_sigma']
-
-
-        sigma_batch = _inputs['sigma_batch']
-        mu_batch = _inputs['mu_batch']
-
-        with torch.inference_mode():
-            kl = torch.sum(
-                torch.log(sigma_batch / old_sigma_batch + 1.e-5) + \
-                (torch.square(old_sigma_batch) + torch.square(old_mu_batch - mu_batch)) / (2.0 * torch.square(sigma_batch)) - \
-                0.5, axis=-1)
-
-            kl_mean = torch.mean(kl)
-
-            if kl_mean > self.desired_kl * 2.0:
-                self.actor_learning_rate = max(1e-5, self.actor_learning_rate / 1.5)
-                self.critic_learning_rate = max(1e-5, self.critic_learning_rate / 1.5)
-            elif kl_mean < self.desired_kl / 2.0 and kl_mean > 0.0:
-                self.actor_learning_rate = min(1e-2, self.actor_learning_rate * 1.5)
-                self.critic_learning_rate = min(1e-2, self.critic_learning_rate * 1.5)
-
-            for param_group in self.actor_optimizer.param_groups:
-                param_group['lr'] = self.actor_learning_rate
-            for param_group in self.critic_optimizer.param_groups:
-                param_group['lr'] = self.critic_learning_rate
-
-    def step(self):
+    def step(self, _inputs):
+        self._step_calcute_kl_update_rl(_inputs)
         # merger with pre_step
         self.actor_optimizer.zero_grad()
         self.critic_optimizer.zero_grad()
@@ -96,3 +63,37 @@ class Optimizer(base.BaseComponent):
         self.actor_learning_rate = actor_learning_rate
         self.critic_learning_rate = critic_learning_rate
     '''
+
+    def _step_calcute_kl_update_rl(self, _inputs):
+        # update lr with kl
+        # KL
+        if self.desired_kl == None or self.schedule != 'adaptive':
+            return
+
+        policy_state_dict = _inputs['policy_state_dict']
+        old_mu_batch = policy_state_dict['action_mean']
+        old_sigma_batch = policy_state_dict['action_sigma']
+
+
+        sigma_batch = _inputs['sigma_batch']
+        mu_batch = _inputs['mu_batch']
+
+        with torch.inference_mode():
+            kl = torch.sum(
+                torch.log(sigma_batch / old_sigma_batch + 1.e-5) + \
+                (torch.square(old_sigma_batch) + torch.square(old_mu_batch - mu_batch)) / (2.0 * torch.square(sigma_batch)) - \
+                0.5, axis=-1)
+
+            kl_mean = torch.mean(kl)
+
+            if kl_mean > self.desired_kl * 2.0:
+                self.actor_learning_rate = max(1e-5, self.actor_learning_rate / 1.5)
+                self.critic_learning_rate = max(1e-5, self.critic_learning_rate / 1.5)
+            elif kl_mean < self.desired_kl / 2.0 and kl_mean > 0.0:
+                self.actor_learning_rate = min(1e-2, self.actor_learning_rate * 1.5)
+                self.critic_learning_rate = min(1e-2, self.critic_learning_rate * 1.5)
+
+            for param_group in self.actor_optimizer.param_groups:
+                param_group['lr'] = self.actor_learning_rate
+            for param_group in self.critic_optimizer.param_groups:
+                param_group['lr'] = self.critic_learning_rate

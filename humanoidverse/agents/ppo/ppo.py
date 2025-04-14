@@ -135,12 +135,12 @@ class PPO(base_algo.BaseAlgo):
         self.storage_component.pre_epoch(_inputs)
         generator = _inputs['generator']
 
-        _inputs = {'context': base.Context.TRAIN.value }
         for policy_state_dict in generator:
             # Move everything to the device
             for policy_state_key in policy_state_dict.keys():
                 policy_state_dict[policy_state_key] = policy_state_dict[policy_state_key].to(self.device)
 
+            _inputs = {'context': base.Context.TRAIN.value }
             _inputs['policy_state_dict'] = policy_state_dict
             ## update algo step
             self.trainer_component.step(_inputs)

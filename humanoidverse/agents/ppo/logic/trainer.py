@@ -29,10 +29,7 @@ class Trainer(base.BaseComponent):
         # step 1 run policy obtain the new values
         self.algo.modules_component.step(_inputs)
 
-        # step 2 update rl with kl
-        self.algo.optimizer_component.pre_step(_inputs)
-
-        # step 3 actor loss
+        # step 2 actor loss
         surrogate_loss = self._calcute_surrogate_loss(_inputs)
         self._update_loss('Surrogate', surrogate_loss.item())
 
@@ -48,16 +45,16 @@ class Trainer(base.BaseComponent):
 
         critic_loss = self.value_loss_coef * value_loss
 
-        ## TODO merger pre_step
         ## note zero_grad
-        self.algo.optimizer_component.step()
+        # step 2 update rl with kl
+        self.algo.optimizer_component.step(_inputs)
 
         ##
         actor_loss.backward()
         critic_loss.backward()
 
         ##
-        # Gradient step
+        # model gradient clip step
         self.algo.modules_component.post_step(_inputs)
 
         ## noptimizer step

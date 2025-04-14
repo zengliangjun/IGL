@@ -41,7 +41,7 @@ class Rollout(base.BaseComponent):
         # clear storage
         self.algo.storage_component.pre_epoch(_inputs)
 
-    def post_loop(self):
+    def post_epoch(self):
         # prepare data for training
         _inputs = {'context': base.Context.ROLLOUT.value}
         # stage 1
