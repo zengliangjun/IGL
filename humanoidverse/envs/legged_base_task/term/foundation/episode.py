@@ -10,18 +10,20 @@ class LeggedEpisode(episode.BaseEpisode):
         super(LeggedEpisode, self).init()
         self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
 
-        self.common_step_counter = 0
+        self.common_step_counter = torch.tensor(0, device=self.device, dtype=torch.long)
         # for reward penalty curriculum
-        self.average_episode_length = 0. # num_compute_average_epl last termination episode length
+        self.average_episode_length = torch.tensor(0, device=self.device, dtype=torch.long) # num_compute_average_epl last termination episode length
         self.last_episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
 
     # stage 3
     def pre_compute(self):
+        super(LeggedEpisode, self).pre_compute()
         self.common_step_counter  +=1
         self.episode_length_buf += 1
         self.last_episode_length_buf = self.episode_length_buf.clone()
 
     def check_termination(self):
+        super(LeggedEpisode, self).check_termination()
         """ Check if environments need to be reset
         """
         # self.reset_buf = 0

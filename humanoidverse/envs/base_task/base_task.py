@@ -11,6 +11,9 @@ class BaseTask():
         torch._C._jit_set_profiling_mode(False)
         torch._C._jit_set_profiling_executor(False)
 
+        ## flags for policy evaluating
+        self.is_evaluating = False
+
         # self.simulator = instantiate(config=self.config.simulator, device=device)
         SimulatorClass = get_class(self.config.simulator._target_)
         self.simulator: BaseSimulator = SimulatorClass(config=self.config, device=device)
@@ -39,8 +42,9 @@ class BaseTask():
         self.simulator.prepare_sim()
         # if running with a viewer, set up keyboard shortcuts and camera
         self.viewer = None
+
+        self.debug_viz = False
         if self.headless == False:
-            self.debug_viz = False
             self.simulator.setup_viewer()
             ###########################################################################
             # Jiawei: Should be removed
@@ -49,8 +53,6 @@ class BaseTask():
 
         self._init()
         self._post_init()
-        ## flags for policy evaluating
-        self.is_evaluating = False
         ###########################################################################
         #### Jiawei: Should be removed
         ###########################################################################

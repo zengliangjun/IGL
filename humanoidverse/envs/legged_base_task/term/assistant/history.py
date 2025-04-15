@@ -58,3 +58,28 @@ class LeggedHistoryManager(base.BaseManager):
             history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
             history_tensors.append(history_tensor)
         return torch.cat(history_tensors, dim=1)
+
+    ## actor
+    def _get_obs_history_actor(self,):
+        assert "history_actor" in self.config.obs.obs_auxiliary.keys()
+        history_config = self.config.obs.obs_auxiliary['history_actor']
+        history_key_list = history_config.keys()
+        history_tensors = []
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
+
+    def _get_obs_history_critic(self,):
+        assert "history_critic" in self.config.obs.obs_auxiliary.keys()
+        history_config = self.config.obs.obs_auxiliary['history_critic']
+        history_key_list = history_config.keys()
+        history_tensors = []
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
