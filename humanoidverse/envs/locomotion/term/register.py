@@ -29,7 +29,7 @@ base_register.rewards_registry[current_namespace] = locomotion_rewards_registry
 gait_namespace: str  = "gait_locomotion_task"
 
 
-############ REWARDS ############
+####################################
 gait_rewards_registry = copy.deepcopy(locomotion_rewards_registry)
 from humanoidverse.envs.locomotion.rewards import feet_gait
 gait_rewards_registry['gait_rewards'] = feet_gait.GaitRewards
