@@ -12,6 +12,7 @@ class ASAPMotionTrainer(LeggedRobotBase):
 class ASAPMotionPlayer(LeggedRobotBase):
     def __init__(self, config, device):
         super(ASAPMotionPlayer, self).__init__(config, device)
+        self.is_motion_player = True
 
     ## help function
     def next_task(self):

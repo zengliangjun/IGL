@@ -31,7 +31,7 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
 
     # stage 3
     def reset(self, env_ids):
-        super(LeggedRobotDataManager, self).reset()
+        super(LeggedRobotDataManager, self).reset(env_ids)
         if len(env_ids) == 0:
             return
 

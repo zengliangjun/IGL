@@ -2,6 +2,6 @@
 
 defaults:
   - /algo: ppo
-  - /env: motion_tracking
+  - /env: asap_motion_tracking
 
 experiment_name: TEST_Motion_Tracking

@@ -15,18 +15,66 @@ from omegaconf import OmegaConf
 import logging
 from loguru import logger
 
+import threading
+from pynput import keyboard
+
+def on_press(key, env):
+    try:
+        if key.char == 'n':
+            env.next_task()
+            logger.info("Moved to the next task.")
+        # Force Control
+       # Force Control
+        if hasattr(key, 'char'):
+            if key.char == '1':
+                env.apply_force_tensor[:, env.left_hand_link_index, 2] += 1.0
+                logger.info(f"Left hand force: {env.apply_force_tensor[:, env.left_hand_link_index, :]}")
+            elif key.char == '2':
+                env.apply_force_tensor[:, env.left_hand_link_index, 2] -= 1.0
+                logger.info(f"Left hand force: {env.apply_force_tensor[:, env.left_hand_link_index, :]}")
+            elif key.char == '3':
+                env.apply_force_tensor[:, env.right_hand_link_index, 2] += 1.0
+                logger.info(f"Right hand force: {env.apply_force_tensor[:, env.right_hand_link_index, :]}")
+            elif key.char == '4':
+                env.apply_force_tensor[:, env.right_hand_link_index, 2] -= 1.0
+                logger.info(f"Right hand force: {env.apply_force_tensor[:, env.right_hand_link_index, :]}")
+    except AttributeError:
+        pass
+
+def listen_for_keypress(env):
+    with keyboard.Listener(on_press=lambda key: on_press(key, env)) as listener:
+        listener.join()
+
 
 
 
 from utils.config_utils import *  # noqa: E402, F403
 
-import hydra_main
-@hydra_main.main(config_path="config", config_name="base", version_base="1.1")
+@hydra.main(config_path="config", config_name="base", version_base="1.1")
 def main(config: OmegaConf):
     # import ipdb; ipdb.set_trace()
     simulator_type = config.simulator['_target_'].split('.')[-1]
+
+    simulator_type = config.simulator.config.name
     # import ipdb; ipdb.set_trace()
-    if simulator_type == 'IsaacSim':
+    if simulator_type == 'isaacsim45':
+        from isaaclab.app import AppLauncher
+        import argparse
+        parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
+        AppLauncher.add_app_launcher_args(parser)
+
+        args_cli, hydra_args = parser.parse_known_args()
+        sys.argv = [sys.argv[0]] + hydra_args
+        args_cli.num_envs = config.num_envs
+        args_cli.seed = config.seed
+        args_cli.env_spacing = config.env.config.env_spacing # config.env_spacing
+        args_cli.output_dir = config.output_dir
+        args_cli.headless = config.headless
+
+        app_launcher = AppLauncher(args_cli)
+        simulation_app = app_launcher.app
+
+    if simulator_type == 'isaacsim':
         from omni.isaac.lab.app import AppLauncher
         import argparse
         parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -44,7 +92,7 @@ def main(config: OmegaConf):
         simulation_app = app_launcher.app
 
         # import ipdb; ipdb.set_trace()
-    if simulator_type == 'IsaacGym':
+    if simulator_type == 'isaacgym':
         import isaacgym  # noqa: F401
 
 
@@ -93,42 +141,22 @@ def main(config: OmegaConf):
 
     pre_process_config(config)
 
-    # torch.set_float32_matmul_precision("medium")
-
-    # fabric: Fabric = instantiate(config.fabric)
-    # fabric.launch()
-
-    # if config.seed is not None:
-    #     rank = fabric.global_rank
-    #     if rank is None:
-    #         rank = 0
-    #     fabric.seed_everything(config.seed + rank)
-    #     seeding(config.seed + rank, torch_deterministic=config.torch_deterministic)
     config.env.config.save_rendering_dir = str(Path(config.experiment_dir) / "renderings_training")
-    config.env._target_ = config.env._target_ + "Trainer"
-    env: BaseTask = instantiate(config=config.env, device=device)
+    config.env._target_ = config.env._target_ + "Player"
+    env = instantiate(config.env, device=device)
+
+    # Start a thread to listen for key press
+    key_listener_thread = threading.Thread(target=listen_for_keypress, args=(env,))
+    key_listener_thread.daemon = True
+    key_listener_thread.start()
+
+    env.set_is_evaluating()
+    env.reset_all()
+    while True:
+        _state = {}
+        env.step(_state)
 
 
-    experiment_save_dir = Path(config.experiment_dir)
-    experiment_save_dir.mkdir(exist_ok=True, parents=True)
-
-    logger.info(f"Saving config file to {experiment_save_dir}")
-    with open(experiment_save_dir / "config.yaml", "w") as file:
-        OmegaConf.save(unresolved_conf, file)
-
-    ## update with postfix
-    config.algo._target_ = config.algo._target_ + "Trainer"
-
-    algo: BaseAlgo = instantiate(device=device, env=env, config=config.algo, log_dir=experiment_save_dir)
-    algo.setup()
-    # import ipdb;    ipdb.set_trace()
-    algo.load(config.checkpoint)
-
-    # handle saving config
-    algo.learn()
-
-    if simulator_type == 'IsaacSim':
-        simulation_app.close()
 
 if __name__ == "__main__":
     main()

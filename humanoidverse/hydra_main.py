@@ -82,6 +82,19 @@ def main(
                         'project_name=HumanoidLocomotion',
                         'checkpoint=logs/HumanoidLocomotion/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt'
                     ]
+                elif "base_play" == config_name:
+                    args.overrides = [
+                        '+simulator=isaacgym',
+                        '+exp=asap_motion_tracking',
+                        '+domain_rand=NO_domain_rand',
+                        '+rewards=asap_motion_tracking/reward_motion_tracking_dm_2real',
+                        '+robot=g1/g1_29dof_anneal_23dof',
+                        '+terrain=terrain_locomotion_plane',
+                        '+obs=asap_motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history',
+                        'project_name=ASAP',
+                        'experiment_name=MotionTracking_CR7',
+                        'robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl'
+                    ]
                 else:
                     args.overrides = [
 

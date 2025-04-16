@@ -68,16 +68,16 @@ class BaseTask():
         self.simulator.set_dof_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.dof_state)
         # self._refresh_env_idx_tensors(torch.arange(self.num_envs, device=self.device))
 
-        if not hasattr(self, "actions_manager"):
+        if hasattr(self, "actions_manager"):
             actor_state = self.actions_manager.zeros()
+            items = self.step(actor_state)
+            assert ('obs_dict' in items)
+            return items['obs_dict']
         else:
-            actions = torch.zeros(self.num_envs, self.robotdata_manager.num_dof, device=self.device, requires_grad=False)
             actor_state = {}
-            actor_state["actions"] = actions
-
-        items = self.step(actor_state)
-        assert ('obs_dict' in items)
-        return items['obs_dict']
+            #actions = torch.zeros(self.num_envs, self.robotdata_manager.num_dof, device=self.device, requires_grad=False)
+            #actor_state["actions"] = actions
+            return self.step(actor_state)
 
     # def _refresh_env_idx_tensors(self, env_ids):
     #     env_ids_int32 = env_ids.to(dtype=torch.int32)

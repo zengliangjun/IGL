@@ -14,6 +14,7 @@ class ASAPEpisode(episode.LeggedEpisode):
         self.terminate_when_motion_far_threshold = self.config.termination_scales.termination_motion_far_threshold
         logger.info(f"Terminate when motion far threshold: {self.terminate_when_motion_far_threshold}")
 
+    ## termination with motion_far
     def _update_reset_buf(self):
         super(ASAPEpisode, self)._update_reset_buf()
 
@@ -33,6 +34,7 @@ class ASAPEpisode(episode.LeggedEpisode):
         self.reset_buf |= reset_buf_motion_far
         # log current motion far threshold
 
+    ## termination with timeout
     def _update_timeout_buf(self):
         super(ASAPEpisode, self)._update_timeout_buf()
 

@@ -55,9 +55,10 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
             self.upper_body_id = [self.task.simulator._body_list.index(link) for link in self.config.robot.motion.upper_body_link]
 
     def reset(self, env_ids):
+        super(AsapMotion, self).reset(env_ids)
         if len(env_ids) == 0:
             return
-        # don't call super reset
+        # NOTE don't call super reset
         # super(AsapMotion, self).reset(env_ids)
 
         self.motion_len[env_ids] = self._motion_lib.get_motion_length(self.motion_ids[env_ids])
@@ -72,11 +73,14 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
 
     def pre_compute(self):
         super(AsapMotion, self).pre_compute()
+
+        self._pre_play()
+
         if self.task.is_evaluating:
             return
 
         ## only for training with random_sample update
-        if self.config.resample_motion_when_training:
+        if not self.config.resample_motion_when_training:
             return
 
         if not hasattr(self.task, 'episode_manager'):
@@ -86,9 +90,22 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         if episode_manager.common_step_counter.item() % self.resample_time_interval:
             return
 
-        logger.info(f"Resampling motion at step {self.common_step_counter.item()}")
+        if 0 == episode_manager.common_step_counter.item():
+            return
+
+        logger.info(f"Resampling motion at step {episode_manager.common_step_counter.item()}")
         self._motion_lib.load_motions(random_sample=True)
         episode_manager.reset_buf[:] = 1
+
+
+    def _pre_play(self):
+        if not hasattr(self.task, 'is_motion_player') or not self.task.is_motion_player:
+            return
+        ## only for player
+        env_ids = torch.arange(self.num_envs, device=self.device)
+        self._reset_dofs(env_ids)
+        self._reset_root_states(env_ids)
+        self.task.need_to_refresh_envs[env_ids] = True
 
     ## help function
     def next_task(self):

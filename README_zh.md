@@ -302,10 +302,10 @@ class BaseComponent():
 - storage 回放封装子模块
 </details>
 
-h1 locomotion
+h1 locomotion train  
 
 ```bash
-HYDRA_FULL_ERROR=1 humanoidverse/train_agent.py \
+HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
 +simulator=isaacgym \
 +exp=locomotion \
 +domain_rand=NO_domain_rand \
@@ -321,7 +321,7 @@ headless=True
 ```
   
 
-g1 locomotion  
+g1 locomotion train  
 
   
 ```bash
@@ -342,18 +342,18 @@ rewards.reward_initial_penalty_scale=0.1 \
 rewards.reward_penalty_degree=0.00003
 ```
   
-g1 asap
+g1 asap train  
   
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
 +simulator=isaacgym \
-+exp=motion_tracking \
++exp=asap_motion_tracking \
 +domain_rand=NO_domain_rand \
-+rewards=motion_tracking/reward_motion_tracking_dm_2real \
++rewards=asap_motion_tracking/reward_motion_tracking_dm_2real \
 +robot=g1/g1_29dof_anneal_23dof \
 +terrain=terrain_locomotion_plane \
-+obs=motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
++obs=asap_motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
 project_name=ASAP \
 experiment_name=MotionTracking_CR7 \
 robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl \
@@ -366,6 +366,26 @@ env.config.termination_curriculum.terminate_when_motion_far_threshold_min=0.3 \
 env.config.termination_curriculum.terminate_when_motion_far_curriculum_degree=0.000025 \
 robot.asset.self_collisions=0
 ```
+
+g1 motion file play  
+  
+
+```bash
+HYDRA_FULL_ERROR=1 python humanoidverse/play_agent.py \
++simulator=isaacgym \
++exp=asap_motion_tracking \
++domain_rand=NO_domain_rand \
++rewards=asap_motion_tracking/reward_motion_tracking_dm_2real \
++robot=g1/g1_29dof_anneal_23dof \
++terrain=terrain_locomotion_plane \
++obs=asap_motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
+project_name=ASAP \
+experiment_name=MotionTracking_CR7 \
+robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl
+
+```
+
+
 
 # Citation
 Please use the following bibtex if you find this repo helpful and would like to cite:

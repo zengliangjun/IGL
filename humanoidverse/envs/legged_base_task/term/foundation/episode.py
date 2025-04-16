@@ -56,8 +56,10 @@ class LeggedEpisode(episode.BaseEpisode):
         return self.reset_buf.nonzero(as_tuple=False).flatten()
 
     def _update_reset_buf(self):
-
         robotdata_manager = self.task.robotdata_manager
+        if not hasattr(self.task, 'robotstatus_manager'):
+            return
+
         robotstatus_manager = self.task.robotstatus_manager
         task = self.task
 

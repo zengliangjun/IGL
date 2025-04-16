@@ -5,7 +5,7 @@ defaults:
 
 # Env structure
 env:
-  _target_: humanoidverse.envs.locomotion.locomotion.LocomotionTrainer
+  _target_: humanoidverse.envs.locomotion.locomotion.Locomotion
   config:
     max_episode_length_s: 20
     locomotion_obs_scales:

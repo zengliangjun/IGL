@@ -19,11 +19,16 @@ class LeggedRobotBase(BaseTask):
         Args:
             actions (torch.Tensor): Tensor of shape (num_envs, num_actions_per_env)
         """
-        actions = actor_state["actions"]
-        # stage 2
-        self._pre_physics_step(actions)
-        self._physics_step()
-        self._post_physics_step()
+        if 'actions' in actor_state:
+            actions = actor_state["actions"]
+            # stage 2
+            self._pre_physics_step(actions)
+            self._physics_step()
+            self._post_physics_step()
+        else:
+            self.render()
+            for _ in range(self.config.simulator.config.sim.control_decimation):
+                self.simulator.simulate_at_each_physics_step()
 
         # stage 3
         self._compute3()
@@ -48,6 +53,9 @@ class LeggedRobotBase(BaseTask):
 
     # stage 2
     def _pre_physics_step(self, actions):
+        if not hasattr(self, "actions_manager"):
+            return
+
         self.actions_manager.pre_physics_step(actions)
 
     def _physics_step(self):
@@ -57,6 +65,9 @@ class LeggedRobotBase(BaseTask):
             self.simulator.simulate_at_each_physics_step()
 
     def _apply_force_in_physics_step(self):
+        if not hasattr(self, "actions_manager"):
+            return
+
         _actions = self.actions_manager.actual_actions
         self.actuators_manager.pre_physics_step(_actions)
         self.simulator.apply_torques_at_dof(self.actuators_manager.torques)

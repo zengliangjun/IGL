@@ -5,7 +5,7 @@ defaults:
 
 # Env structure
 env:
-  _target_: humanoidverse.envs.motion_tracking.asap.asap.ASAPMotionTrainer
+  _target_: humanoidverse.envs.motion_tracking.asap.asap.ASAPMotion
   config:
     max_episode_length_s: 20
     termination:
