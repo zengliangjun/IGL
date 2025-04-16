@@ -33,10 +33,7 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         ## motion
         self.config.robot.motion.step_dt = self.task.dt
         self._motion_lib = motion_lib_robot.MotionLibRobot(self.config.robot.motion, num_envs=self.num_envs, device=self.device)
-        if self.task.is_evaluating:
-            self._motion_lib.load_motions(random_sample=False)
-        else:
-            self._motion_lib.load_motions(random_sample=True)
+        self._motion_lib.load_motions(random_sample=False)
 
         ## for sample
         self.motion_start_idx = 0
@@ -75,13 +72,14 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
 
     def pre_compute(self):
         super(AsapMotion, self).pre_compute()
-        if self.config.resample_motion_when_training:
-            return
-
         if self.task.is_evaluating:
             return
 
-        if hasattr(self.task, 'episode_manager'):
+        ## only for training with random_sample update
+        if self.config.resample_motion_when_training:
+            return
+
+        if not hasattr(self.task, 'episode_manager'):
             return
 
         episode_manager = self.task.episode_manager
@@ -103,6 +101,14 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
             self._motion_lib.load_motions(random_sample=False, start_idx=self.motion_start_idx)
         else:
             self._motion_lib.load_motions(random_sample=True, start_idx=self.motion_start_idx)
+
+    # only for set_is_evaluating random_sample is false
+    def with_evaluating(self):
+        if not self.task.is_evaluating:
+            return
+
+        logger.info(f"reset with evaluating model with self._motion_lib.load_motions(random_sample=False)")
+        self._motion_lib.load_motions(random_sample=False)
 
     ###
     def _post_init_extend(self):

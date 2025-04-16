@@ -19,6 +19,11 @@ class ASAPMotionPlayer(LeggedRobotBase):
         self.robotdata_manager.next_task()
         super(ASAPMotionPlayer, self).reset_all()
 
+    def set_is_evaluating(self):
+        super(ASAPMotionPlayer, self).set_is_evaluating()
+        assert hasattr(self, "robotdata_manager")
+        self.robotdata_manager.with_evaluating()
+
     @property
     def namespace(self):
         from humanoidverse.envs.motion_tracking.asap import register
