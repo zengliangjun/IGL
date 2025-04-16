@@ -3,7 +3,7 @@ import copy
 
 core_registry = copy.deepcopy(register.registry[register.core_namespace]) #copy.deepcopy(register.baseregistry)
 
-# level 0
+# core
 from humanoidverse.envs.legged_base_task.term.foundation import actuators, episode, robotdata
 core_registry["actuators_manager"] = actuators.LeggedActuatorsManager  # core
 core_registry["episode_manager"] = episode.LeggedEpisode              # core
@@ -11,7 +11,7 @@ core_registry["robotdata_manager"] = robotdata.LeggedRobotDataManager  # core
 
 
 trainer_registry = copy.deepcopy(core_registry)
-# level 1
+# trainer
 from humanoidverse.envs.legged_base_task.term.status import feet, robotstatus # status
 trainer_registry["feet_manager"] = feet.LeggedFeetManager
 trainer_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
@@ -46,6 +46,28 @@ core_namespace: str  = "legged_core_task"
 trainer_namespace: str  = "legged_trainer_task"
 register.registry[core_namespace] = core_registry
 register.registry[trainer_namespace] = trainer_registry
+
+
+evaluater_registry = copy.deepcopy(core_registry)
+# evaluater
+evaluater_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
+evaluater_registry["history_manager"] = history.LeggedHistoryManager
+
+from humanoidverse.envs.legged_base_task.term.mdp import actions, \
+    command, observations, rewards                                     # mdp
+
+evaluater_registry["command_manager"] = command.LeggedCommandManager
+evaluater_registry["actions_manager"] = actions.LeggedActionsManager
+evaluater_registry["observations_manager"] = observations.LeggedObservations
+# level 2
+evaluater_registry["extras_manager"] = extras.LeggedExtrasManager
+
+core_namespace: str  = "legged_core_task"
+trainer_namespace: str  = "legged_trainer_task"
+evaluater_namespace: str  = "legged_evaluater_task"
+register.registry[core_namespace] = core_registry
+register.registry[trainer_namespace] = trainer_registry
+register.registry[evaluater_namespace] = evaluater_registry
 
 ############ REWARDS ############
 legged_base_rewards_registry = {}

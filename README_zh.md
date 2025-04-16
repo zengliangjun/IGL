@@ -318,6 +318,9 @@ project_name=HumanoidLocomotion \
 experiment_name=H110dof_loco_IsaacGym \
 headless=True
 
+HYDRA_FULL_ERROR=1 python humanoidverse/eval_agent.py \
++checkpoint=logs/HumanoidLocomotion/isaacgym/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt
+
 ```
   
 
@@ -365,6 +368,11 @@ env.config.termination_curriculum.terminate_when_motion_far_curriculum=True \
 env.config.termination_curriculum.terminate_when_motion_far_threshold_min=0.3 \
 env.config.termination_curriculum.terminate_when_motion_far_curriculum_degree=0.000025 \
 robot.asset.self_collisions=0
+
+
+HYDRA_FULL_ERROR=1 python humanoidverse/eval_agent.py \
++checkpoint=logs/
+
 ```
 
 g1 motion file play  

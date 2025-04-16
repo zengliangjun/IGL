@@ -24,6 +24,12 @@ asap_trainer_registry["terminate_when_motion_far_curriculum"] = terminate_when_m
 from humanoidverse.envs.motion_tracking.asap.extends import asap_motion_save
 asap_trainer_registry["asap_motion_save"] = asap_motion_save.MotionSave
 
+# evaluater
+asap_evaluater_registry = copy.deepcopy(base_register.registry[legged_register.evaluater_namespace])
+asap_evaluater_registry.update(core_registry)
+asap_evaluater_registry["robotstatus_manager"] = asap_robotstatus.AsapStatus
+
+
 ############ REWARDS ############
 asap_rewards_registry = copy.deepcopy(base_register.rewards_registry[legged_register.trainer_namespace])
 
@@ -38,3 +44,6 @@ base_register.registry[player_namespace] = core_registry
 trainer_namespace: str  = "asap_trainer_task"
 base_register.registry[trainer_namespace] = asap_trainer_registry
 base_register.rewards_registry[trainer_namespace] = asap_rewards_registry
+
+evaluater_namespace: str  = "asap_evaluater_task"
+base_register.registry[evaluater_namespace] = asap_evaluater_registry

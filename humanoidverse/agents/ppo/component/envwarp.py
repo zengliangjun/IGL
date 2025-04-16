@@ -50,16 +50,21 @@ class EnvWarp(base.BaseComponent):
         ##
 
         obs_dict = _items['obs_dict']
-        rewards = _items['rewards']
         dones = _items['dones']
         infos = _items['infos']
         # critic_obs = privileged_obs if privileged_obs is not None else obs
         for obs_key in obs_dict.keys():
             obs_dict[obs_key] = obs_dict[obs_key].to(self.device)
-        rewards, dones = rewards.to(self.device), dones.to(self.device)
+
+        dones = dones.to(self.device)
+
+
+        if 'rewards' in _items:
+            rewards = _items['rewards']
+            rewards = rewards.to(self.device)
+            _inputs['rewards'] = rewards
 
         _inputs['obs_dict'] = obs_dict # TODO don't update
-        _inputs['rewards'] = rewards
         _inputs['dones'] = dones
         _inputs['infos'] = infos
 

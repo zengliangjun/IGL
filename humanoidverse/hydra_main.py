@@ -95,6 +95,10 @@ def main(
                         'experiment_name=MotionTracking_CR7',
                         'robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl'
                     ]
+                elif "base_eval" == config_name:
+                    args.overrides = [
+                        '+checkpoint=logs/ASAP/isaacgym/20250416_082938-MotionTracking_CR7-motion_tracking-g1_29dof_anneal_23dof/model_36600.pt'
+                    ]
                 else:
                     args.overrides = [
 

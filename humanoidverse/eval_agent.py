@@ -53,8 +53,8 @@ def listen_for_keypress(env):
 
 # from humanoidverse.envs.base_task.base_task import BaseTask
 # from humanoidverse.envs.base_task.omnih2o_cfg import OmniH2OCfg
-
-@hydra.main(config_path="config", config_name="base_eval")
+import hydra_main
+@hydra_main.main(config_path="config", config_name="base_eval")
 def main(override_config: OmegaConf):
     # logging to hydra log file
     hydra_log_path = os.path.join(HydraConfig.get().runtime.output_dir, "eval.log")
@@ -165,6 +165,8 @@ def main(override_config: OmegaConf):
     ckpt_num = config.checkpoint.split('/')[-1].split('_')[-1].split('.')[0]
     config.env.config.save_rendering_dir = str(checkpoint.parent / "renderings" / f"ckpt_{ckpt_num}")
     config.env.config.ckpt_dir = str(checkpoint.parent) # commented out for now, might need it back to save motion
+
+    config.env._target_ = config.env._target_ + "Evaluater"
     env = instantiate(config.env, device=device)
 
     # Start a thread to listen for key press

@@ -17,3 +17,17 @@ class GaitTrainer(LeggedRobotBase):
     def namespace(self):
         from humanoidverse.envs.locomotion.term import register
         return register.gait_trainer_namespace
+
+class LocomotionEvaluater(LeggedRobotBase):
+    def __init__(self, config, device):
+        super(LocomotionEvaluater, self).__init__(config, device)
+
+    @property
+    def namespace(self):
+        from humanoidverse.envs.locomotion.term import register
+        return register.evaluater_namespace
+
+
+class GaitEvaluater(LocomotionEvaluater):
+    def __init__(self, config, device):
+        super(GaitEvaluater, self).__init__(config, device)
