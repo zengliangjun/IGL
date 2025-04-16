@@ -3,16 +3,16 @@ from humanoidverse.envs.base_task.term.statistics import extras
 from humanoidverse.envs.base_task.term.foundation import episode, robotdata, terrain
 from humanoidverse.envs.base_task.term.mdp import actions, observations, rewards
 
-baseregistry: dict = {} # [str, base.BaseManager] = {}
+coreregistry: dict = {} # [str, base.BaseManager] = {}
 
-baseregistry["terrain_manager"] = terrain.BaseTerrainManager
-baseregistry["robotdata_manager"] = robotdata.BaseRobotDataManager
+coreregistry["terrain_manager"] = terrain.BaseTerrainManager         # core
+coreregistry["robotdata_manager"] = robotdata.BaseRobotDataManager   # core
 
 
-current_namespace: str  = "base_task"
+core_namespace: str  = "base_task"
 
 registry: dict = {}
-registry[current_namespace] = baseregistry
+registry[core_namespace] = coreregistry
 
 ############ REWARDS ############
 rewards_registry: dict = {}

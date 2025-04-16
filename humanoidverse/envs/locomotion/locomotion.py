@@ -1,19 +1,19 @@
 from humanoidverse.envs.legged_base_task.legged_robot_base import LeggedRobotBase
 
-class BaseLocomotion(LeggedRobotBase):
+class LocomotionTrainer(LeggedRobotBase):
     def __init__(self, config, device):
-        super(BaseLocomotion, self).__init__(config, device)
+        super(LocomotionTrainer, self).__init__(config, device)
 
     @property
     def namespace(self):
         from humanoidverse.envs.locomotion.term import register
-        return register.current_namespace
+        return register.trainer_namespace
 
-class GaitLocomotion(LeggedRobotBase):
+class GaitTrainer(LeggedRobotBase):
     def __init__(self, config, device):
-        super(GaitLocomotion, self).__init__(config, device)
+        super(GaitTrainer, self).__init__(config, device)
 
     @property
     def namespace(self):
         from humanoidverse.envs.locomotion.term import register
-        return register.gait_namespace
+        return register.gait_trainer_namespace

@@ -138,7 +138,7 @@ class BaseTask():
     @property
     def namespace(self):
         from humanoidverse.envs.base_task.term import register
-        return register.current_namespace
+        return register.core_namespace
 
     def _setup_manager(self):
         self.managers = {}

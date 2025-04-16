@@ -125,7 +125,7 @@ def main(override_config: OmegaConf):
         app_launcher = AppLauncher(args_cli)
         simulation_app = app_launcher.app
 
-    if simulator_type == 'IsaacSim':
+    if simulator_type == 'isaacsim':
         from omni.isaac.lab.app import AppLauncher
         import argparse
         parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -143,7 +143,7 @@ def main(override_config: OmegaConf):
         print('args_cli', args_cli)
         print('hydra_args', hydra_args)
         sys.argv = [sys.argv[0]] + hydra_args
-    if simulator_type == 'IsaacGym':
+    if simulator_type == 'isaacgym':
         import isaacgym
 
     from humanoidverse.agents.base_algo.base_algo import BaseAlgo  # noqa: E402

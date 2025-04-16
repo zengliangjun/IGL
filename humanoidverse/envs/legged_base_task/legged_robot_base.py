@@ -123,22 +123,13 @@ class LeggedRobotBase(BaseTask):
         # draw height lines
         self.gym.clear_lines(self.viewer)
         self._refresh_sim_tensors()
-        # sphere_geom = gymutil.WireframeSphereGeometry(0.02, 4, 4, None, color=(1, 1, 0))
-        # for i in range(self.num_envs):
-        #     base_pos = (self.simulator.robot_root_states[i, :3]).cpu().numpy()
-        #     heights = self.measured_heights[i].cpu().numpy()
-        #     height_points = quat_apply_yaw(self.base_quat[i].repeat(heights.shape[0]), self.height_points[i]).cpu().numpy()
-        #     for j in range(heights.shape[0]):
-        #         x = height_points[j, 0] + base_pos[0]
-        #         y = height_points[j, 1] + base_pos[1]
-        #         z = heights[j]
-        #         sphere_pose = gymapi.Transform(gymapi.Vec3(x, y, z), r=None)
-        #         gymutil.draw_lines(sphere_geom, self.gym, self.viewer, self.envs[i], sphere_pose)
+        for _key in self.managers:
+            self.managers[_key].draw_debug_vis()
 
     @property
     def namespace(self):
         from humanoidverse.envs.legged_base_task.term import register
-        return register.current_namespace
+        return register.core_namespace
 
     def _plot_domain_rand_params(self):
         raise NotImplementedError
