@@ -89,7 +89,7 @@ def main(config: OmegaConf):
                 config=unresolved_conf,
                 dir=wandb_dir)
 
-    device = "cuda:1" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     pre_process_config(config)
 

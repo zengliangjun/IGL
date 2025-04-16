@@ -107,7 +107,24 @@ def main(override_config: OmegaConf):
         else:
             config = override_config
 
-    simulator_type = config.simulator['_target_'].split('.')[-1]
+    simulator_type = config.simulator.config.name
+    if simulator_type == 'isaacsim45':
+        from isaaclab.app import AppLauncher
+        import argparse
+        parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
+        AppLauncher.add_app_launcher_args(parser)
+
+        args_cli, hydra_args = parser.parse_known_args()
+        sys.argv = [sys.argv[0]] + hydra_args
+        args_cli.num_envs = config.num_envs
+        args_cli.seed = config.seed
+        args_cli.env_spacing = config.env.config.env_spacing # config.env_spacing
+        args_cli.output_dir = config.output_dir
+        args_cli.headless = config.headless
+
+        app_launcher = AppLauncher(args_cli)
+        simulation_app = app_launcher.app
+
     if simulator_type == 'IsaacSim':
         from omni.isaac.lab.app import AppLauncher
         import argparse

@@ -24,8 +24,27 @@ from utils.config_utils import *  # noqa: E402, F403
 def main(config: OmegaConf):
     # import ipdb; ipdb.set_trace()
     simulator_type = config.simulator['_target_'].split('.')[-1]
+
+    simulator_type = config.simulator.config.name
     # import ipdb; ipdb.set_trace()
-    if simulator_type == 'IsaacSim':
+    if simulator_type == 'isaacsim45':
+        from isaaclab.app import AppLauncher
+        import argparse
+        parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
+        AppLauncher.add_app_launcher_args(parser)
+
+        args_cli, hydra_args = parser.parse_known_args()
+        sys.argv = [sys.argv[0]] + hydra_args
+        args_cli.num_envs = config.num_envs
+        args_cli.seed = config.seed
+        args_cli.env_spacing = config.env.config.env_spacing # config.env_spacing
+        args_cli.output_dir = config.output_dir
+        args_cli.headless = config.headless
+
+        app_launcher = AppLauncher(args_cli)
+        simulation_app = app_launcher.app
+
+    if simulator_type == 'isaacsim':
         from omni.isaac.lab.app import AppLauncher
         import argparse
         parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -43,7 +62,7 @@ def main(config: OmegaConf):
         simulation_app = app_launcher.app
 
         # import ipdb; ipdb.set_trace()
-    if simulator_type == 'IsaacGym':
+    if simulator_type == 'isaacgym':
         import isaacgym  # noqa: F401
 
 
@@ -88,7 +107,7 @@ def main(config: OmegaConf):
                 config=unresolved_conf,
                 dir=wandb_dir)
 
-    device = "cuda:1" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     pre_process_config(config)
 
