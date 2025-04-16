@@ -3,7 +3,7 @@ import numpy as np
 from humanoidverse.envs.legged_base_task.term.foundation import robotdata
 
 from motion_lib import motion_lib_robot
-
+from loguru import logger
 
 def _small_random_quaternions(obj, n, max_angle):
     axis = torch.randn((n, 3), device=obj.device)
@@ -57,10 +57,11 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         if "upper_body_link" in self.config.robot.motion:
             self.upper_body_id = [self.task.simulator._body_list.index(link) for link in self.config.robot.motion.upper_body_link]
 
-
     def reset(self, env_ids):
         if len(env_ids) == 0:
             return
+        # don't call super reset
+        # super(AsapMotion, self).reset(env_ids)
 
         self.motion_len[env_ids] = self._motion_lib.get_motion_length(self.motion_ids[env_ids])
         if self.task.is_evaluating and not self.config.enforce_randomize_motion_start_eval:
@@ -71,6 +72,25 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         ## stage 2
         self._reset_dofs(env_ids)
         self._reset_root_states(env_ids)
+
+    def pre_compute(self):
+        super(AsapMotion, self).pre_compute()
+        if self.config.resample_motion_when_training:
+            return
+
+        if self.task.is_evaluating:
+            return
+
+        if hasattr(self.task, 'episode_manager'):
+            return
+
+        episode_manager = self.task.episode_manager
+        if episode_manager.common_step_counter.item() % self.resample_time_interval:
+            return
+
+        logger.info(f"Resampling motion at step {self.common_step_counter.item()}")
+        self._motion_lib.load_motions(random_sample=True)
+        episode_manager.reset_buf[:] = 1
 
     ## help function
     def next_task(self):
@@ -117,6 +137,11 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         """
         motion_res = self.motion_res
 
+        if self.task.is_evaluating:
+            self.task.simulator.dof_pos[env_ids] = motion_res['dof_pos'][env_ids]
+            self.task.simulator.dof_vel[env_ids] = motion_res['dof_vel'][env_ids]
+            return
+
         dof_pos_noise = self.config.init_noise_scale.dof_pos * self.config.noise_to_initial_level
         dof_vel_noise = self.config.init_noise_scale.dof_vel * self.config.noise_to_initial_level
         dof_pos = motion_res['dof_pos'][env_ids]
@@ -155,10 +180,16 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         else:
             from isaac_utils.rotations import quat_mul, xyzw_to_wxyz
 
-            root_pos_noise = self.config.init_noise_scale.root_pos * self.config.noise_to_initial_level
-            root_rot_noise = self.config.init_noise_scale.root_rot * 3.14 / 180 * self.config.noise_to_initial_level
-            root_vel_noise = self.config.init_noise_scale.root_vel * self.config.noise_to_initial_level
-            root_ang_vel_noise = self.config.init_noise_scale.root_ang_vel * self.config.noise_to_initial_level
+            if self.task.is_evaluating:
+                root_pos_noise = 0
+                root_rot_noise = 0
+                root_vel_noise = 0
+                root_ang_vel_noise = 0
+            else:
+                root_pos_noise = self.config.init_noise_scale.root_pos * self.config.noise_to_initial_level
+                root_rot_noise = self.config.init_noise_scale.root_rot * 3.14 / 180 * self.config.noise_to_initial_level
+                root_vel_noise = self.config.init_noise_scale.root_vel * self.config.noise_to_initial_level
+                root_ang_vel_noise = self.config.init_noise_scale.root_ang_vel * self.config.noise_to_initial_level
 
             root_pos = motion_res['root_pos'][env_ids]
             root_rot = motion_res['root_rot'][env_ids]
