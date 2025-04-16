@@ -78,7 +78,11 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         self.motion_start_idx += self.num_envs
         if self.motion_start_idx >= self.num_motions:
             self.motion_start_idx = 0
-        self._motion_lib.load_motions(random_sample=False, start_idx=self.motion_start_idx)
+
+        if self.task.is_evaluating:
+            self._motion_lib.load_motions(random_sample=False, start_idx=self.motion_start_idx)
+        else:
+            self._motion_lib.load_motions(random_sample=True, start_idx=self.motion_start_idx)
 
     ###
     def _post_init_extend(self):

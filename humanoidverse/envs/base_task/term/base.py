@@ -1,6 +1,9 @@
 
 class BaseManager():
     def __init__(self, _task):
+        '''
+        simulator had setup
+        '''
         self.task = _task
         self.num_envs = _task.num_envs
         self.device = _task.device
@@ -8,14 +11,22 @@ class BaseManager():
 
     # stage 1
     def pre_init(self):
-        # init robot data
-        # init terrain
+        '''
+        help for simulator had loaded assets
+        and waitting for create envs
+        '''
         pass
 
     def init(self):
+        '''
+        simulator ready, applicable to initialization of each manager that does not depend on other managers
+        '''
         pass
 
     def post_init(self):
+        '''
+        simulator ready, applicable to initialization of each manager that depend on other managers
+        '''
         pass
 
     # stage 2

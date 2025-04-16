@@ -22,4 +22,4 @@ class ASAPMotionPlayer(LeggedRobotBase):
     @property
     def namespace(self):
         from humanoidverse.envs.motion_tracking.asap import register
-        return register.current_player
+        return register.player_namespace
