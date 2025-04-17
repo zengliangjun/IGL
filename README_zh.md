@@ -394,6 +394,24 @@ robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/s
 ```
 
 
+h1 motion file play  
+
+```bash
+HYDRA_FULL_ERROR=1 python humanoidverse/play_agent.py \
++simulator=isaacgym \
++exp=asap_motion_tracking \
++domain_rand=NO_domain_rand \
++rewards=asap_motion_tracking/reward_motion_tracking_dm_2real \
++robot=h1/OmniH2Oh1 \
++terrain=terrain_locomotion_plane \
++obs=asap_motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
+project_name=ASAP \
+experiment_name=OmniH2Oh1 \
+robot.motion.motion_file=data/motions/OmniH2O/stable_punch.pkl
+
+```
+
+
 
 # Citation
 Please use the following bibtex if you find this repo helpful and would like to cite:
