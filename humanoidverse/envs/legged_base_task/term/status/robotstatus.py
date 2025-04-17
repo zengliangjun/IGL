@@ -40,7 +40,8 @@ class LeggedStatusManager(base.BaseManager):
         self.last_dof_pos[env_ids] = 0.
         self.last_dof_vel[env_ids] = 0.
 
-    def post_compute(self):
+    def post_step(self):
+        ## record status for calcute
         self.last_dof_pos[:] = self.task.simulator.dof_pos[:]
         self.last_dof_vel[:] = self.task.simulator.dof_vel[:]
         self.last_root_vel[:] = self.task.simulator.robot_root_states[:, 7:13]

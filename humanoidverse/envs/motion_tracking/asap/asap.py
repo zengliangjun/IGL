@@ -18,7 +18,7 @@ class ASAPMotionEvaluater(LeggedRobotBase):
     def next_task(self):
         assert hasattr(self, "robotdata_manager")
         self.robotdata_manager.next_task()
-        super(ASAPMotionEvaluater, self).reset_all()
+        # super(ASAPMotionEvaluater, self).reset_all()
 
     def set_is_evaluating(self):
         super(ASAPMotionEvaluater, self).set_is_evaluating()

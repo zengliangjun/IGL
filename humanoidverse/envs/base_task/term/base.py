@@ -30,7 +30,15 @@ class BaseManager():
         pass
 
     # stage 2
+    def pre_step(self):
+        '''
+        task pre step, used for clean history invalid info
+        '''
+        pass
+
+
     def pre_physics_step(self, actions):
+        # actions, actuators
         pass
 
     def physics_step(self):
@@ -44,7 +52,7 @@ class BaseManager():
     def pre_compute(self):
         pass
 
-    def check_termination(self):
+    def compute_reset(self):
         # only for episode
         # update to compute
         pass
@@ -65,4 +73,7 @@ class BaseManager():
 
     # stage 4
     def draw_debug_vis(self):
+        pass
+
+    def post_step(self):
         pass

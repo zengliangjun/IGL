@@ -47,7 +47,7 @@ class LeggedRobotDataManager(robotdata.BaseRobotDataManager):
         else:
             self.task.simulator.robot_root_states[env_ids] = self.base_init_state
             self.task.simulator.robot_root_states[env_ids, :3] += terrain_manager.env_origins[env_ids]
-        # base velocities
 
+        # base velocities
         self.task.simulator.robot_root_states[env_ids, 7:13] = torch_rand_float(-0.5, 0.5, (len(env_ids), 6), device=str(self.device)) # [7:10]: lin vel, [10:13]: ang vel
 

@@ -20,7 +20,6 @@ class LeggedFeetManager(base.BaseManager):
     # stage 3
     def pre_compute(self):
         robotdata_manager = self.task.robotdata_manager
-
         ## contact update
         contact = self.task.simulator.contact_forces[:, robotdata_manager.feet_indices, 2] > 1.
         contact_filt = torch.logical_or(contact, self.contacts)
@@ -31,12 +30,16 @@ class LeggedFeetManager(base.BaseManager):
         self.feet_air_max_height = torch.max(self.feet_air_max_height, \
                                              self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2])
 
-    def post_compute(self):
+    def reset(self, env_ids):
+        ## TODO
+        pass
+
+    def post_step(self):
         self.feet_air_max_height *= ~self.contact_filt
         self.last_contacts_filt = self.contact_filt
 
-
     ######################### Observations #########################
     def _get_obs_feet_contact_force(self,):
-        return self.simulator.contact_forces[:, self.feet_indices, :].view(self.num_envs, -1)
+        robotdata_manager = self.task.robotdata_manager
+        return self.simulator.contact_forces[:, robotdata_manager.feet_indices, :].view(self.num_envs, -1)
 

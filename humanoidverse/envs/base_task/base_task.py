@@ -6,15 +6,18 @@ from loguru import logger
 # Base class for RL tasks
 class BaseTask():
     def __init__(self, config, device):
+        ## flags for policy evaluating
         self.config = config
+        self.num_envs = self.config.num_envs
+
+        self.debug_viz = False
+        self.is_evaluating = False
+
         # optimization flags for pytorch JIT
         torch._C._jit_set_profiling_mode(False)
         torch._C._jit_set_profiling_executor(False)
 
-        ## flags for policy evaluating
-        self.is_evaluating = False
-
-        # self.simulator = instantiate(config=self.config.simulator, device=device)
+        ## set simulator
         SimulatorClass = get_class(self.config.simulator._target_)
         self.simulator: BaseSimulator = SimulatorClass(config=self.config, device=device)
 
@@ -26,41 +29,36 @@ class BaseTask():
         self.up_axis_idx = 2 # Jiawei: HARD CODE FOR NOW
 
         self.dt = self.config.simulator.config.sim.control_decimation * self.sim_dt
-        self.num_envs = self.config.num_envs
 
+        ## set terrain
         terrain_mesh_type = self.config.terrain.mesh_type
         self.simulator.setup_terrain(terrain_mesh_type)
 
+        ## instance manager
         self._setup_manager()
-        # create envs, sim and viewer
+
+        ## load assets
         self.simulator.load_assets()
 
+        ## pre init
         self._pre_init()
 
+        # create envs, sim and viewer
         self._create_envs()
-        # self._create_sim()
-        self.simulator.prepare_sim()
-        # if running with a viewer, set up keyboard shortcuts and camera
-        self.viewer = None
 
-        self.debug_viz = False
+        self.simulator.prepare_sim()
         if self.headless == False:
             self.simulator.setup_viewer()
-            ###########################################################################
-            # Jiawei: Should be removed
-            ###########################################################################
-            self.viewer = self.simulator.viewer
 
+        ## init
         self._init()
-        self._post_init()
-        ###########################################################################
-        #### Jiawei: Should be removed
-        ###########################################################################
-        # self.gym = self.simulator.gym
-        # self.sim = self.simulator.sim
-        if self.headless == False:
-            self.viewer = self.simulator.viewer
 
+        ## post init
+        self._post_init()
+
+
+    ###########################################################################
+    # Helper functions
     def reset_all(self):
         """ Reset all robots"""
         self._reset(torch.arange(self.num_envs, device=self.device))
@@ -79,19 +77,6 @@ class BaseTask():
             #actor_state["actions"] = actions
             return self.step(actor_state)
 
-    # def _refresh_env_idx_tensors(self, env_ids):
-    #     env_ids_int32 = env_ids.to(dtype=torch.int32)
-    #     self.gym.set_actor_root_state_tensor_indexed(self.sim,
-    #                                                 gymtorch.unwrap_tensor(self.all_root_states),
-    #                                                 gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
-    #     self.gym.set_dof_state_tensor_indexed(self.sim,
-    #                                             gymtorch.unwrap_tensor(self.dof_state),
-    #                                             gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
-
-    def render(self, sync_frame_time=True):
-        if self.viewer:
-            self.simulator.render(sync_frame_time)
-
     def rand_episode_length(self):
         if self.is_evaluating:
             return
@@ -103,25 +88,7 @@ class BaseTask():
         logger.info("Setting Env is evaluating")
         self.is_evaluating = True
 
-    ###########################################################################
-    #### Helper functions
-    ###########################################################################
-    def _pre_init(self):
-        for _key in self.managers:
-            self.managers[_key].pre_init()
-
-    def _init(self):
-        for _key in self.managers:
-            self.managers[_key].init()
-
-    def _post_init(self):
-        for _key in self.managers:
-            self.managers[_key].post_init()
-
-    def _refresh_sim_tensors(self):
-        self.simulator.refresh_sim_tensors()
-        return
-
+    # internal functions
     def _create_envs(self):
         """ Creates environments:
              1. loads the robot URDF/MJCF asset,
@@ -135,10 +102,18 @@ class BaseTask():
         self.simulator.create_envs(self.num_envs,
                                     self.terrain_manager.env_origins,
                                     self.robotdata_manager.base_init_state)
-    @property
-    def namespace(self):
-        from humanoidverse.envs.base_task.term import register
-        return register.core_namespace
+
+    def _pre_init(self):
+        for _key in self.managers:
+            self.managers[_key].pre_init()
+
+    def _init(self):
+        for _key in self.managers:
+            self.managers[_key].init()
+
+    def _post_init(self):
+        for _key in self.managers:
+            self.managers[_key].post_init()
 
     def _setup_manager(self):
         self.managers = {}
@@ -149,3 +124,7 @@ class BaseTask():
             self.managers[_name] = _manager
             setattr(self, _name, _manager)
 
+    @property
+    def namespace(self):
+        from humanoidverse.envs.base_task.term import register
+        return register.core_namespace

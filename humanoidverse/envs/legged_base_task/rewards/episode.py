@@ -8,4 +8,4 @@ class EpisodeRewards(base.BaseManager):
     def _reward_termination(self):
         _episode_manager = self.task.episode_manager
         # Terminal reward / penalty
-        return _episode_manager.reset_buf * ~_episode_manager.time_out_buf
+        return _episode_manager.termination_buf

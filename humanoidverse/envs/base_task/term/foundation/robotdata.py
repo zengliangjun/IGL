@@ -7,6 +7,9 @@ class BaseRobotDataManager(base.BaseManager):
         super(BaseRobotDataManager, self).__init__(_task)
 
     def pre_init(self):
+        '''
+        simulator had instanced
+        '''
         self.num_dof = self.task.simulator.num_dof
         self.num_bodies = self.task.simulator.num_bodies
         self.dof_names = self.task.simulator.dof_names
@@ -26,6 +29,10 @@ class BaseRobotDataManager(base.BaseManager):
         self.base_init_state = to_torch(base_init_state_list, device=self.device, requires_grad=False)
 
     def init(self):
+        '''
+        envs had created
+        '''
+
         self.dof_pos_limits, \
         self.dof_vel_limits, \
         self.torque_limits = self.task.simulator.get_dof_limits_properties()
@@ -51,7 +58,6 @@ class BaseRobotDataManager(base.BaseManager):
 
         self.penalised_contact_indices = torch.zeros(len(penalized_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(penalized_contact_names)):
-
             self.penalised_contact_indices[i] = self.task.simulator.find_rigid_body_indice(penalized_contact_names[i])
 
         self.termination_contact_indices = torch.zeros(len(termination_contact_names), dtype=torch.long, device=self.device, requires_grad=False)

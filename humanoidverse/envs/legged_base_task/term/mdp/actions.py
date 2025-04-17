@@ -61,7 +61,7 @@ class LeggedActionsManager(BaseActionsManager):
                     self.config.domain_rand.ctrl_delay_step_range[1]+1,
                      (len(env_ids),), device=self.device, requires_grad=False)
 
-    def post_compute(self):
+    def post_step(self):
         self.last_actions[:] = self.actions[:]
 
     @property
@@ -71,4 +71,3 @@ class LeggedActionsManager(BaseActionsManager):
     ######################### Observations #########################
     def _get_obs_actions(self,):
         return self.actions
-

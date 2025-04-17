@@ -27,7 +27,7 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         super(AsapMotion, self).pre_init()
         ## status
         self.motion_ids = torch.arange(self.num_envs).to(self.device)
-        self.motion_len = torch.zeros(self.num_envs, dtype=torch.float32, device=self.device, requires_grad=False)
+        # self.motion_len = torch.zeros(self.num_envs, dtype=torch.float32, device=self.device, requires_grad=False)
         self.motion_start_times = torch.zeros(self.num_envs, dtype=torch.float32, device=self.device, requires_grad=False)
 
         ## motion
@@ -61,7 +61,7 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         # NOTE don't call super reset
         # super(AsapMotion, self).reset(env_ids)
 
-        self.motion_len[env_ids] = self._motion_lib.get_motion_length(self.motion_ids[env_ids])
+        # self.motion_len[env_ids] = self._motion_lib.get_motion_length(self.motion_ids[env_ids])
         if self.task.is_evaluating and not self.config.enforce_randomize_motion_start_eval:
             self.motion_start_times[env_ids] = torch.zeros(len(env_ids), dtype=torch.float32, device=self.device)
         else:

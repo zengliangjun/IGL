@@ -21,13 +21,9 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
     # stage 1
     def init(self):
         super(LeggedRewardsManager, self).init()
-        #self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
-        #self.forward_vec = to_torch([1., 0., 0.], device=self.device).repeat((self.num_envs, 1))
         for _name in self.rewards_dict:
             _rewards = self.rewards_dict[_name]
             _rewards.init()
-            #setattr(self, _name, _rewards)
-
 
     def post_init(self):
         """ Prepares a list of reward functions, whcih will be called to compute the total reward.
@@ -102,6 +98,9 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
             Calls each reward function which had a non-zero scale (processed in self._prepare_reward_function())
             adds each terms to the episode sums and to the total reward
         """
+        # it must here
+        self._pre_curriculum_compute()
+
         self.rew_buf[:] = 0.
         for i in range(len(self.reward_functions)):
             name = self.reward_names[i]
@@ -125,15 +124,6 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
             self.rew_buf += rew
             self.episode_sums["termination"] += rew
 
-        if self.use_reward_penalty_curriculum:
-            assert hasattr(self.task, "extras_manager")
-            extras_manager = self.task.extras_manager
-            assert hasattr(self.task, "episode_manager")
-            episode_manager = self.task.episode_manager
-
-            extras_manager.log_dict["penalty_scale"] = torch.tensor(self.reward_penalty_scale, dtype=torch.float)
-            extras_manager.log_dict["average_episode_length"] = episode_manager.average_episode_length
-
     def reset(self, env_ids):
         # fill extras
         # if not hasattr(self.task, "extras_manager") or not hasattr(self.task, "episode_manager"):
@@ -154,9 +144,21 @@ class LeggedRewardsManager(rewards.BaseRewardsManager):
 
         extras_manager.extras["episode"] = _rew_episode
 
-    def compute(self):
-        # after with episode.reset(self, env_ids)
-        ################ Curriculum #################
+    def post_compute(self):
+        if not self.use_reward_penalty_curriculum:
+            return
+
+        assert hasattr(self.task, "extras_manager")
+        extras_manager = self.task.extras_manager
+        assert hasattr(self.task, "episode_manager")
+        episode_manager = self.task.episode_manager
+
+        extras_manager.log_dict["penalty_scale"] = torch.tensor(self.reward_penalty_scale, dtype=torch.float)
+        extras_manager.log_dict["average_episode_length"] = episode_manager.average_episode_length
+
+    ## help functions
+    def _pre_curriculum_compute(self):
+        # episode_manager.average_episode_length update at compute_reset
         """
         Update the penalty curriculum based on the average episode length.
 

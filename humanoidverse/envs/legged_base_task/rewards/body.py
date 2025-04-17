@@ -15,7 +15,7 @@ class UpperBodyRewards(base.BaseManager):
         torso_ang_vel = quat_rotate_inverse(self.task.simulator._rigid_body_rot[:, robotdata_manager.torso_index],
                                             self.task.simulator._rigid_body_ang_vel[:, robotdata_manager.torso_index])
         return torch.sum(torch.square(torso_ang_vel[:, :2]), dim=1)
-    
+
     def _reward_upperbody_joint_angle_freeze(self):
         # returns keep the upper body joint angles close to the default
         assert self.config.robot.has_upper_body_dof
@@ -30,7 +30,7 @@ class UpperBodyRewards(base.BaseManager):
         return torch.square(base_height - self.config.rewards.desired_base_height)
 
     def _reward_penalty_hip_pos(self):
-        # TODO HIP is leg ?
+        # TODO
         # Penalize the hip joints (only roll and yaw)
         robotdata_manager = self.task.robotdata_manager
 

@@ -7,8 +7,11 @@ class BaseTerrainManager(base.BaseManager):
         super(BaseTerrainManager, self).__init__(_task)
 
     def pre_init(self):
-        """ Sets environment origins. On rough terrain the origins are defined by the terrain platforms.
-            Otherwise create a grid.
+        """
+        Sets environment origins. On rough terrain the origins are defined by the terrain platforms.
+        Otherwise create a grid.
+
+        simulator had instanced
         """
         if self.config.terrain.mesh_type in ["heightfield", "trimesh"]:
             # import ipdb; ipdb.set_trace()
@@ -23,7 +26,7 @@ class BaseTerrainManager(base.BaseManager):
             if isinstance(self.task.simulator.terrain.env_origins, np.ndarray):
                 self.terrain_origins = torch.from_numpy(self.task.simulator.terrain.env_origins).to(self.device).to(torch.float)
             else:
-                self.terrain_origins = self.task.simulator.terrain.env_origins.to(self.device).to(torch.float)   
+                self.terrain_origins = self.task.simulator.terrain.env_origins.to(self.device).to(torch.float)
             self.env_origins[:] = self.terrain_origins[self.terrain_levels, self.terrain_types]
             # import ipdb; ipdb.set_trace()
             # print(self.terrain_origins.shape)
