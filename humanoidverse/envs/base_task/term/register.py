@@ -7,7 +7,9 @@ coreregistry: dict = {} # [str, base.BaseManager] = {}
 
 coreregistry["terrain_manager"] = terrain.BaseTerrainManager         # core
 coreregistry["robotdata_manager"] = robotdata.BaseRobotDataManager   # core
-
+coreregistry["observations_manager"] = observations.BaseObservations
+coreregistry["rewards_manager"] = rewards.BaseRewardsManager
+coreregistry["episode_manager"] = episode.BaseEpisode              # core
 
 core_namespace: str  = "base_task"
 
