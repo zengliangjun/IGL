@@ -8,8 +8,10 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
     def _reward_teleop_body_position_extend(self):
         _robotstatus_manager = self.task.robotstatus_manager
         _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
 
-        ref_body_pos = _robotstatus_manager.motion_res["rg_pos_t"]
+        ref_body_pos = _robotdata_manager.current_motion_ref["rg_pos_t"]
         dif_global_body_pos = ref_body_pos - _robotstatus_manager._rigid_body_pos
 
         upper_body_diff = dif_global_body_pos[:, _robotdata_manager.upper_body_id, :]
@@ -27,8 +29,10 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
     def _reward_teleop_vr_3point(self):
         _robotstatus_manager = self.task.robotstatus_manager
         _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
 
-        ref_body_pos = _robotstatus_manager.motion_res["rg_pos_t"]
+        ref_body_pos = _robotdata_manager.current_motion_ref["rg_pos_t"]
         dif_global_body_pos = ref_body_pos - _robotstatus_manager._rigid_body_pos
 
         vr_3point_diff = dif_global_body_pos[:, _robotdata_manager.motion_tracking_id, :]
@@ -39,8 +43,10 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
     def _reward_teleop_body_position_feet(self):
         _robotstatus_manager = self.task.robotstatus_manager
         _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
 
-        ref_body_pos = _robotstatus_manager.motion_res["rg_pos_t"]
+        ref_body_pos = _robotdata_manager.current_motion_ref["rg_pos_t"]
         dif_global_body_pos = ref_body_pos - _robotstatus_manager._rigid_body_pos
 
         feet_diff = dif_global_body_pos[:, _robotdata_manager.feet_indices, :]
@@ -50,9 +56,11 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
 
     def _reward_teleop_body_rotation_extend(self):
         _robotstatus_manager = self.task.robotstatus_manager
-        #_robotdata_manager = self.task.robotdata_manager
+        _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
 
-        ref_body_rot = _robotstatus_manager.motion_res["rg_rot_t"] # [num_envs, num_markers, 4]
+        ref_body_rot = _robotdata_manager.current_motion_ref["rg_rot_t"] # [num_envs, num_markers, 4]
         rotation_diff = ref_body_rot - _robotstatus_manager._rigid_body_rot
 
         diff_body_rot_dist = (rotation_diff**2).mean(dim=-1).mean(dim=-1)
@@ -61,9 +69,11 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
 
     def _reward_teleop_body_velocity_extend(self):
         _robotstatus_manager = self.task.robotstatus_manager
-        #_robotdata_manager = self.task.robotdata_manager
+        _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
 
-        ref_body_vel = _robotstatus_manager.motion_res["body_vel_t"] # [num_envs, num_markers, 3]
+        ref_body_vel = _robotdata_manager.current_motion_ref["body_vel_t"] # [num_envs, num_markers, 3]
         velocity_diff = ref_body_vel - _robotstatus_manager._rigid_body_vel
 
         diff_body_vel_dist = (velocity_diff**2).mean(dim=-1).mean(dim=-1)
@@ -72,7 +82,11 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
 
     def _reward_teleop_body_ang_velocity_extend(self):
         _robotstatus_manager = self.task.robotstatus_manager
-        ref_body_ang_vel = _robotstatus_manager.motion_res["body_ang_vel_t"] # [num_envs, num_markers, 3]
+        _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
+
+        ref_body_ang_vel = _robotdata_manager.current_motion_ref["body_ang_vel_t"] # [num_envs, num_markers, 3]
         ang_velocity_diff = ref_body_ang_vel - _robotstatus_manager._rigid_body_ang_vel
 
         diff_body_ang_vel_dist = (ang_velocity_diff**2).mean(dim=-1).mean(dim=-1)
@@ -80,8 +94,11 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
         return r_body_ang_vel
 
     def _reward_teleop_joint_position(self):
-        _robotstatus_manager = self.task.robotstatus_manager
-        ref_joint_pos = _robotstatus_manager.motion_res["dof_pos"] # [num_envs, num_dofs]
+        _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
+
+        ref_joint_pos = _robotdata_manager.current_motion_ref["dof_pos"] # [num_envs, num_dofs]
 
         joint_pos_diff = ref_joint_pos - self.task.simulator.dof_pos
         diff_joint_pos_dist = (joint_pos_diff**2).mean(dim=-1)
@@ -89,8 +106,11 @@ class ASAPStatusRewards(robotstatus.StatusRewards):
         return r_joint_pos
 
     def _reward_teleop_joint_velocity(self):
-        _robotstatus_manager = self.task.robotstatus_manager
-        ref_joint_vel = _robotstatus_manager.motion_res["dof_vel"] # [num_envs, num_dofs]
+        _robotdata_manager = self.task.robotdata_manager
+        if not hasattr(_robotdata_manager, 'current_motion_ref'):
+            return torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
+
+        ref_joint_vel = _robotdata_manager.current_motion_ref["dof_vel"] # [num_envs, num_dofs]
         joint_vel_diff = ref_joint_vel - self.task.simulator.dof_vel
 
         diff_joint_vel_dist = (joint_vel_diff**2).mean(dim=-1)

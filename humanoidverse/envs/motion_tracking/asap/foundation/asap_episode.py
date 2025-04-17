@@ -15,28 +15,29 @@ class ASAPEpisode(episode.LeggedEpisode):
         logger.info(f"Terminate when motion far threshold: {self.terminate_when_motion_far_threshold}")
 
     ## termination with motion_far
-    def _update_reset_buf(self):
-        super(ASAPEpisode, self)._update_reset_buf()
+    def _check_termination(self):
+        super(ASAPEpisode, self)._check_termination()
 
         if not self.config.termination.terminate_when_motion_far:
             return
 
-        if not hasattr(self.task, "robotstatus_manager"):
-            return
-
+        robotdata_manager = self.task.robotdata_manager
         robotstatus_manager = self.task.robotstatus_manager
 
-        ref_body_pos = robotstatus_manager.motion_res["rg_pos_t"]
+        if not hasattr(robotdata_manager, 'current_motion_ref'):
+            return
+
+        ref_body_pos = robotdata_manager.current_motion_ref["rg_pos_t"]
         ## diff compute - kinematic position
         _dif_global_body_pos = ref_body_pos - robotstatus_manager._rigid_body_pos
 
         reset_buf_motion_far = torch.any(torch.norm(_dif_global_body_pos, dim=-1) > self.terminate_when_motion_far_threshold, dim=-1)
-        self.reset_buf |= reset_buf_motion_far
+        self.termination_buf |= reset_buf_motion_far
         # log current motion far threshold
 
     ## termination with timeout
-    def _update_timeout_buf(self):
-        super(ASAPEpisode, self)._update_timeout_buf()
+    def _check_time_out(self):
+        super(ASAPEpisode, self)._check_time_out()
 
         if self.config.termination.terminate_when_motion_end:
             robotdata_manager = self.task.robotdata_manager

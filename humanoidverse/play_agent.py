@@ -26,18 +26,10 @@ def on_press(key, env):
         # Force Control
        # Force Control
         if hasattr(key, 'char'):
-            if key.char == '1':
-                env.apply_force_tensor[:, env.left_hand_link_index, 2] += 1.0
-                logger.info(f"Left hand force: {env.apply_force_tensor[:, env.left_hand_link_index, :]}")
-            elif key.char == '2':
-                env.apply_force_tensor[:, env.left_hand_link_index, 2] -= 1.0
-                logger.info(f"Left hand force: {env.apply_force_tensor[:, env.left_hand_link_index, :]}")
-            elif key.char == '3':
-                env.apply_force_tensor[:, env.right_hand_link_index, 2] += 1.0
-                logger.info(f"Right hand force: {env.apply_force_tensor[:, env.right_hand_link_index, :]}")
-            elif key.char == '4':
-                env.apply_force_tensor[:, env.right_hand_link_index, 2] -= 1.0
-                logger.info(f"Right hand force: {env.apply_force_tensor[:, env.right_hand_link_index, :]}")
+            if key.char == 'T' or key.char == 't':
+                env.next_task()
+                logger.info(f"next_task")
+
     except AttributeError:
         pass
 
@@ -155,7 +147,6 @@ def main(config: OmegaConf):
     while True:
         _state = {}
         env.step(_state)
-
 
 
 if __name__ == "__main__":

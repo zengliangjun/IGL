@@ -45,7 +45,7 @@ class MotionfarCurrculum(base.BaseManager):
                                                          self.config.termination_curriculum.terminate_when_motion_far_threshold_min,
                                                          self.config.termination_curriculum.terminate_when_motion_far_threshold_max)
 
-    def pre_compute(self):
+    def post_compute(self):
         if not self.config.termination.terminate_when_motion_far or \
            not self.config.termination_curriculum.terminate_when_motion_far_curriculum:
             return

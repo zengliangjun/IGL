@@ -12,15 +12,16 @@ class LeggedEpisode(episode.BaseEpisode):
 
         self.common_step_counter = torch.tensor(0, device=self.device, dtype=torch.long)
         # for reward penalty curriculum
+        # NOTE it is used after reset
         self.average_episode_length = torch.tensor(0, device=self.device, dtype=torch.long) # num_compute_average_epl last termination episode length
-        self.last_episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
 
     # stage 3
-    def pre_compute(self):
-        super(LeggedEpisode, self).pre_compute()
+    def pre_step(self):
+        super(LeggedEpisode, self).pre_step()
         self.common_step_counter  +=1
+        # it will reset to 0
         self.episode_length_buf += 1
-
+        # keep status for later calcute
 
     def compute_reset(self):
         super(LeggedEpisode, self).compute_reset()
@@ -32,18 +33,19 @@ class LeggedEpisode(episode.BaseEpisode):
         env_ids = self.reset_env_ids
         if len(env_ids) == 0:
             return
-        self.episode_length_buf[env_ids] = 0
 
-        # for curriculum
+        # calcute average_episode_length first
         num = len(env_ids)
-        current_average_episode_length = torch.mean(self.last_episode_length_buf[env_ids], dtype=torch.float)
+        current_average_episode_length = torch.mean(self.episode_length_buf[env_ids], dtype=torch.float)
         self.average_episode_length = self.average_episode_length * (1 - num / self.num_compute_average_epl) + current_average_episode_length * (num / self.num_compute_average_epl)
+        # reset average_episode_length later
+        self.episode_length_buf[env_ids] = 0
 
     def reset(self, env_ids):
         pass
 
     def post_step(self):
-        self.last_episode_length_buf[:] = self.episode_length_buf[:]
+        pass
 
     @property
     def reset_env_ids(self):
