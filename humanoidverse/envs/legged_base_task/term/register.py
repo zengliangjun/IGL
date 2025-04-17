@@ -9,7 +9,6 @@ core_registry["actuators_manager"] = actuators.LeggedActuatorsManager  # core
 core_registry["episode_manager"] = episode.LeggedEpisode              # core
 core_registry["robotdata_manager"] = robotdata.LeggedRobotDataManager  # core
 
-
 trainer_registry = copy.deepcopy(core_registry)
 # trainer
 from humanoidverse.envs.legged_base_task.term.status import feet, robotstatus # status
@@ -21,12 +20,13 @@ trainer_registry["history_manager"] = history.LeggedHistoryManager
 
 
 from humanoidverse.envs.legged_base_task.term.mdp import actions, \
-    command, observations, rewards                                     # mdp
+    command, observations, rewards, terminations                   # mdp
 
 trainer_registry["command_manager"] = command.LeggedCommandManager
 trainer_registry["actions_manager"] = actions.LeggedActionsManager
 trainer_registry["observations_manager"] = observations.LeggedObservations
 trainer_registry["rewards_manager"] = rewards.LeggedRewardsManager
+trainer_registry["terminations_manager"] = terminations.TerminationManager
 
 # level 2
 from humanoidverse.envs.legged_base_task.term.sim2real import push
@@ -42,11 +42,6 @@ trainer_registry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCu
 from humanoidverse.envs.legged_base_task.term.statistics import extras
 trainer_registry["extras_manager"] = extras.LeggedExtrasManager          # core
 
-core_namespace: str  = "legged_core_task"
-trainer_namespace: str  = "legged_trainer_task"
-register.registry[core_namespace] = core_registry
-register.registry[trainer_namespace] = trainer_registry
-
 
 evaluater_registry = copy.deepcopy(core_registry)
 # evaluater
@@ -59,6 +54,7 @@ from humanoidverse.envs.legged_base_task.term.mdp import actions, \
 evaluater_registry["command_manager"] = command.LeggedCommandManager
 evaluater_registry["actions_manager"] = actions.LeggedActionsManager
 evaluater_registry["observations_manager"] = observations.LeggedObservations
+evaluater_registry["terminations_manager"] = terminations.TerminationManager
 # level 2
 evaluater_registry["extras_manager"] = extras.LeggedExtrasManager
 
