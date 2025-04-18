@@ -1,5 +1,6 @@
 import torch
 from humanoidverse.envs.base_task.term import base
+from humanoidverse.envs.base_task.term.mdp import reset
 import numpy as np
 
 class BaseEpisode(base.BaseManager):
@@ -7,14 +8,9 @@ class BaseEpisode(base.BaseManager):
         super(BaseEpisode, self).__init__(_task)
         self.max_episode_length_s = self.config.max_episode_length_s
         self.max_episode_length = np.ceil(self.max_episode_length_s / self.task.dt)
+        self.reset_manager = reset.Reset(self.task)
 
     # stage 1
-    def pre_init(self):
-        super(BaseEpisode, self).pre_init()
-        self._collect_compute_reset()
-
-
-
     def init(self):
         # time out flags
         self.time_out_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.bool)
@@ -28,6 +24,7 @@ class BaseEpisode(base.BaseManager):
         # for reward penalty curriculum
         # NOTE it is used after reset
         self.average_episode_length = torch.tensor(0, device=self.device, dtype=torch.long) # num_compute_average_epl last termination episode length
+        self.reset_manager.init()
 
     ## stage 2
     def pre_step(self):
@@ -44,18 +41,8 @@ class BaseEpisode(base.BaseManager):
         """ Check if environments need to be reset
         """
         # termination
-        for _termination in self.check_termination_dict.values():
-            _reset = _termination()
-            if _reset is None:
-                continue
-            self.termination_buf |= _reset
-
-        # time_out
-        for _time_out in self.check_time_out_dict.values():
-            _reset = _time_out()
-            if _reset is None:
-                continue
-            self.time_out_buf |= _reset
+        self.reset_manager.compute_reset()
+        self._time_out()
 
         env_ids = self.reset_env_ids
         if len(env_ids) == 0:
@@ -84,22 +71,7 @@ class BaseEpisode(base.BaseManager):
     def rand_episode_length(self):
         self.episode_length_buf = torch.randint_like(self.episode_length_buf, high=int(self.max_episode_length))
 
-    def _collect_compute_reset(self):
-        self.check_termination_dict = {}
-        self.check_time_out_dict = {}
-
-        for _manager in self.task.managers.values():
-            _items = dir(_manager)
-            for _item in _items:
-                if _item.startswith("_check_termination"):
-                    _termination_function = getattr(_manager, _item)
-                    self.check_termination_dict[_item] = _termination_function
-                elif _item.startswith("_check_time_out"):
-                    _time_out_function = getattr(_manager, _item)
-                    self.check_time_out_dict[_item] = _time_out_function
-
-                #setattr(self, _item, _termination_function)
-
     ###############################################################################
-    def _check_time_out(self):
+    def _time_out(self):
+        # this functions is not manage by reset
         return self.episode_length_buf > self.max_episode_length # no terminal reward for time-outs

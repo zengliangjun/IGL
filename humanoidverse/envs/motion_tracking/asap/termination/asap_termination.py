@@ -13,10 +13,7 @@ class TrackTermination(base.BaseManager):
         logger.info(f"Terminate when motion far threshold: {self.terminate_when_motion_far_threshold}")
 
     ## termination with motion_far
-    def _check_termination(self):
-        if not self.config.termination.terminate_when_motion_far:
-            return None
-
+    def _check_terminate_when_motion_far(self):
         robotdata_manager = self.task.robotdata_manager
         robotstatus_manager = self.task.robotstatus_manager
 
@@ -32,9 +29,7 @@ class TrackTermination(base.BaseManager):
         # log current motion far threshold
 
     ## termination with timeout
-    def _check_time_out(self):
-        if not self.config.termination.terminate_when_motion_end:
-            return None
+    def _check_time_out_when_motion_end(self):
         assert hasattr(self.task, "episode_manager")
         episode_manager = self.task.episode_manager
         robotdata_manager = self.task.robotdata_manager

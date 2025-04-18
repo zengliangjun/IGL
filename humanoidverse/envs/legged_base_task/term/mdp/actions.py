@@ -21,7 +21,7 @@ class LeggedActionsManager(BaseActionsManager):
         clip_action_limit = self.config.robot.control.action_clip_value
         self.actions = torch.clip(actions, -clip_action_limit, clip_action_limit).to(self.device)
         ## delay
-        self.actions_after_delay = self.ctrl_delay.pre_physics_step(self, actions)
+        self.actions_after_delay = self.ctrl_delay.pre_physics_step(actions)
 
 
     def post_physics_step(self):
