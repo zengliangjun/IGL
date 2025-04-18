@@ -339,15 +339,15 @@ robot:
         parent_name: "right_elbow_link"
         pos: [0.3, 0.0, 0.0]
         rot: [1.0, 0.0, 0.0, 0.0]
-      - joint_name: "head_link"
-        parent_name: "pelvis"
-        pos: [0.0, 0.0, 0.6]
-        rot: [1.0, 0.0, 0.0, 0.0]
+      #- joint_name: "head_link"
+      #  parent_name: "torso_link"
+      #  pos: [0.0, 0.0, 0.6]
+      #  rot: [1.0, 0.0, 0.0, 0.0]
 
     motion_tracking_link:
       - "left_hand_link"
       - "right_hand_link"
-      - "head_link"
+      #- "head_link"
 
     lower_body_link:
       - "pelvis"
@@ -361,9 +361,9 @@ robot:
       - "right_hip_pitch_link"
       - "right_knee_link"
       - "right_ankle_link"
+      - "torso_link"
 
     upper_body_link:
-      - "torso_link"
       - "left_shoulder_pitch_link"
       - "left_shoulder_roll_link"
       - "left_shoulder_yaw_link"
@@ -374,7 +374,7 @@ robot:
       - "right_elbow_link"
       - "left_hand_link"
       - "right_hand_link"
-      - "head_link"
+      #- "head_link"
 
     pelvis_link: "pelvis"
     base_link: "torso_link"
@@ -411,4 +411,4 @@ robot:
       - [0.929, 0.867, 0.437] # right_elbow_joint
       - [0, 0.351, 0.613] # left_elbow_joint_extend
       - [0, 0.351, 0.613] # right_elbow_joint_extend
-      - [0, 0.351, 0.613] # head_link
+      #- [0, 0.351, 0.613] # head_link
