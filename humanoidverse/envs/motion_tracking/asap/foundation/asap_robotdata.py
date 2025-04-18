@@ -40,8 +40,12 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         if self.config.resample_motion_when_training:
             self.resample_time_interval = np.ceil(self.config.resample_time_interval_s / self.task.dt)
 
-    def post_init(self):
-        super(AsapMotion, self).post_init()
+    def init(self):
+        super(AsapMotion, self).init()
+        if "extend_config" in self.config.robot.motion:
+            for extend_config in self.config.robot.motion.extend_config:
+                self.task.simulator._body_list.append(extend_config["joint_name"])
+
         if "motion_tracking_link" in self.config.robot.motion:
             self.motion_tracking_id = [self.task.simulator._body_list.index(link) for link in self.config.robot.motion.motion_tracking_link]
         if "lower_body_link" in self.config.robot.motion:

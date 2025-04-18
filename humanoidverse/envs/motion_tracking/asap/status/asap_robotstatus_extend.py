@@ -22,7 +22,6 @@ class AsapMotionExtends(base.BaseManager):
             # extend_parent_ids.append(self.task.simulator.find_rigid_body_indice(extend_config["parent_name"]))
             extend_pos.append(extend_config["pos"])
             extend_rot.append(extend_config["rot"])
-            self.task.simulator._body_list.append(extend_config["joint_name"])
 
         self.extend_body_parent_ids = torch.tensor(extend_parent_ids, device=self.device, dtype=torch.long)
         self.extend_body_pos_in_parent = torch.tensor(extend_pos).repeat(self.num_envs, 1, 1).to(self.device)

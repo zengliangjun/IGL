@@ -20,13 +20,9 @@ from pynput import keyboard
 
 def on_press(key, env):
     try:
-        if key.char == 'n':
-            env.next_task()
-            logger.info("Moved to the next task.")
-        # Force Control
        # Force Control
         if hasattr(key, 'char'):
-            if key.char == 'T' or key.char == 't':
+            if key.char == 'N' or key.char == 'N':
                 env.next_task()
                 logger.info(f"next_task")
 

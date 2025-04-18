@@ -46,4 +46,9 @@ base_register.registry[evaluater_namespace] = asap_evaluater_registry
 base_register.rewards_registry[evaluater_namespace] = {}
 
 player_namespace: str  = "asap_player_task"
+
+if 'rewards_manager' in asap_player_registry:
+    asap_player_registry.pop("rewards_manager")
+if 'observations_manager' in asap_player_registry:
+    asap_player_registry.pop("observations_manager")
 base_register.registry[player_namespace] = asap_player_registry
