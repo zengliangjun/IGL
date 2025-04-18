@@ -102,16 +102,16 @@ class BaseTask():
                                     self.robotdata_manager.base_init_state)
 
     def _pre_init(self):
-        for _key in self.managers:
-            self.managers[_key].pre_init()
+        for _manager in self.managers.values():
+            _manager.pre_init()
 
     def _init(self):
-        for _key in self.managers:
-            self.managers[_key].init()
+        for _manager in self.managers.values():
+            _manager.init()
 
     def _post_init(self):
-        for _key in self.managers:
-            self.managers[_key].post_init()
+        for _manager in self.managers.values():
+            _manager.post_init()
 
     def _setup_manager(self):
         self.managers = {}

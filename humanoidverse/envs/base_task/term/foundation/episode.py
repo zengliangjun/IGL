@@ -44,15 +44,15 @@ class BaseEpisode(base.BaseManager):
         """ Check if environments need to be reset
         """
         # termination
-        for _key in self.check_termination_dict:
-            _reset = self.check_termination_dict[_key]()
+        for _termination in self.check_termination_dict.values():
+            _reset = _termination()
             if _reset is None:
                 continue
             self.termination_buf |= _reset
 
         # time_out
-        for _key in self.check_time_out_dict:
-            _reset = self.check_time_out_dict[_key]()
+        for _time_out in self.check_time_out_dict.values():
+            _reset = _time_out()
             if _reset is None:
                 continue
             self.time_out_buf |= _reset
@@ -88,8 +88,7 @@ class BaseEpisode(base.BaseManager):
         self.check_termination_dict = {}
         self.check_time_out_dict = {}
 
-        for _key in self.task.managers:
-            _manager = self.task.managers[_key]
+        for _manager in self.task.managers.values():
             _items = dir(_manager)
             for _item in _items:
                 if _item.startswith("_check_termination"):

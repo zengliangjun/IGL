@@ -14,16 +14,14 @@ class BaseRewardsManager(base.BaseManager):
     def pre_init(self):
         super(BaseRewardsManager, self).pre_init()
         self._collect_rewards()
-        for _name in self.rewards_dict:
-            _rewards = self.rewards_dict[_name]
+        for _name, _rewards in self.rewards_dict.items():
             _rewards.pre_init()
 
 
     def init(self):
         self.rew_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
         super(BaseRewardsManager, self).init()
-        for _name in self.rewards_dict:
-            _rewards = self.rewards_dict[_name]
+        for _name, _rewards in self.rewards_dict.items():
             _rewards.init()
 
     def post_init(self):
@@ -32,14 +30,12 @@ class BaseRewardsManager(base.BaseManager):
         """
         logger.info(colored(f"{self.config.rewards.set_reward} set reward on {self.config.rewards.set_reward_date}", "green"))
 
-        for _name in self.rewards_dict:
-            _rewards = self.rewards_dict[_name]
+        for _name, _rewards in self.rewards_dict.items():
             _rewards.post_init()
 
         ### step 1 collect functions
         _rewards_functions = {}
-        for _key in self.rewards_dict:
-            _rewards = self.rewards_dict[_key]
+        for _key, _rewards in self.rewards_dict.items():
             _items = dir(_rewards)
             for _item in _items:
                 if _item.startswith("_reward_"):

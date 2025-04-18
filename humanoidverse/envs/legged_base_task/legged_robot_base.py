@@ -74,8 +74,8 @@ class LeggedRobotBase(BaseTask):
 
     # helper functions
     def _pre_step(self):
-        for _key in self.managers:
-            self.managers[_key].pre_step()
+        for _manager in self.managers.values():
+            _manager.pre_step()
 
     # physics step
     def _pre_physics_step(self, actions):
@@ -101,8 +101,8 @@ class LeggedRobotBase(BaseTask):
 
     # compute
     def _pre_compute(self):
-        for _key in self.managers:
-            self.managers[_key].pre_compute()
+        for _manager in self.managers.values():
+            _manager.pre_compute()
 
     def _reset(self, _env_ids = None):
         assert hasattr(self, "episode_manager")
@@ -116,16 +116,16 @@ class LeggedRobotBase(BaseTask):
             return
         # update refresh flags
         self.need_to_refresh_envs[_env_ids] = True
-        for _key in self.managers:
-            self.managers[_key].reset(_env_ids)
+        for _manager in self.managers.values():
+            _manager.reset(_env_ids)
 
     def _compute(self):
-        for _key in self.managers:
-            self.managers[_key].compute()
+        for _manager in self.managers.values():
+            _manager.compute()
 
     def _post_compute(self):
-        for _key in self.managers:
-            self.managers[_key].post_compute()
+        for _manager in self.managers.values():
+            _manager.post_compute()
 
     # stage 4
     def _draw_debug_vis(self):
@@ -140,12 +140,12 @@ class LeggedRobotBase(BaseTask):
 
         self.simulator.clear_lines()
         self._refresh_sim_tensors()
-        for _key in self.managers:
-            self.managers[_key].draw_debug_vis()
+        for _manager in self.managers.values():
+            _manager.draw_debug_vis()
 
     def _post_step(self):
-        for _key in self.managers:
-            self.managers[_key].post_step()
+        for _manager in self.managers.values():
+            _manager.post_step()
 
     def _render(self, sync_frame_time=True):
         if self.headless:

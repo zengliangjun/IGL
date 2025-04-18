@@ -53,8 +53,7 @@ class BaseObservations(base.BaseManager):
 
     def _collect_observationss(self):
         self.observationss_dict = {}
-        for _key in self.task.managers:
-            _manager = self.task.managers[_key]
+        for _key, _manager in self.task.managers.items():
             _items = dir(_manager)
             for _item in _items:
                 if _item.startswith("_get_obs_"):
