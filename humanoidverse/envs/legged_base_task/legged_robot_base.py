@@ -47,11 +47,7 @@ class LeggedRobotBase(BaseTask):
         self._reset()
 
         # set envs
-        refresh_env_ids = self.need_to_refresh_envs.nonzero(as_tuple=False).flatten()
-        if len(refresh_env_ids) > 0:
-            self.simulator.set_actor_root_state_tensor(refresh_env_ids, self.simulator.all_root_states)
-            self.simulator.set_dof_state_tensor(refresh_env_ids, self.simulator.dof_state)
-            self.need_to_refresh_envs[refresh_env_ids] = False
+        self._refresh_envs()
 
         self._compute() # in some cases a simulation step might be required to refresh some obs (for example body positions)
         self._post_compute()
@@ -160,6 +156,13 @@ class LeggedRobotBase(BaseTask):
     def _refresh_sim_tensors(self):
         self.simulator.refresh_sim_tensors()
         return
+
+    def _refresh_envs(self):
+        refresh_env_ids = self.need_to_refresh_envs.nonzero(as_tuple=False).flatten()
+        if len(refresh_env_ids) > 0:
+            self.simulator.set_actor_root_state_tensor(refresh_env_ids, self.simulator.all_root_states)
+            self.simulator.set_dof_state_tensor(refresh_env_ids, self.simulator.dof_state)
+            self.need_to_refresh_envs[refresh_env_ids] = False
 
 
     @property

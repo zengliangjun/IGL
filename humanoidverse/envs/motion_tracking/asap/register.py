@@ -49,3 +49,4 @@ base_register.rewards_registry[trainer_namespace] = asap_rewards_registry
 
 evaluater_namespace: str  = "asap_evaluater_task"
 base_register.registry[evaluater_namespace] = asap_evaluater_registry
+base_register.rewards_registry[evaluater_namespace] = {}

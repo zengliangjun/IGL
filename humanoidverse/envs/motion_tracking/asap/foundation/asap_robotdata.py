@@ -49,6 +49,16 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         if "upper_body_link" in self.config.robot.motion:
             self.upper_body_id = [self.task.simulator._body_list.index(link) for link in self.config.robot.motion.upper_body_link]
 
+    def pre_compute(self):
+        ## resample falg when training
+        if self.config.resample_motion_when_training and not self.task.is_evaluating:
+            episode_manager = self.task.episode_manager
+            if episode_manager.common_step_counter % self.resample_time_interval == 0:
+                logger.info(f"Resampling motion at step {episode_manager.common_step_counter}")
+                ## update reset flag with True
+                self.motion_lib.load_motions(random_sample=True)
+                episode_manager.time_out_buf[:] = 1
+
     def reset(self, env_ids):
         super(AsapMotion, self).reset(env_ids)
         if len(env_ids) != 0:

@@ -62,9 +62,7 @@ class BaseTask():
     def reset_all(self):
         """ Reset all robots"""
         self._reset(torch.arange(self.num_envs, device=self.device))
-        self.simulator.set_actor_root_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.all_root_states)
-        self.simulator.set_dof_state_tensor(torch.arange(self.num_envs, device=self.device), self.simulator.dof_state)
-        # self._refresh_env_idx_tensors(torch.arange(self.num_envs, device=self.device))
+        self._refresh_envs()
 
         if hasattr(self, "actions_manager"):
             actor_state = self.actions_manager.zeros()
