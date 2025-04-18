@@ -119,7 +119,7 @@ class BaseRewardsManager(base.BaseManager):
         if self.config.rewards.only_positive_rewards:
             self.rew_buf[:] = torch.clip(self.rew_buf[:], min=0.)
         # add termination reward after clipping
-        if "termination" in self.reward_scales:
+        if "termination" in self.reward_scales and hasattr(self, "reward_termination"):
             rew = self.reward_termination() * self.reward_scales["termination"]
             self.rew_buf += rew
             self.episode_sums["termination"] += rew
