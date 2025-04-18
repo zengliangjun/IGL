@@ -42,9 +42,8 @@ class VelocityCommand(command.LeggedCommandManager):
         )
 
     def reset(self, env_ids):
-        ## TODO need this check?
-        #if self.is_evaluating:
-        #    return
+        if 0 == len(env_ids):
+            return
         self._resample(env_ids)
 
     def post_compute(self):
