@@ -599,26 +599,33 @@ class IsaacGym(BaseSimulator):
             elif evt.action == "toggle_viewer_sync" and evt.value > 0:
                 self.enable_viewer_sync = not self.enable_viewer_sync
             elif evt.action == "forward_command" and evt.value > 0:
-                self.commands[:, 0] += 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 0] += 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "backward_command" and evt.value > 0:
-                self.commands[:, 0] -= 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 0] -= 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "left_command" and evt.value > 0:
-                self.commands[:, 1] -= 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 1] -= 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "right_command" and evt.value > 0:
-                self.commands[:, 1] += 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 1] += 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "heading_left_command" and evt.value > 0:
-                self.commands[:, 3] -= 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 3] -= 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "heading_right_command" and evt.value > 0:
-                self.commands[:, 3] += 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 3] += 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "zero_command" and evt.value > 0:
-                self.commands[:, :4] = 0
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, :4] = 0
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "push_robots" and evt.value > 0:
                 logger.info("Push Robots")
                 self._push_robots(torch.arange(self.num_envs, device=self.device))
@@ -634,14 +641,17 @@ class IsaacGym(BaseSimulator):
                 self.user_recording_state_change = False
                 delete_user_viewer_recordings = True
             elif evt.action == "walk_stand_toggle" and evt.value > 0:
-                self.commands[:, 4] = 1 - self.commands[:, 4]
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 4] = 1 - self.commands[:, 4]
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "height_up" and evt.value > 0:
-                self.commands[:, 4] += 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 4] += 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "height_down" and evt.value > 0:
-                self.commands[:, 4] -= 0.1
-                logger.info(f"Current Command: {self.commands[:, ]}")
+                if hasattr(self, "commands"):
+                    self.commands[:, 4] -= 0.1
+                    logger.info(f"Current Command: {self.commands[:, ]}")
             elif evt.action == "force_left_up" and evt.value > 0:
                 self.apply_force_tensor[:, self.left_hand_link_index, 2] = 1.0
                 logger.info(f"Left hand force: {self.apply_force_tensor[:, self.left_hand_link_index, :]}")
