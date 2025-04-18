@@ -29,7 +29,7 @@ asap_evaluater_registry["asap_termination"] = asap_termination.TrackTermination
 
 # player
 asap_player_registry = copy.deepcopy(base_register.registry[legged_register.core_namespace])
-asap_player_registry["robotdata_manager"] = asap_robotdata.AsapMotionEvaluater
+asap_player_registry["robotdata_manager"] = asap_robotdata.AsapMotionPlayer
 ############ REWARDS ############
 asap_rewards_registry = copy.deepcopy(base_register.rewards_registry[legged_register.trainer_namespace])
 

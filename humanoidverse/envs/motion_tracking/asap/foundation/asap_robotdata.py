@@ -61,6 +61,7 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
                 logger.info(f"Resampling motion at step {episode_manager.common_step_counter}")
                 ## update reset flag with True
                 self.motion_lib.load_motions(random_sample=True)
+                self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
                 episode_manager.time_out_buf[:] = 1
 
     def reset(self, env_ids):
@@ -228,3 +229,28 @@ class AsapMotionEvaluater(AsapMotion):
                 self.motion_start_idx = 0
 
             self.motion_lib.load_motions(random_sample=False, start_idx=self.motion_start_idx)
+            self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
+            episode_manager = self.task.episode_manager
+            episode_manager.time_out_buf[:] = 1
+
+
+class AsapMotionPlayer(AsapMotionEvaluater):
+    def __init__(self, _task):
+        super(AsapMotionPlayer, self).__init__(_task)
+
+    def reset(self, env_ids):
+        # only for reset motion res
+        if hasattr(self, 'current_motion_ref'):
+            _motion_ref = self.current_motion_ref
+        else:
+            _motion_ref = self._motion_ref
+
+        ## stage 2
+        self._reset_dofs(env_ids, _motion_ref)
+        self._reset_root_states(env_ids, _motion_ref)
+        self.next_motion_ref = self._next_motion_ref
+
+        ## for debug
+        _ref_motion_length = self.motion_len
+        _ref_motion_phase = self._next_motion_times / _ref_motion_length
+        print("motion_phase", _ref_motion_phase)

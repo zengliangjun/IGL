@@ -25,6 +25,12 @@ class ASAPMotionPlayer(ASAPMotionEvaluater):
     def __init__(self, config, device):
         super(ASAPMotionPlayer, self).__init__(config, device)
 
+    def _reset(self, _env_ids = None):
+        # update every envs
+        import torch
+        _env_ids = torch.arange(self.num_envs, device=self.device)
+        super(ASAPMotionPlayer, self)._reset(_env_ids)
+
     @property
     def namespace(self):
         from humanoidverse.envs.motion_tracking.asap import register

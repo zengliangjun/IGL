@@ -22,7 +22,7 @@ def on_press(key, env):
     try:
        # Force Control
         if hasattr(key, 'char'):
-            if key.char == 'N' or key.char == 'N':
+            if key.char == 'N' or key.char == 'n':
                 env.next_task()
                 logger.info(f"next_task")
 
