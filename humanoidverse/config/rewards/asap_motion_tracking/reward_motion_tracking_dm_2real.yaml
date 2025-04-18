@@ -22,18 +22,18 @@ rewards:
       penalty_action_rate: -0.5 # need to be tuned up to -0.5 for real robot
       # penalty_feet_contact_forces: -0.01
       # penalty_stumble: -10.0
-      
+
       # better for landing
       penalty_feet_ori: -2.0
       feet_heading_alignment: -0.1
-      penalty_slippage: -1.0
+      penalty_feet_slippage: -1.0
 
       limits_dof_pos: -10.0
       limits_dof_vel: -5.0
       limits_torque: -5.0
       termination: -200.0
       # feet_max_height_for_this_air: -100.0
-      
+
 
   teleop_body_pos_lowerbody_weight : 0.5
   teleop_body_pos_upperbody_weight : 1.0
@@ -106,4 +106,4 @@ rewards:
     "limits_torque",
     "feet_heading_alignment",
     "penalty_feet_ori",
-    "penalty_slippage"]
+    "penalty_feet_slippage"]
