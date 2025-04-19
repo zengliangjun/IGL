@@ -103,3 +103,15 @@ class LimitsCurrculum(base.BaseManager):
                                                         self.config.rewards.reward_limit.reward_limits_curriculum.soft_torque_max_limit)
             ## update
             actuators_rewards.limits_torque = self.task.simulator.torque_limits * self.soft_torque_curriculum_value
+
+    def post_compute(self):
+        if not hasattr(self.task, "extras_manager"):
+            return
+
+        extras_manager = self.task.extras_manager
+        if self.use_reward_limits_dof_pos_curriculum:
+            extras_manager.log_dict["soft_dof_pos_curriculum_value"] = torch.tensor(self.soft_dof_pos_curriculum_value, dtype=torch.float)
+        if self.use_reward_limits_dof_vel_curriculum:
+            extras_manager.log_dict["soft_dof_vel_curriculum_value"] = torch.tensor(self.soft_dof_vel_curriculum_value, dtype=torch.float)
+        if self.use_reward_limits_torque_curriculum:
+            extras_manager.log_dict["soft_torque_curriculum_value"] = torch.tensor(self.soft_torque_curriculum_value, dtype=torch.float)
