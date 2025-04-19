@@ -15,8 +15,6 @@ class VelocityCommand(command.LeggedCommandManager):
                                      device=self.device)
 
         self.command_ranges = self.config.locomotion_command_ranges
-        # sample as rewards
-        self.forward_vec = to_torch([1., 0., 0.], device=self.device).repeat((self.num_envs, 1))
 
     # stage 3
     def pre_compute(self):
