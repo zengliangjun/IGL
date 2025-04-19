@@ -15,6 +15,10 @@ class NoiseCurrculum(base.BaseManager):
     def reset(self, env_ids):
         if not self.add_noise_currculum:
             return
+
+        if 0 == len(env_ids):
+            return
+
         # waitting for episode reset
         assert hasattr(self.task, "episode_manager")
         episode_manager = self.task.episode_manager

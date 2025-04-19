@@ -112,8 +112,8 @@ class LeggedRobotBase(BaseTask):
             # TODO merger _env_ids & self.episode_manager.reset_env_ids
             pass
 
-        if 0 == len(_env_ids):
-            return
+        #if 0 == len(_env_ids):
+        #    return
         # update refresh flags
         self.need_to_refresh_envs[_env_ids] = True
         for _manager in self.managers.values():
