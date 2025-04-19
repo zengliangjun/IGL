@@ -128,10 +128,10 @@ robot:
                                20.,               # right_elbow_joint
                             ]
   # only apply for isaacsim
-  dof_armature_list: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+  dof_armature_list: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0.1, 0.1, 0.1, 0.1, 0.1,
                       0.1, 0.1, 0.1, 0.1, 0.1]
   # only apply for isaacsim
-  dof_joint_friction_list: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+  dof_joint_friction_list: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,0.00, 0.00, 0.00, 0.00, 0.00,
                             0.00, 0.00, 0.00, 0.00, 0.00]
 
   body_names: ['pelvis',
@@ -236,7 +236,7 @@ robot:
     urdf_file: "h1/${robot.asset.robot_type}.urdf"
     usd_file: "h1/${robot.asset.robot_type}.usd"
     xml_file: "h1/${robot.asset.robot_type}.xml"
-    robot_type: OmniH2Oh1
+    robot_type: h1
     self_collisions: 1 # 1 to disable, 0 to enable self collisions
     default_dof_drive_mode: 3
 
@@ -244,8 +244,8 @@ robot:
     motion_file : 'data/motions/OmniH2O/stable_punch.pkl'
     asset:
       assetRoot: "humanoidverse/data/robots/h1/"
-      assetFileName: "OmniH2Oh1.xml"
-      urdfFileName: "OmniH2Oh1.urdf"
+      assetFileName: "h1.xml"
+      urdfFileName: "h1.urdf"
 
     humanoid_type: h1
     bias_offset: False
