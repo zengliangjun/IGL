@@ -362,7 +362,6 @@ experiment_name=MotionTracking_CR7 \
 robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl \
 rewards.reward_penalty_curriculum=True \
 rewards.reward_penalty_degree=0.00001 \
-env.config.enforce_randomize_motion_start_eval=True \
 env.config.resample_motion_when_training=False \
 env.config.termination.terminate_when_motion_far=True \
 env.config.termination_curriculum.terminate_when_motion_far_curriculum=True \
