@@ -52,6 +52,8 @@ class Trainer(base.BaseComponent):
         ##
         actor_loss.backward()
         critic_loss.backward()
+        self._update_loss('actor', actor_loss.item())
+        self._update_loss('critic', critic_loss.item())
 
         ##
         # model gradient clip step
