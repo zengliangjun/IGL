@@ -20,6 +20,10 @@ class BaseObservations(base.BaseManager):
         self._collect_observationss()
 
     # stage 3
+    def pre_step(self):
+        self.hist_obs_dict.clear()
+
+
     def compute(self):
         """ Computes observations
         """

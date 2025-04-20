@@ -17,7 +17,7 @@ class LeggedHistoryManager(base.BaseManager):
         self.history_handler.reset(env_ids)
 
     def post_compute(self):
-        if not hasattr(self, "observations_manager"):
+        if not hasattr(self.task, "observations_manager"):
             return
 
         _observations_manager = self.task.observations_manager
