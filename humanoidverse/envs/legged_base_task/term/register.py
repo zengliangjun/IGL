@@ -34,9 +34,6 @@ trainer_registry["observations_noise_currculum"] = observations_noise_currculum.
 trainer_registry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCurrculum
 
 # level 3
-from humanoidverse.envs.legged_base_task.term.statistics import extras
-trainer_registry["extras_manager"] = extras.LeggedExtrasManager          # core
-
 
 evaluater_registry = copy.deepcopy(core_registry)
 # evaluater
@@ -46,7 +43,6 @@ evaluater_registry["history_manager"] = history.LeggedHistoryManager
 evaluater_registry["command_manager"] = command.LeggedCommandManager
 evaluater_registry["actions_manager"] = actions.LeggedActionsManager
 # level 2
-evaluater_registry["extras_manager"] = extras.LeggedExtrasManager
 
 core_namespace: str  = "legged_core_task"
 trainer_namespace: str  = "legged_trainer_task"

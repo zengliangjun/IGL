@@ -8,13 +8,16 @@ from humanoidverse.envs.base_task.terminates import terminations
 
 coreregistry: dict = {} # [str, base.BaseManager] = {}
 
+coreregistry["episode_manager"] = episode.BaseEpisode              # core
 coreregistry["terrain_manager"] = terrain.BaseTerrainManager         # core
 coreregistry["robotdata_manager"] = robotdata.BaseRobotDataManager   # core
 coreregistry["observations_manager"] = observations.BaseObservations
-coreregistry["rewards_manager"] = rewards.BaseRewardsManager
-coreregistry["episode_manager"] = episode.BaseEpisode              # core
 
 coreregistry["terminations_manager"] = terminations.TerminateManager
+
+coreregistry["rewards_manager"] = rewards.BaseRewardsManager
+coreregistry["extras_manager"] = extras.BaseExtrasManager
+
 
 core_namespace: str  = "base_task"
 
