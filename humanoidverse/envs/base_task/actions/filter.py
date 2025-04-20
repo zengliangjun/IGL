@@ -1,5 +1,5 @@
 from humanoidverse.envs.base_task.term import base
-from humanoidverse.envs.legged_base_task.actions import lpf
+from humanoidverse.envs.base_task.actions import lpf
 
 import numpy as np
 import torch

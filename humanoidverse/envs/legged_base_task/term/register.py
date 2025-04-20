@@ -18,10 +18,8 @@ from humanoidverse.envs.legged_base_task.term.assistant import history # assista
 trainer_registry["history_manager"] = history.LeggedHistoryManager
 
 
-from humanoidverse.envs.legged_base_task.term.mdp import actions, \
-    command                   # mdp
+from humanoidverse.envs.legged_base_task.term.mdp import command  # mdp
 trainer_registry["command_manager"] = command.LeggedCommandManager
-trainer_registry["actions_manager"] = actions.LeggedActionsManager
 
 # level 2
 from humanoidverse.envs.legged_base_task.term.currculum import observations_noise_currculum, \
@@ -37,7 +35,6 @@ evaluater_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
 evaluater_registry["history_manager"] = history.LeggedHistoryManager
 
 evaluater_registry["command_manager"] = command.LeggedCommandManager
-evaluater_registry["actions_manager"] = actions.LeggedActionsManager
 # level 2
 
 core_namespace: str  = "legged_core_task"

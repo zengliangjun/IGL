@@ -10,6 +10,7 @@ coreregistry["episode_manager"] = episode.BaseEpisode              # core
 coreregistry["terrain_manager"] = terrain.BaseTerrainManager         # core
 coreregistry["robotdata_manager"] = robotdata.BaseRobotDataManager   # core
 coreregistry["observations_manager"] = observations.BaseObservations
+coreregistry["actions_manager"] = actions.ActionsManager
 
 coreregistry["terminations_manager"] = terminations.TerminateManager
 
