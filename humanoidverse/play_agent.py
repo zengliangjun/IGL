@@ -41,7 +41,7 @@ from utils.config_utils import *  # noqa: E402, F403
 @hydra.main(config_path="config", config_name="base_play", version_base="1.1")
 def main(config: OmegaConf):
     # import ipdb; ipdb.set_trace()
-    simulator_type = config.simulator['_target_'].split('.')[-1]
+    #simulator_type = config.simulator['_target_'].split('.')[-1]
 
     simulator_type = config.simulator.config.name
     # import ipdb; ipdb.set_trace()
