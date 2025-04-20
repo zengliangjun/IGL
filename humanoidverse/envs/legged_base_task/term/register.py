@@ -14,9 +14,6 @@ from humanoidverse.envs.legged_base_task.term.status import feet, robotstatus # 
 trainer_registry["feet_manager"] = feet.LeggedFeetManager
 trainer_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
 
-from humanoidverse.envs.legged_base_task.term.assistant import history # assistant
-trainer_registry["history_manager"] = history.LeggedHistoryManager
-
 
 from humanoidverse.envs.legged_base_task.term.mdp import command  # mdp
 trainer_registry["command_manager"] = command.LeggedCommandManager
@@ -32,7 +29,6 @@ trainer_registry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCu
 evaluater_registry = copy.deepcopy(core_registry)
 # evaluater
 evaluater_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
-evaluater_registry["history_manager"] = history.LeggedHistoryManager
 
 evaluater_registry["command_manager"] = command.LeggedCommandManager
 # level 2

@@ -1,5 +1,6 @@
 from humanoidverse.envs.base_task.term import base
 from humanoidverse.utils.helpers import parse_observation
+from humanoidverse.envs.base_task.assistant import history
 import copy
 import torch
 
@@ -10,14 +11,17 @@ class BaseObservations(base.BaseManager):
         self.dim_critic_obs = self.config.robot.critic_obs_dim
         self.noise_scales = copy.deepcopy(self.config.obs.noise_scales)
 
+
     def init(self):
         self.obs_buf_dict = {}
         self.obs_buf_dict_raw = {}
         self.hist_obs_dict = {}
+        self.history_manager = history.HistoryManager(self.task)
 
     def post_init(self):
         super(BaseObservations, self).init()
         self._collect_observationss()
+
 
     # stage 3
     def pre_step(self):
@@ -63,3 +67,10 @@ class BaseObservations(base.BaseManager):
                 if _item.startswith("_get_obs_"):
                     _obs_function = getattr(_manager, _item)
                     setattr(self, _item, _obs_function)
+
+        _manager = self.history_manager
+        _items = dir(_manager)
+        for _item in _items:
+            if _item.startswith("_get_obs_"):
+                _obs_function = getattr(_manager, _item)
+                setattr(self, _item, _obs_function)

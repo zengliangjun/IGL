@@ -2,9 +2,14 @@ from humanoidverse.envs.base_task.term import base
 from humanoidverse.envs.env_utils.history_handler import HistoryHandler
 import torch
 
-class LeggedHistoryManager(base.BaseManager):
+'''
+NOTE it not regist to register,
+is 0bservations manager's member.
+'''
+
+class HistoryManager(base.BaseManager):
     def __init__(self, _task):
-        super(LeggedHistoryManager, self).__init__(_task)
+        super(HistoryManager, self).__init__(_task)
         self.history_handler = HistoryHandler(self.num_envs,
                                               self.config.obs.obs_auxiliary,
                                               self.config.obs.obs_dims,

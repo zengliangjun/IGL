@@ -1,6 +1,6 @@
 import torch
 from humanoidverse.envs.base_task.term import base
-from humanoidverse.envs.base_task.term.mdp import reset
+from humanoidverse.envs.base_task.assistant import reset
 import numpy as np
 
 class BaseEpisode(base.BaseManager):
