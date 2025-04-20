@@ -20,9 +20,9 @@ class BaseEpisode(base.BaseManager):
         self.episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
         self.common_step_counter = torch.tensor(0, device=self.device, dtype=torch.long)
 
-        self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
         # for reward penalty curriculum
         # NOTE it is used after reset
+        self.num_compute_average_epl = self.config.rewards.num_compute_average_epl
         self.average_episode_length = torch.tensor(0, device=self.device, dtype=torch.long) # num_compute_average_epl last termination episode length
         self.reset_manager.init()
 
