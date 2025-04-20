@@ -43,12 +43,11 @@ def to_torch(tensor):
         return torch.from_numpy(tensor)
 
 class MotionLibBase():
-    def __init__(self, motion_lib_cfg, num_envs, device):
+    def __init__(self, motion_lib_cfg, num_envs):
         self.m_cfg = motion_lib_cfg
         self._sim_fps = 1/self.m_cfg.get("step_dt", 1/50)
 
         self.num_envs = num_envs
-        self._device = device
         self.mesh_parsers = None
         self.has_action = False
         skeleton_file = Path(self.m_cfg.asset.assetRoot) / self.m_cfg.asset.assetFileName
@@ -95,10 +94,10 @@ class MotionLibBase():
 
         #### Termination history
         self._curr_motion_ids = None
-        self._termination_history = torch.zeros(self._num_unique_motions).to(self._device)
-        self._success_rate = torch.zeros(self._num_unique_motions).to(self._device)
-        self._sampling_history = torch.zeros(self._num_unique_motions).to(self._device)
-        self._sampling_prob = torch.ones(self._num_unique_motions).to(self._device) / self._num_unique_motions  # For use in sampling batches
+        self._termination_history = torch.zeros(self._num_unique_motions)
+        self._success_rate = torch.zeros(self._num_unique_motions)
+        self._sampling_history = torch.zeros(self._num_unique_motions)
+        self._sampling_prob = torch.ones(self._num_unique_motions) / self._num_unique_motions  # For use in sampling batches
 
     def get_motion_actions(self, motion_ids, motion_times):
         motion_len = self._motion_lengths[motion_ids]
@@ -255,9 +254,9 @@ class MotionLibBase():
         num_motion_to_load = self.num_envs
 
         if random_sample:
-            sample_idxes = torch.multinomial(self._sampling_prob, num_samples=num_motion_to_load, replacement=True).to(self._device)
+            sample_idxes = torch.multinomial(self._sampling_prob, num_samples=num_motion_to_load, replacement=True)
         else:
-            sample_idxes = torch.remainder(torch.arange(num_motion_to_load) + start_idx, self._num_unique_motions ).to(self._device)
+            sample_idxes = torch.remainder(torch.arange(num_motion_to_load) + start_idx, self._num_unique_motions )
 
         self._curr_motion_ids = sample_idxes
         self.curr_motion_keys = self._motion_data_keys[sample_idxes.cpu()]
@@ -299,47 +298,47 @@ class MotionLibBase():
 
             del curr_motion
 
-        self._motion_lengths = torch.tensor(_motion_lengths, device=self._device, dtype=torch.float32)
-        self._motion_fps = torch.tensor(_motion_fps, device=self._device, dtype=torch.float32)
-        self._motion_bodies = torch.stack(_motion_bodies).to(self._device).type(torch.float32)
-        self._motion_aa = torch.tensor(np.concatenate(_motion_aa), device=self._device, dtype=torch.float32)
+        self._motion_lengths = torch.tensor(_motion_lengths, dtype=torch.float32)
+        self._motion_fps = torch.tensor(_motion_fps, dtype=torch.float32)
+        self._motion_bodies = torch.stack(_motion_bodies).type(torch.float32)
+        self._motion_aa = torch.tensor(np.concatenate(_motion_aa), dtype=torch.float32)
 
-        self._motion_dt = torch.tensor(_motion_dt, device=self._device, dtype=torch.float32)
-        self._motion_num_frames = torch.tensor(_motion_num_frames, device=self._device)
+        self._motion_dt = torch.tensor(_motion_dt, dtype=torch.float32)
+        self._motion_num_frames = torch.tensor(_motion_num_frames)
         # import ipdb; ipdb.set_trace()
         if self.has_action:
-            self._motion_actions = torch.cat(_motion_actions, dim=0).float().to(self._device)
+            self._motion_actions = torch.cat(_motion_actions, dim=0).float()
         self._num_motions = len(motions)
 
-        self.gts = torch.cat([m.global_translation for m in motions], dim=0).float().to(self._device)
-        self.grs = torch.cat([m.global_rotation for m in motions], dim=0).float().to(self._device)
-        self.lrs = torch.cat([m.local_rotation for m in motions], dim=0).float().to(self._device)
-        self.grvs = torch.cat([m.global_root_velocity for m in motions], dim=0).float().to(self._device)
-        self.gravs = torch.cat([m.global_root_angular_velocity for m in motions], dim=0).float().to(self._device)
-        self.gavs = torch.cat([m.global_angular_velocity for m in motions], dim=0).float().to(self._device)
-        self.gvs = torch.cat([m.global_velocity for m in motions], dim=0).float().to(self._device)
-        self.dvs = torch.cat([m.dof_vels for m in motions], dim=0).float().to(self._device)
+        self.gts = torch.cat([m.global_translation for m in motions], dim=0).float()
+        self.grs = torch.cat([m.global_rotation for m in motions], dim=0).float()
+        self.lrs = torch.cat([m.local_rotation for m in motions], dim=0).float()
+        self.grvs = torch.cat([m.global_root_velocity for m in motions], dim=0).float()
+        self.gravs = torch.cat([m.global_root_angular_velocity for m in motions], dim=0).float()
+        self.gavs = torch.cat([m.global_angular_velocity for m in motions], dim=0).float()
+        self.gvs = torch.cat([m.global_velocity for m in motions], dim=0).float()
+        self.dvs = torch.cat([m.dof_vels for m in motions], dim=0).float()
 
         if "global_translation_extend" in motions[0].__dict__:
-            self.gts_t = torch.cat([m.global_translation_extend for m in motions], dim=0).float().to(self._device)
-            self.grs_t = torch.cat([m.global_rotation_extend for m in motions], dim=0).float().to(self._device)
-            self.gvs_t = torch.cat([m.global_velocity_extend for m in motions], dim=0).float().to(self._device)
-            self.gavs_t = torch.cat([m.global_angular_velocity_extend for m in motions], dim=0).float().to(self._device)
+            self.gts_t = torch.cat([m.global_translation_extend for m in motions], dim=0).float()
+            self.grs_t = torch.cat([m.global_rotation_extend for m in motions], dim=0).float()
+            self.gvs_t = torch.cat([m.global_velocity_extend for m in motions], dim=0).float()
+            self.gavs_t = torch.cat([m.global_angular_velocity_extend for m in motions], dim=0).float()
 
         if "dof_pos" in motions[0].__dict__:
-            self.dof_pos = torch.cat([m.dof_pos for m in motions], dim=0).float().to(self._device)
+            self.dof_pos = torch.cat([m.dof_pos for m in motions], dim=0).float()
         # import ipdb; ipdb.set_trace()
         if flags.real_traj:
-            self.q_gts = torch.cat(self.q_gts, dim=0).float().to(self._device)
-            self.q_grs = torch.cat(self.q_grs, dim=0).float().to(self._device)
-            self.q_gavs = torch.cat(self.q_gavs, dim=0).float().to(self._device)
-            self.q_gvs = torch.cat(self.q_gvs, dim=0).float().to(self._device)
+            self.q_gts = torch.cat(self.q_gts, dim=0).float()
+            self.q_grs = torch.cat(self.q_grs, dim=0).float()
+            self.q_gavs = torch.cat(self.q_gavs, dim=0).float()
+            self.q_gvs = torch.cat(self.q_gvs, dim=0).float()
 
         lengths = self._motion_num_frames
         lengths_shifted = lengths.roll(1)
         lengths_shifted[0] = 0
         self.length_starts = lengths_shifted.cumsum(0)
-        self.motion_ids = torch.arange(len(motions), dtype=torch.long, device=self._device)
+        self.motion_ids = torch.arange(len(motions), dtype=torch.long)
         motion = motions[0]
         self.num_bodies = self.num_joints
 
@@ -424,14 +423,14 @@ class MotionLibBase():
 
     def sample_time(self, motion_ids, truncate_time=None):
         n = len(motion_ids)
-        phase = torch.rand(motion_ids.shape, device=self._device)
+        phase = torch.rand(motion_ids.shape)
         motion_len = self._motion_lengths[motion_ids]
         if (truncate_time is not None):
             assert (truncate_time >= 0.0)
             motion_len -= truncate_time
 
         motion_time = phase * motion_len
-        return motion_time.to(self._device)
+        return motion_time
 
     def get_motion_length(self, motion_ids=None):
         if motion_ids is None:

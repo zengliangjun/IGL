@@ -35,7 +35,7 @@ class AsapMotion(robotdata.LeggedRobotDataManager):
         self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
 
         ## for resample
-        self.motion_start_idx = 0
+        #self.motion_start_idx = 0
         self.num_motions = self.motion_lib._num_unique_motions
         if self.config.resample_motion_when_training:
             self.resample_time_interval = np.ceil(self.config.resample_time_interval_s / self.task.dt)
