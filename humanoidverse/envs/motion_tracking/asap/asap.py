@@ -12,6 +12,7 @@ class ASAPMotionTrainer(LeggedRobotBase):
 class ASAPMotionEvaluater(LeggedRobotBase):
     def __init__(self, config, device):
         super(ASAPMotionEvaluater, self).__init__(config, device)
+        self.debug_viz = True
 
     def next_task(self):
         self.robotdata_manager.next_task()
@@ -24,6 +25,7 @@ class ASAPMotionEvaluater(LeggedRobotBase):
 class ASAPMotionPlayer(ASAPMotionEvaluater):
     def __init__(self, config, device):
         super(ASAPMotionPlayer, self).__init__(config, device)
+        self.debug_viz = True
 
     def _reset(self, _env_ids = None):
         # update every envs

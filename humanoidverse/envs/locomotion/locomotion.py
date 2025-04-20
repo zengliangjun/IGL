@@ -21,6 +21,7 @@ class GaitTrainer(LeggedRobotBase):
 class LocomotionEvaluater(LeggedRobotBase):
     def __init__(self, config, device):
         super(LocomotionEvaluater, self).__init__(config, device)
+        self.debug_viz = True
 
     @property
     def namespace(self):

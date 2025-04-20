@@ -163,7 +163,7 @@ class AsapStatus(robotstatus.LeggedStatusManager):
         for env_id in range(self.num_envs):
 
             # draw marker joints
-            for pos_id, pos_joint in enumerate(self.marker_coords[env_id]): # idx 0 torso (duplicate with 11)
+            for pos_id, pos_joint in enumerate(ref_body_pos[env_id]): # idx 0 torso (duplicate with 11)
                 if self.config.robot.motion.visualization.customize_color:
                     _id = pos_id % len(self.config.robot.motion.visualization.marker_joint_colors)
                     color_inner = self.config.robot.motion.visualization.marker_joint_colors[_id]
