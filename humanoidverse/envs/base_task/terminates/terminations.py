@@ -1,9 +1,9 @@
 import torch
 from humanoidverse.envs.base_task.term import base
 
-class TerminationManager(base.BaseManager):
+class TerminateManager(base.BaseManager):
     def __init__(self, _task):
-        super(TerminationManager, self).__init__(_task)
+        super(TerminateManager, self).__init__(_task)
 
     def _check_terminate_by_contact(self):
         robotdata_manager = self.task.robotdata_manager

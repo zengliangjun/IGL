@@ -20,10 +20,9 @@ trainer_registry["history_manager"] = history.LeggedHistoryManager
 
 
 from humanoidverse.envs.legged_base_task.term.mdp import actions, \
-    command, terminations                   # mdp
+    command                   # mdp
 trainer_registry["command_manager"] = command.LeggedCommandManager
 trainer_registry["actions_manager"] = actions.LeggedActionsManager
-trainer_registry["terminations_manager"] = terminations.TerminationManager
 
 # level 2
 from humanoidverse.envs.legged_base_task.term.sim2real import push
@@ -47,7 +46,6 @@ evaluater_registry["history_manager"] = history.LeggedHistoryManager
 
 evaluater_registry["command_manager"] = command.LeggedCommandManager
 evaluater_registry["actions_manager"] = actions.LeggedActionsManager
-evaluater_registry["terminations_manager"] = terminations.TerminationManager
 # level 2
 evaluater_registry["extras_manager"] = extras.LeggedExtrasManager
 
