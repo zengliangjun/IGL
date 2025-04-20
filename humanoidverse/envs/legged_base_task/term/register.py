@@ -24,10 +24,6 @@ trainer_registry["command_manager"] = command.LeggedCommandManager
 trainer_registry["actions_manager"] = actions.LeggedActionsManager
 
 # level 2
-from humanoidverse.envs.legged_base_task.term.sim2real import push
-trainer_registry["push_manager"] = push.LeggedPushManager
-
-
 from humanoidverse.envs.legged_base_task.term.currculum import observations_noise_currculum, \
                                                                reward_limits_curriculum
 trainer_registry["observations_noise_currculum"] = observations_noise_currculum.NoiseCurrculum

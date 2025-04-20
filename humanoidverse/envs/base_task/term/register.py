@@ -1,10 +1,8 @@
-from humanoidverse.envs.base_task.term import base
 from humanoidverse.envs.base_task.term.statistics import extras
 from humanoidverse.envs.base_task.term.foundation import episode, robotdata, terrain
 from humanoidverse.envs.base_task.term.mdp import actions, observations, rewards
-
 from humanoidverse.envs.base_task.terminates import terminations
-
+from humanoidverse.envs.base_task.term.sim2real import push
 
 coreregistry: dict = {} # [str, base.BaseManager] = {}
 
@@ -17,8 +15,9 @@ coreregistry["terminations_manager"] = terminations.TerminateManager
 
 coreregistry["rewards_manager"] = rewards.BaseRewardsManager
 coreregistry["extras_manager"] = extras.BaseExtrasManager
+coreregistry["push_manager"] = push.PushManager
 
-
+############ REWARDS ############
 core_namespace: str  = "base_task"
 
 registry: dict = {}

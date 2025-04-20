@@ -5,10 +5,10 @@ import torch
 # from isaacgym import gymtorch, gymapi, gymutil
 from humanoidverse.envs.env_utils.visualization import Point
 
-class LeggedPushManager(base.BaseManager):
+class PushManager(base.BaseManager):
 
     def __init__(self, _task):
-        super(LeggedPushManager, self).__init__(_task)
+        super(PushManager, self).__init__(_task)
         if not self.config.domain_rand.push_robots:
             return
 
@@ -61,6 +61,8 @@ class LeggedPushManager(base.BaseManager):
 
     # stage 4
     def draw_debug_vis(self):
+        if not self.config.domain_rand.push_robots:
+            return
         # draw push robot
         draw_env_ids = (self.push_robot_plot_counter < 10).nonzero(as_tuple=False).flatten()
         not_draw_env_ids = (self.push_robot_plot_counter >= 10).nonzero(as_tuple=False).flatten()
@@ -78,7 +80,7 @@ class LeggedPushManager(base.BaseManager):
             push_line_widths = [0.03]
             for push_vel, push_pos, push_mag, push_color, push_line_width in zip(push_vel_list, push_pos_list, push_mag_list, push_color_schems, push_line_widths):
                 for _ in range(200):
-                    gymutil.draw_line(Point(push_pos +torch.rand(3, device=self.device) * push_line_width),
+                    self.task.simulator.draw_line(Point(push_pos +torch.rand(3, device=self.device) * push_line_width),
                                         Point(push_pos + push_vel * push_mag),
                                         Point(push_color),
-                                        self.gym, self.viewer, self.envs[env_id])
+                                        env_id)
