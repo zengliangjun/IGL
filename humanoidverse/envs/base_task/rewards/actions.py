@@ -9,4 +9,4 @@ class ActionsRewards(base.BaseManager):
     def _reward_penalty_action_rate(self):
         # Penalize changes in actions
         _actions_manager = self.task.actions_manager
-        return torch.sum(torch.square(_actions_manager.last_actions - _actions_manager.actions), dim=1)
+        return torch.sum(torch.square(_actions_manager.last_actions - _actions_manager.obs_actions), dim=1)

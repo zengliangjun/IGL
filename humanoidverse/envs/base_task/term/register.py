@@ -17,4 +17,9 @@ registry: dict = {}
 registry[core_namespace] = coreregistry
 
 ############ REWARDS ############
+from humanoidverse.envs.base_task.rewards import actions
+core_rewards_registry: dict = {}
+core_rewards_registry['actions_rewards'] = actions.ActionsRewards
+
 rewards_registry: dict = {}
+rewards_registry[core_namespace] = core_rewards_registry
