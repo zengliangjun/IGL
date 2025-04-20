@@ -23,7 +23,6 @@ locomotion_rewards_registry = copy.deepcopy(base_register.rewards_registry[legge
 
 from humanoidverse.envs.locomotion.rewards import command, feet
 locomotion_rewards_registry['command_rewards'] = command.CommandRewards
-locomotion_rewards_registry['feet_rewards'] = feet.FeetRewards
 
 ####################################
 trainer_namespace: str  = "locomotion_trainer_task"

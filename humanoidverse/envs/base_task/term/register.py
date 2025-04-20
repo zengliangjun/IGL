@@ -14,6 +14,11 @@ coreregistry["actions_manager"] = actions.ActionsManager
 
 coreregistry["terminations_manager"] = terminations.TerminateManager
 
+
+from humanoidverse.envs.base_task.term.status import feet, robotstatus # status
+coreregistry["feet_manager"] = feet.FeetManager
+coreregistry["robotstatus_manager"] = robotstatus.StatusManager
+
 coreregistry["rewards_manager"] = rewards.BaseRewardsManager
 coreregistry["extras_manager"] = extras.BaseExtrasManager
 coreregistry["push_manager"] = push.PushManager
@@ -25,10 +30,11 @@ registry: dict = {}
 registry[core_namespace] = coreregistry
 
 ############ REWARDS ############
-from humanoidverse.envs.base_task.rewards import actions, episode
+from humanoidverse.envs.base_task.rewards import actions, episode, feet
 core_rewards_registry: dict = {}
 core_rewards_registry['actions_rewards'] = actions.ActionsRewards
 core_rewards_registry['episode_rewards'] = episode.EpisodeRewards
+core_rewards_registry['feet_rewards'] = feet.FeetRewards
 
 rewards_registry: dict = {}
 rewards_registry[core_namespace] = core_rewards_registry

@@ -1,9 +1,9 @@
 import torch
 from humanoidverse.envs.base_task.term import base
 
-class LeggedFeetManager(base.BaseManager):
+class FeetManager(base.BaseManager):
     def __init__(self, _task):
-        super(LeggedFeetManager, self).__init__(_task)
+        super(FeetManager, self).__init__(_task)
 
     # stage 1
     def post_init(self):
@@ -16,6 +16,10 @@ class LeggedFeetManager(base.BaseManager):
 
         self.feet_air_max_height = torch.zeros(self.num_envs, robotdata_manager.feet_indices.shape[0],
                                                dtype=torch.float, device=self.device, requires_grad=False)
+
+        ##
+        self.feet_air_time = torch.zeros(self.num_envs, robotdata_manager.feet_indices.shape[0],
+                                         dtype=torch.float, device=self.device, requires_grad=False)
 
     # stage 3
     def pre_compute(self):
@@ -30,13 +34,18 @@ class LeggedFeetManager(base.BaseManager):
         self.feet_air_max_height = torch.max(self.feet_air_max_height, \
                                              self.task.simulator._rigid_body_pos[:, robotdata_manager.feet_indices, 2])
 
+        self.feet_air_time += self.task.dt  ## TODO update here
+
+
     def reset(self, env_ids):
-        ## TODO
-        pass
+        if len(env_ids) == 0:
+            return
+        self.feet_air_time[env_ids] = 0.
 
     def post_step(self):
         self.feet_air_max_height *= ~self.contact_filt
         self.last_contacts_filt = self.contact_filt
+        self.feet_air_time *= ~self.contact_filt
 
     ######################### Observations #########################
     def _get_obs_feet_contact_force(self,):

@@ -3,10 +3,10 @@ from isaac_utils.rotations import get_euler_xyz_in_tensor
 from humanoidverse.envs.base_task.term import base
 import torch
 
-class LeggedStatusManager(base.BaseManager):
+class StatusManager(base.BaseManager):
 
     def __init__(self, _task):
-        super(LeggedStatusManager, self).__init__(_task)
+        super(StatusManager, self).__init__(_task)
 
     # stage 1
     def init(self):

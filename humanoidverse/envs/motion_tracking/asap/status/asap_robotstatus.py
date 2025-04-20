@@ -1,5 +1,5 @@
 import torch
-from humanoidverse.envs.legged_base_task.term.status import robotstatus
+from humanoidverse.envs.base_task.term.status import robotstatus
 from humanoidverse.envs.motion_tracking.asap.status import asap_robotstatus_extend
 from isaac_utils.rotations import (
     my_quat_rotate,
@@ -8,11 +8,10 @@ from isaac_utils.rotations import (
     quat_mul,
 )
 
-class AsapStatus(robotstatus.LeggedStatusManager):
+class AsapStatus(robotstatus.StatusManager):
     def __init__(self, _task):
         super(AsapStatus, self).__init__(_task)
         self.extends = asap_robotstatus_extend.AsapMotionExtends(_task)
-
 
     def init(self):
         super(AsapStatus, self).init()

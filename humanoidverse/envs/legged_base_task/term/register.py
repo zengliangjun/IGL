@@ -10,9 +10,7 @@ core_registry["robotdata_manager"] = robotdata.LeggedRobotDataManager  # core
 
 trainer_registry = copy.deepcopy(core_registry)
 # trainer
-from humanoidverse.envs.legged_base_task.term.status import feet, robotstatus # status
-trainer_registry["feet_manager"] = feet.LeggedFeetManager
-trainer_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
+
 
 # level 2
 from humanoidverse.envs.legged_base_task.term.currculum import observations_noise_currculum, \
@@ -24,7 +22,6 @@ trainer_registry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCu
 
 evaluater_registry = copy.deepcopy(core_registry)
 # evaluater
-evaluater_registry["robotstatus_manager"] = robotstatus.LeggedStatusManager
 
 # level 2
 
@@ -37,12 +34,11 @@ register.registry[evaluater_namespace] = evaluater_registry
 
 ############ REWARDS ############
 legged_base_rewards_registry = copy.deepcopy(register.rewards_registry[register.core_namespace])
-from humanoidverse.envs.legged_base_task.rewards import actuators, body, feet, robotstatus
+from humanoidverse.envs.legged_base_task.rewards import actuators, body, robotstatus
 legged_base_rewards_registry['actuators_rewards'] = actuators.ActuatorsRewards
 
 
 legged_base_rewards_registry['robotstatus_rewards'] = robotstatus.StatusRewards
-legged_base_rewards_registry['feet_rewards'] = feet.FeetRewards
 legged_base_rewards_registry['body_rewards'] = body.UpperBodyRewards
 
 register.rewards_registry[trainer_namespace] = legged_base_rewards_registry
