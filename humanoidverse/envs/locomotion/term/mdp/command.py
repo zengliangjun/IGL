@@ -1,15 +1,16 @@
-from humanoidverse.envs.legged_base_task.term.mdp import command
+from humanoidverse.envs.base_task.term import base
 from humanoidverse.utils.torch_utils import quat_apply, to_torch, torch_rand_float
 from isaac_utils.rotations import wrap_to_pi
 import torch
 
-class VelocityCommand(command.LeggedCommandManager):
+class VelocityCommand(base.BaseManager):
     def __init__(self, _task):
         super(VelocityCommand, self).__init__(_task)
 
     # stage 1
     def init(self):
         super(VelocityCommand, self).init()
+        self.command_counter = torch.zeros(self.num_envs, dtype=torch.int, device=self.device, requires_grad=False)
         self.commands = torch.zeros((self.num_envs, 4),
                                      dtype=torch.float32,
                                      device=self.device)
@@ -23,7 +24,9 @@ class VelocityCommand(command.LeggedCommandManager):
         """
         #
         # commands
+        self.command_counter[:] += 1
         episode_manager = self.task.episode_manager
+        robotdata_manager = self.task.robotdata_manager
         robotstatus_manager = self.task.robotstatus_manager
 
         if not self.task.is_evaluating:
@@ -31,7 +34,7 @@ class VelocityCommand(command.LeggedCommandManager):
                        int(self.config.locomotion_command_resampling_time / self.task.dt)==0).nonzero(as_tuple=False).flatten()
             self._resample(env_ids)
 
-        forward = quat_apply(robotstatus_manager.base_quat, self.forward_vec)
+        forward = quat_apply(robotstatus_manager.base_quat, robotdata_manager.forward_vec)
         heading = torch.atan2(forward[:, 1], forward[:, 0])
         self.commands[:, 2] = torch.clip(
             0.5 * wrap_to_pi(self.commands[:, 3] - heading),

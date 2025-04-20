@@ -10,6 +10,8 @@ class BaseRobotDataManager(base.BaseManager):
         '''
         simulator had instanced
         '''
+        self.forward_vec = to_torch([1., 0., 0.], device=self.device).repeat((self.num_envs, 1))
+
         self.num_dof = self.task.simulator.num_dof
         self.num_bodies = self.task.simulator.num_bodies
         self.dof_names = self.task.simulator.dof_names
