@@ -13,9 +13,7 @@ trainer_registry = copy.deepcopy(core_registry)
 
 
 # level 2
-from humanoidverse.envs.legged_base_task.term.currculum import observations_noise_currculum, \
-                                                               reward_limits_curriculum
-trainer_registry["observations_noise_currculum"] = observations_noise_currculum.NoiseCurrculum
+from humanoidverse.envs.legged_base_task.term.currculum import reward_limits_curriculum
 trainer_registry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCurrculum
 
 # level 3

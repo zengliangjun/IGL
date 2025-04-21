@@ -23,6 +23,11 @@ coreregistry["rewards_manager"] = rewards.BaseRewardsManager
 coreregistry["extras_manager"] = extras.BaseExtrasManager
 coreregistry["push_manager"] = push.PushManager
 
+
+from humanoidverse.envs.base_task.currculum import observations_noise_currculum
+coreregistry["observations_noise_currculum"] = observations_noise_currculum.NoiseCurrculum
+
+
 ############ REWARDS ############
 core_namespace: str  = "base_task"
 

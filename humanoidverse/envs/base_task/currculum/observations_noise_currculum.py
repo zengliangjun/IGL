@@ -1,5 +1,6 @@
 from humanoidverse.envs.base_task.term import base
 import numpy as np
+import torch
 
 class NoiseCurrculum(base.BaseManager):
 
@@ -13,10 +14,10 @@ class NoiseCurrculum(base.BaseManager):
             self.add_noise_currculum = False
 
     def reset(self, env_ids):
-        if not self.add_noise_currculum:
+        if 0 == len(env_ids):
             return
 
-        if 0 == len(env_ids):
+        if not self.add_noise_currculum:
             return
 
         # waitting for episode reset
@@ -38,6 +39,6 @@ class NoiseCurrculum(base.BaseManager):
             for _key in self.config.obs.noise_scales:
                 observations_manager.noise_scales[_key] = self.current_noise_curriculum_value * self.config.obs.noise_scales[_key]
 
+    def post_compute(self):
         if hasattr(self.task, "extras_manager"):
-            import torch
             self.task.extras_manager.log_dict["current_noise_curriculum_value"] = torch.tensor(self.current_noise_curriculum_value, dtype=torch.float)
