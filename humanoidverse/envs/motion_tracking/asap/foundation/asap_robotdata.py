@@ -30,7 +30,7 @@ class AsapMotion(robotdata.BaseRobotDataManager):
 
         ## motion
         self.config.robot.motion.step_dt = self.task.dt
-        self.motion_lib = motion_lib_robot.MotionLibRobot(self.config.robot.motion, num_envs=self.num_envs, device=self.device)
+        self.motion_lib = motion_lib_robot.MotionLibRobot(self.task)
         self.motion_lib.load_motions(random_sample=False)
         self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
 
