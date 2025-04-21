@@ -1,15 +1,20 @@
-from humanoidverse.envs.legged_base_task.legged_robot_base import LeggedRobotBase
+from humanoidverse.envs.base_task.base_task import BaseTask
+from humanoidverse.envs.motion_tracking.asap import register
 
-class ASAPMotionTrainer(LeggedRobotBase):
+class ASAPMotionTrainer(BaseTask):
     def __init__(self, config, device):
         super(ASAPMotionTrainer, self).__init__(config, device)
 
     @property
-    def namespace(self):
-        from humanoidverse.envs.motion_tracking.asap import register
-        return register.trainer_namespace
+    def manager_map(self):
+        return register.asap_trainer_registry
 
-class ASAPMotionEvaluater(LeggedRobotBase):
+    @property
+    def rewards_map(self):
+        return register.asap_rewards_registry
+
+
+class ASAPMotionEvaluater(BaseTask):
     def __init__(self, config, device):
         super(ASAPMotionEvaluater, self).__init__(config, device)
         self.debug_viz = True
@@ -18,14 +23,16 @@ class ASAPMotionEvaluater(LeggedRobotBase):
         self.robotdata_manager.next_task()
 
     @property
-    def namespace(self):
-        from humanoidverse.envs.motion_tracking.asap import register
-        return register.evaluater_namespace
+    def manager_map(self):
+        return register.asap_evaluater_registry
+
+    @property
+    def rewards_map(self):
+        return {}
 
 class ASAPMotionPlayer(ASAPMotionEvaluater):
     def __init__(self, config, device):
         super(ASAPMotionPlayer, self).__init__(config, device)
-        self.debug_viz = True
 
     def _reset(self, _env_ids = None):
         # update every envs
@@ -34,6 +41,5 @@ class ASAPMotionPlayer(ASAPMotionEvaluater):
         super(ASAPMotionPlayer, self)._reset(_env_ids)
 
     @property
-    def namespace(self):
-        from humanoidverse.envs.motion_tracking.asap import register
-        return register.player_namespace
+    def manager_map(self):
+        return register.asap_evaluater_registry

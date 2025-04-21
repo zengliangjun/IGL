@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from humanoidverse.envs.legged_base_task.term.foundation import robotdata
+from humanoidverse.envs.base_task.term.foundation import robotdata
 
 from motion_lib import motion_lib_robot
 from loguru import logger
@@ -17,7 +17,7 @@ def _small_random_quaternions(obj, n, max_angle):
     q = torch.cat([sin_half_angle * axis, cos_half_angle], dim=1)
     return q
 
-class AsapMotion(robotdata.LeggedRobotDataManager):
+class AsapMotion(robotdata.BaseRobotDataManager):
     def __init__(self, _task):
         super(AsapMotion, self).__init__(_task)
 
