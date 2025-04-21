@@ -183,9 +183,7 @@ class BaseRewardsManager(base.BaseManager):
 
     def _collect_rewards(self):
         self.rewards_dict = {}
-        from humanoidverse.envs.base_task.term import register
-        _registry = register.rewards_registry[self.task.namespace]
-        for _name in _registry:
-            _rewards = _registry[_name](self.task)
+        for _name, _rewards in self.task.rewards_map.items():
+            _rewards = _rewards(self.task)
             self.rewards_dict[_name] = _rewards
             setattr(self, _name, _rewards)

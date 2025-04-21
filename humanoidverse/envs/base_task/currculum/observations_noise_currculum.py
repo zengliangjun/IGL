@@ -40,5 +40,7 @@ class NoiseCurrculum(base.BaseManager):
                 observations_manager.noise_scales[_key] = self.current_noise_curriculum_value * self.config.obs.noise_scales[_key]
 
     def post_compute(self):
+        if not self.add_noise_currculum:
+            return
         if hasattr(self.task, "extras_manager"):
             self.task.extras_manager.log_dict["current_noise_curriculum_value"] = torch.tensor(self.current_noise_curriculum_value, dtype=torch.float)

@@ -36,6 +36,9 @@ class FeetRewards(base.BaseManager):
 
     ## air
     def _reward_penalty_in_the_air(self):
+        if not hasattr(self.task, "feet_manager"):
+            return None
+
         feet_manager = self.task.feet_manager
 
         first_foot_contact = feet_manager.contact_filt[:, 0]
@@ -46,6 +49,10 @@ class FeetRewards(base.BaseManager):
     def _reward_feet_air_time(self):
         # Reward long steps
         # Need to filter the contacts because the contact reporting of PhysX is unreliable on meshes
+        if not hasattr(self.task, "feet_manager"):
+            return None
+        if not hasattr(self.task, "command_manager"):
+            return None
         feet_manager = self.task.feet_manager
         command_manager = self.task.command_manager
 
@@ -59,6 +66,8 @@ class FeetRewards(base.BaseManager):
         # Reward long steps
         # Need to filter the contacts because the contact reporting of PhysX is unreliable on meshes
         # Jiawei: Key ingredient.
+        if not hasattr(self.task, "feet_manager"):
+            return None
         feet_manager = self.task.feet_manager
 
         from_air_to_contact = torch.logical_and(feet_manager.contact_filt, ~feet_manager.last_contacts_filt)

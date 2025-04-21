@@ -6,34 +6,28 @@ from humanoidverse.envs.base_task.term.sim2real import push
 
 coreregistry: dict = {} # [str, base.BaseManager] = {}
 
-coreregistry["episode_manager"] = episode.BaseEpisode           # core
-coreregistry["terrain_manager"] = terrain.BaseTerrainManager    # core
-coreregistry["actuators_manager"] = actuators.ActuatorsManager  # core
-coreregistry["robotdata_manager"] = robotdata.RandResetDataManager   # core
+coreregistry["episode_manager"] = episode.BaseEpisode                 # core
+coreregistry["terrain_manager"] = terrain.BaseTerrainManager          # core
+coreregistry["actuators_manager"] = actuators.ActuatorsManager        # core
+coreregistry["robotdata_manager"] = robotdata.RandResetDataManager    # core
 
-coreregistry["observations_manager"] = observations.BaseObservations
 coreregistry["actions_manager"] = actions.ActionsManager
-
-coreregistry["terminations_manager"] = terminations.TerminateManager
-
+coreregistry["observations_manager"] = observations.BaseObservations
 
 from humanoidverse.envs.base_task.term.status import feet, robotstatus # status
-coreregistry["feet_manager"] = feet.FeetManager
 coreregistry["robotstatus_manager"] = robotstatus.StatusManager
+coreregistry["feet_manager"] = feet.FeetManager
 
 coreregistry["rewards_manager"] = rewards.BaseRewardsManager
 coreregistry["extras_manager"] = extras.BaseExtrasManager
+
+
 coreregistry["push_manager"] = push.PushManager
+coreregistry["terminations_manager"] = terminations.TerminateManager
 
 from humanoidverse.envs.base_task.currculum import observations_noise_currculum, reward_limits_curriculum
 coreregistry["observations_noise_currculum"] = observations_noise_currculum.NoiseCurrculum
 coreregistry["reward_limits_curriculum"] = reward_limits_curriculum.LimitsCurrculum
-
-############ REWARDS ############
-core_namespace: str  = "base_task"
-
-registry: dict = {}
-registry[core_namespace] = coreregistry
 
 ############ REWARDS ############
 from humanoidverse.envs.base_task.rewards import actions, episode, feet, robotstatus, actuators, body
@@ -45,6 +39,3 @@ core_rewards_registry['feet_rewards'] = feet.FeetRewards
 core_rewards_registry['robotstatus_rewards'] = robotstatus.StatusRewards
 core_rewards_registry['actuators_rewards'] = actuators.ActuatorsRewards
 
-
-rewards_registry: dict = {}
-rewards_registry[core_namespace] = core_rewards_registry
