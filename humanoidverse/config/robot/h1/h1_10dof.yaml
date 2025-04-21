@@ -23,18 +23,18 @@ robot:
   foot_name: "ankle"
   knee_name: "knee_link"
   has_upper_body_dof: False
-  has_torso: True
+  has_torso: False
   torso_name: "torso_link"
   # DFS order (isaacgym order)
-  dof_names: ['left_hip_yaw_joint', 
-              'left_hip_roll_joint', 
-              'left_hip_pitch_joint', 
-              'left_knee_joint', 
+  dof_names: ['left_hip_yaw_joint',
+              'left_hip_roll_joint',
+              'left_hip_pitch_joint',
+              'left_knee_joint',
               'left_ankle_joint',
-              'right_hip_yaw_joint', 
-              'right_hip_roll_joint', 
-              'right_hip_pitch_joint', 
-              'right_knee_joint', 
+              'right_hip_yaw_joint',
+              'right_hip_roll_joint',
+              'right_hip_pitch_joint',
+              'right_knee_joint',
               'right_ankle_joint']
 
   decouple_upper_and_lower_dofs: false
@@ -45,10 +45,10 @@ robot:
   dof_effort_limit_list:    [200., 200.,  200.,    300.,  40.,         200., 200., 200., 300.,  40.,        ]
   dof_armature_list: [0.1, 0.1, 0.1, 0.1, 0.1,
                       0.1, 0.1, 0.1, 0.1, 0.1]
-  dof_joint_friction_list: [0.00, 0.00, 0.00, 0.00, 0.00, 
+  dof_joint_friction_list: [0.00, 0.00, 0.00, 0.00, 0.00,
                             0.00, 0.00, 0.00, 0.00, 0.00]
 
-  body_names: ['pelvis', 
+  body_names: ['pelvis',
                 'left_hip_yaw_link', 'left_hip_roll_link','left_hip_pitch_link', 'left_knee_link', 'left_ankle_link',
                 'right_hip_yaw_link', 'right_hip_roll_link', 'right_hip_pitch_link', 'right_knee_link', 'right_ankle_link']
 
@@ -61,20 +61,20 @@ robot:
     lin_vel: [0.0, 0.0, 0.0]  # x,y,z [m/s]
     ang_vel: [0.0, 0.0, 0.0]  # x,y,z [rad/s]
     default_joint_angles :  # : target angles [rad] when action : 0.0
-      left_hip_yaw_joint : 0. 
-      left_hip_roll_joint : 0            
-      left_hip_pitch_joint : -0.4      
-      left_knee_joint : 0.8    
-      left_ankle_joint : -0.4  
-      right_hip_yaw_joint : 0. 
-      right_hip_roll_joint : 0 
-      right_hip_pitch_joint : -0.4                                    
-      right_knee_joint : 0.8                                          
-      right_ankle_joint : -0.4                                  
+      left_hip_yaw_joint : 0.
+      left_hip_roll_joint : 0
+      left_hip_pitch_joint : -0.4
+      left_knee_joint : 0.8
+      left_ankle_joint : -0.4
+      right_hip_yaw_joint : 0.
+      right_hip_roll_joint : 0
+      right_hip_pitch_joint : -0.4
+      right_knee_joint : 0.8
+      right_ankle_joint : -0.4
 
 
   randomize_link_body_names : [
-    'pelvis', 'left_hip_yaw_link', 'left_hip_roll_link', 'left_hip_pitch_link', 
+    'pelvis', 'left_hip_yaw_link', 'left_hip_roll_link', 'left_hip_pitch_link',
     'right_hip_yaw_link', 'right_hip_roll_link', 'right_hip_pitch_link',  'torso_link',
   ]
 
@@ -157,10 +157,10 @@ robot:
     real_weight_porpotion_capsules: True
     real_weight_porpotion_boxes: True
 
-    body_names: ['pelvis', 
+    body_names: ['pelvis',
                 'left_hip_yaw_link', 'left_hip_roll_link','left_hip_pitch_link', 'left_knee_link', 'left_ankle_link',
                 'right_hip_yaw_link', 'right_hip_roll_link', 'right_hip_pitch_link', 'right_knee_link', 'right_ankle_link']
-    limb_weight_group: 
+    limb_weight_group:
       - ['left_hip_yaw_link', 'left_hip_roll_link','left_hip_pitch_link', 'left_knee_link', 'left_ankle_link',]
       - ['right_hip_yaw_link', 'right_hip_roll_link', 'right_hip_pitch_link', 'right_knee_link', 'right_ankle_link']
       - ['pelvis']
@@ -247,7 +247,7 @@ robot:
 
     visualization:
       customize_color : True
-      marker_joint_colors : 
+      marker_joint_colors :
       - [0.929, 0.867, 0.437] # pelvis
       - [0.929, 0.867, 0.437] # left_hip_yaw_joint
       - [0.929, 0.867, 0.437] # left_hip_roll_joint
