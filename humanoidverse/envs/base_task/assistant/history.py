@@ -31,63 +31,37 @@ class HistoryManager(base.BaseManager):
             self.history_handler.add(key, _observations_manager.hist_obs_dict[key])
 
     ######################### Observations #########################
-    def _get_obs_history(self,):
+    def _get_obs_history(self):
         assert "history" in self.config.obs.obs_auxiliary.keys()
         history_config = self.config.obs.obs_auxiliary['history']
-        history_key_list = history_config.keys()
-        history_tensors = []
-        for key in sorted(history_config.keys()):
-            history_length = history_config[key]
-            history_tensor = self.history_handler.query(key)[:, :history_length]
-            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
-            history_tensors.append(history_tensor)
-        return torch.cat(history_tensors, dim=1)
+        return self._get_history(history_config)
 
-    def _get_obs_short_history(self,):
+    def _get_obs_short_history(self):
         assert "short_history" in self.config.obs.obs_auxiliary.keys()
         history_config = self.config.obs.obs_auxiliary['short_history']
-        history_key_list = history_config.keys()
-        history_tensors = []
-        for key in sorted(history_config.keys()):
-            history_length = history_config[key]
-            history_tensor = self.history_handler.query(key)[:, :history_length]
-            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
-            history_tensors.append(history_tensor)
-        return torch.cat(history_tensors, dim=1)
+        return self._get_history(history_config)
 
-    def _get_obs_long_history(self,):
+    def _get_obs_long_history(self):
         assert "long_history" in self.config.obs.obs_auxiliary.keys()
         history_config = self.config.obs.obs_auxiliary['long_history']
-        history_key_list = history_config.keys()
-        history_tensors = []
-        for key in sorted(history_config.keys()):
-            history_length = history_config[key]
-            history_tensor = self.history_handler.query(key)[:, :history_length]
-            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
-            history_tensors.append(history_tensor)
-        return torch.cat(history_tensors, dim=1)
+        return self._get_history(history_config)
 
     ## actor
-    def _get_obs_history_actor(self,):
+    def _get_obs_history_actor(self):
         assert "history_actor" in self.config.obs.obs_auxiliary.keys()
         history_config = self.config.obs.obs_auxiliary['history_actor']
-        history_key_list = history_config.keys()
-        history_tensors = []
-        for key in sorted(history_config.keys()):
-            history_length = history_config[key]
-            history_tensor = self.history_handler.query(key)[:, :history_length]
-            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # Shape: [4096, history_length*obs_dim]
-            history_tensors.append(history_tensor)
-        return torch.cat(history_tensors, dim=1)
+        return self._get_history(history_config)
 
-    def _get_obs_history_critic(self,):
+    def _get_obs_history_critic(self):
         assert "history_critic" in self.config.obs.obs_auxiliary.keys()
         history_config = self.config.obs.obs_auxiliary['history_critic']
-        history_key_list = history_config.keys()
+        return self._get_history(history_config)
+
+    def _get_history(self, history_config):
         history_tensors = []
         for key in sorted(history_config.keys()):
             history_length = history_config[key]
             history_tensor = self.history_handler.query(key)[:, :history_length]
-            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)
+            history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # _b, _ndims * history_length
             history_tensors.append(history_tensor)
         return torch.cat(history_tensors, dim=1)

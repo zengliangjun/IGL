@@ -148,7 +148,7 @@ class AsapStatus(robotstatus.StatusManager):
     def _get_obs_ref_motion_phase(self):
         robotdata_manager = self.task.robotdata_manager
         _ref_motion_length = robotdata_manager.motion_len
-        _ref_motion_phase = robotdata_manager._next_motion_times / _ref_motion_length
+        _ref_motion_phase = robotdata_manager.next_motion_times / _ref_motion_length
         return _ref_motion_phase.unsqueeze(1)
 
     def draw_debug_vis(self):

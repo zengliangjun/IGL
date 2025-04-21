@@ -2,9 +2,6 @@ import torch
 import numpy as np
 from humanoidverse.envs.base_task.term.foundation import robotdata
 
-from motion_lib.aosp import motion_lib_robot
-from loguru import logger
-
 def _small_random_quaternions(obj, n, max_angle):
     axis = torch.randn((n, 3), device=obj.device)
     axis = axis / torch.norm(axis, dim=1, keepdim=True)  # Normalize axis
@@ -17,31 +14,23 @@ def _small_random_quaternions(obj, n, max_angle):
     q = torch.cat([sin_half_angle * axis, cos_half_angle], dim=1)
     return q
 
-class AsapMotion(robotdata.BaseRobotDataManager):
+from humanoidverse.envs.motion_tracking.asap.motions import aosp_motion
+
+
+class AsapRobotData(robotdata.BaseRobotDataManager):
     def __init__(self, _task):
-        super(AsapMotion, self).__init__(_task)
+        super(AsapRobotData, self).__init__(_task)
+        self.preinstance_motion()
+
+    def preinstance_motion(self):
+        self.motion_warp = aosp_motion.AsapMotion(self.task)
 
     def pre_init(self):
-        super(AsapMotion, self).pre_init()
-        ## status
-        self.motion_ids = torch.arange(self.num_envs).to(self.device)
-        self.motion_len = torch.zeros(self.num_envs, dtype=torch.float32, device=self.device, requires_grad=False)
-        self.motion_start_times = torch.zeros(self.num_envs, dtype=torch.float32, device=self.device, requires_grad=False)
-
-        ## motion
-        self.config.robot.motion.step_dt = self.task.dt
-        self.motion_lib = motion_lib_robot.MotionLibRobot(self.task)
-        self.motion_lib.load_motions(random_sample=False)
-        self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
-
-        ## for resample
-        #self.motion_start_idx = 0
-        self.num_motions = self.motion_lib._num_unique_motions
-        if self.config.resample_motion_when_training:
-            self.resample_time_interval = np.ceil(self.config.resample_time_interval_s / self.task.dt)
+        super(AsapRobotData, self).pre_init()
+        self.motion_warp.pre_init()
 
     def init(self):
-        super(AsapMotion, self).init()
+        super(AsapRobotData, self).init()
         if "extend_config" in self.config.robot.motion:
             for extend_config in self.config.robot.motion.extend_config:
                 self.task.simulator._body_list.append(extend_config["joint_name"])
@@ -54,34 +43,24 @@ class AsapMotion(robotdata.BaseRobotDataManager):
             self.upper_body_id = [self.task.simulator._body_list.index(link) for link in self.config.robot.motion.upper_body_link]
 
     def pre_compute(self):
-        ## resample falg when training
-        if self.config.resample_motion_when_training and not self.task.is_evaluating:
-            episode_manager = self.task.episode_manager
-            if episode_manager.common_step_counter % self.resample_time_interval == 0:
-                logger.info(f"Resampling motion at step {episode_manager.common_step_counter}")
-                ## update reset flag with True
-                self.motion_lib.load_motions(random_sample=True)
-                self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
-                episode_manager.time_out_buf[:] = 1
+        super(AsapRobotData, self).pre_compute()
+        self.motion_warp.pre_compute()
 
     def reset(self, env_ids):
-        super(AsapMotion, self).reset(env_ids)
+        super(AsapRobotData, self).reset(env_ids)
+        self.motion_warp.reset(env_ids)
         if len(env_ids) != 0:
-            if self.task.is_evaluating and not self.config.enforce_randomize_motion_start_eval:
-                self.motion_start_times[env_ids] = torch.zeros(len(env_ids), dtype=torch.float32, device=self.device)
-            else:
-                self.motion_start_times[env_ids] = self.motion_lib.sample_time(self.motion_ids[env_ids])
-
             # only for reset motion res
-            _motion_ref = self._motion_ref
+            _motion_ref = self.motion_warp.motion_ref
+
             ## stage 2
             self._reset_dofs(env_ids, _motion_ref)
             self._reset_root_states(env_ids, _motion_ref)
         ##
-        self.next_motion_ref = self._next_motion_ref
+        self.next_motion_ref = self.motion_warp.next_motion_ref
 
     def post_compute(self):
-        super(AsapMotion, self).post_compute()
+        super(AsapRobotData, self).post_compute()
         self.current_motion_ref = self.next_motion_ref
 
     def _reset_dofs(self, env_ids, _motion_ref):
@@ -168,82 +147,39 @@ class AsapMotion(robotdata.BaseRobotDataManager):
             self.task.simulator.robot_root_states[env_ids, 10:13] = root_ang_vel + torch.randn_like(root_ang_vel) * root_ang_vel_noise
 
     @property
-    def _motion_ref(self):
-        assert hasattr(self.task, "episode_manager")
-        episode_manager = self.task.episode_manager
-        terrain_manager = self.task.terrain_manager
-
-        offset = terrain_manager.env_origins
-        motion_times = (episode_manager.episode_length_buf) * self.task.dt + self.motion_start_times # next frames so +1
-        motion_ref = self.motion_lib.get_motion_state(self.motion_ids, motion_times, offset=offset)
-        return motion_ref
+    def motion_start_times(self):
+        return self.motion_warp.motion_start_times
 
     @property
-    def _next_motion_ref(self):
-        assert hasattr(self.task, "episode_manager")
-        episode_manager = self.task.episode_manager
-        terrain_manager = self.task.terrain_manager
-
-        offset = terrain_manager.env_origins
-        motion_times = (episode_manager.episode_length_buf + 1) * self.task.dt + self.motion_start_times # next frames so +1
-        motion_ref = self.motion_lib.get_motion_state(self.motion_ids, motion_times, offset=offset)
-        return motion_ref
+    def next_motion_times(self):
+        return self.motion_warp.motion_start_times
 
     @property
-    def _next_motion_times(self):
-        assert hasattr(self.task, "episode_manager")
-        episode_manager = self.task.episode_manager
-        return (episode_manager.episode_length_buf + 1) * self.task.dt + self.motion_start_times # next frames so +1
+    def motion_len(self):
+        return self.motion_warp.motion_len
 
 
-class AsapMotionEvaluater(AsapMotion):
+class AsapRobotDataEvaluater(AsapRobotData):
     def __init__(self, _task):
-        super(AsapMotionEvaluater, self).__init__(_task)
+        super(AsapRobotDataEvaluater, self).__init__(_task)
 
-
-    def pre_init(self):
-        super(AsapMotionEvaluater, self).pre_init()
-        self.motion_start_idx = 0
-        self.num_motions = self.motion_lib._num_unique_motions
-        self.next_motions_flags = False
-        import threading
-        self.flags_lock = threading.Lock()
+    def preinstance_motion(self):
+        self.motion_warp = aosp_motion.AsapMotionEvaluater(self.task)
 
     def next_task(self):
-        self.flags_lock.acquire()  # 获取锁
-        self.next_motions_flags = True
-        self.flags_lock.release()  # 释放锁
-
-    def pre_compute(self):
-        super(AsapMotionEvaluater, self).pre_compute()
-
-        _next_motions_flags = False
-        self.flags_lock.acquire()  # 获取锁
-        _next_motions_flags = self.next_motions_flags
-        self.next_motions_flags = False
-        self.flags_lock.release()  # 释放锁
-
-        if _next_motions_flags:
-            self.motion_start_idx += self.num_envs
-            if self.motion_start_idx >= self.num_motions:
-                self.motion_start_idx = 0
-
-            self.motion_lib.load_motions(random_sample=False, start_idx=self.motion_start_idx)
-            self.motion_len[:] = self.motion_lib.get_motion_length(self.motion_ids)
-            episode_manager = self.task.episode_manager
-            episode_manager.time_out_buf[:] = 1
+        self.motion_warp.next_task()
 
 
-class AsapMotionPlayer(AsapMotionEvaluater):
+class AsapRobotDataPlayer(AsapRobotDataEvaluater):
     def __init__(self, _task):
-        super(AsapMotionPlayer, self).__init__(_task)
+        super(AsapRobotDataPlayer, self).__init__(_task)
 
     def reset(self, env_ids):
         # only for reset motion res
         if hasattr(self, 'current_motion_ref'):
             _motion_ref = self.current_motion_ref
         else:
-            _motion_ref = self._motion_ref
+            _motion_ref = self.motion_warp._motion_ref
 
         ## stage 2
         self._reset_dofs(env_ids, _motion_ref)
@@ -251,6 +187,6 @@ class AsapMotionPlayer(AsapMotionEvaluater):
         self.next_motion_ref = self._next_motion_ref
 
         ## for debug
-        _ref_motion_length = self.motion_len
-        _ref_motion_phase = self._next_motion_times / _ref_motion_length
-        print("motion_phase", _ref_motion_phase)
+        #_ref_motion_length = self.motion_warp.motion_len
+        #_ref_motion_phase = self.motion_warp._next_motion_times / _ref_motion_length
+        #print("motion_phase", _ref_motion_phase)

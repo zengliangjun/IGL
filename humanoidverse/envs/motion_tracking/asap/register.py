@@ -13,7 +13,7 @@ asap_evaluater_registry["episode_manager"] = base_register.coreregistry["episode
 asap_evaluater_registry["extras_manager"] = base_register.coreregistry["extras_manager"]
 asap_evaluater_registry["terrain_manager"] = base_register.coreregistry["terrain_manager"]
 asap_evaluater_registry["actuators_manager"] = base_register.coreregistry["actuators_manager"]
-asap_evaluater_registry["robotdata_manager"] = asap_robotdata.AsapMotionEvaluater  #base_register.coreregistry["robotdata_manager"]
+asap_evaluater_registry["robotdata_manager"] = asap_robotdata.AsapRobotDataEvaluater  #base_register.coreregistry["robotdata_manager"]
 asap_evaluater_registry["actions_manager"] = base_register.coreregistry["actions_manager"]
 asap_evaluater_registry["observations_manager"] = base_register.coreregistry["observations_manager"]
 asap_evaluater_registry["robotstatus_manager"] = asap_robotstatus.AsapStatus  #base_register.coreregistry["robotstatus_manager"]
@@ -27,7 +27,7 @@ asap_evaluater_registry["asap_motion_save"] = asap_motion_save.MotionSave
 
 ## trainer
 asap_trainer_registry = copy.deepcopy(asap_evaluater_registry)
-asap_trainer_registry["robotdata_manager"] = asap_robotdata.AsapMotion
+asap_trainer_registry["robotdata_manager"] = asap_robotdata.AsapRobotData
 asap_trainer_registry["rewards_manager"] =  base_register.coreregistry["rewards_manager"]
 asap_trainer_registry["feet_manager"] = base_register.coreregistry["feet_manager"]
 asap_trainer_registry["push_manager"] =  base_register.coreregistry["push_manager"]
@@ -47,6 +47,6 @@ asap_rewards_registry['asap_motionstatus_rewards'] = asap_motionstatus.ASAPStatu
 asap_player_registry = {}
 asap_evaluater_registry["terrain_manager"] = base_register.coreregistry["terrain_manager"]
 asap_evaluater_registry["actuators_manager"] = base_register.coreregistry["actuators_manager"]
-asap_evaluater_registry["robotdata_manager"] = asap_robotdata.AsapMotionPlayer  #base_register.coreregistry["robotdata_manager"]
+asap_evaluater_registry["robotdata_manager"] = asap_robotdata.AsapRobotDataPlayer  #base_register.coreregistry["robotdata_manager"]
 ############ REWARDS ############
 

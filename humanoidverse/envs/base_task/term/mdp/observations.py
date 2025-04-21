@@ -22,11 +22,14 @@ class BaseObservations(base.BaseManager):
         super(BaseObservations, self).init()
         self._collect_observationss()
 
-
     # stage 3
     def pre_step(self):
         self.hist_obs_dict.clear()
 
+    def reset(self, env_ids):
+        if len(env_ids) == 0:
+            return
+        self.history_manager.reset(env_ids)
 
     def compute(self):
         """ Computes observations
@@ -36,8 +39,8 @@ class BaseObservations(base.BaseManager):
             self.obs_buf_dict_raw[obs_key] = dict()
             parse_observation(self, obs_config, self.obs_buf_dict_raw[obs_key], self.config.obs.obs_scales, self.noise_scales)
 
-        if hasattr(self.task, "history_manager"):
-            history_manager = self.task.history_manager
+        if True:
+            history_manager = self.history_manager
             # Compute history observations
             history_obs_list = history_manager.history_handler.history.keys()
             parse_observation(self, history_obs_list, self.hist_obs_dict, self.config.obs.obs_scales, self.noise_scales)
@@ -49,6 +52,8 @@ class BaseObservations(base.BaseManager):
         for obs_key, obs_val in self.obs_buf_dict.items():
             self.obs_buf_dict[obs_key] = torch.clip(obs_val, -clip_obs, clip_obs)
 
+    def post_compute(self):
+        self.history_manager.post_compute()
 
     # helper functions
     def _post_config_observation_callback(self):
