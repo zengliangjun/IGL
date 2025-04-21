@@ -2,9 +2,9 @@ import torch
 from humanoidverse.envs.base_task.term import base
 from humanoidverse.utils.torch_utils import quat_rotate_inverse
 
-class UpperBodyRewards(base.BaseManager):
+class BodyRewards(base.BaseManager):
     def __init__(self, _task):
-        super(UpperBodyRewards, self).__init__(_task)
+        super(BodyRewards, self).__init__(_task)
 
     ########################### PENALTY REWARDS ###########################
 

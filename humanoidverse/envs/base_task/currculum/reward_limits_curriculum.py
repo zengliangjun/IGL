@@ -108,6 +108,13 @@ class LimitsCurrculum(base.BaseManager):
         if not hasattr(self.task, "extras_manager"):
             return
 
+        if not hasattr(self.task, "rewards_manager"):
+            return
+
+        rewards_manager = self.task.rewards_manager
+        if not hasattr(rewards_manager, 'actuators_rewards'):
+            return
+
         extras_manager = self.task.extras_manager
         if self.use_reward_limits_dof_pos_curriculum:
             extras_manager.log_dict["soft_dof_pos_curriculum_value"] = torch.tensor(self.soft_dof_pos_curriculum_value, dtype=torch.float)

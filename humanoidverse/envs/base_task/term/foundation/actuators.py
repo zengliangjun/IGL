@@ -3,9 +3,9 @@ from humanoidverse.utils.torch_utils import torch_rand_float
 from humanoidverse.envs.base_task.term import base
 from loguru import logger
 
-class LeggedActuatorsManager(base.BaseManager):
+class ActuatorsManager(base.BaseManager):
     def __init__(self, _task):
-        super(LeggedActuatorsManager, self).__init__(_task)
+        super(ActuatorsManager, self).__init__(_task)
         self.dim_actions = self.task.config.robot.actions_dim
 
     # stage 1
