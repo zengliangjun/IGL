@@ -34,7 +34,7 @@ asap_player_registry["robotdata_manager"] = asap_robotdata.AsapMotionPlayer
 asap_rewards_registry = copy.deepcopy(base_register.rewards_registry[legged_register.trainer_namespace])
 
 from humanoidverse.envs.motion_tracking.asap.rewards import asap_motionstatus
-asap_rewards_registry['robotstatus_rewards'] = asap_motionstatus.ASAPStatusRewards
+asap_rewards_registry['asap_motionstatus_rewards'] = asap_motionstatus.ASAPStatusRewards
 
 ####################################
 trainer_namespace: str  = "asap_trainer_task"

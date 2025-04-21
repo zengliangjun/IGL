@@ -30,11 +30,12 @@ registry: dict = {}
 registry[core_namespace] = coreregistry
 
 ############ REWARDS ############
-from humanoidverse.envs.base_task.rewards import actions, episode, feet
+from humanoidverse.envs.base_task.rewards import actions, episode, feet, robotstatus
 core_rewards_registry: dict = {}
 core_rewards_registry['actions_rewards'] = actions.ActionsRewards
 core_rewards_registry['episode_rewards'] = episode.EpisodeRewards
 core_rewards_registry['feet_rewards'] = feet.FeetRewards
+core_rewards_registry['robotstatus_rewards'] = robotstatus.StatusRewards
 
 rewards_registry: dict = {}
 rewards_registry[core_namespace] = core_rewards_registry

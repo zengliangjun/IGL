@@ -1,7 +1,7 @@
 import torch
-from humanoidverse.envs.legged_base_task.rewards import robotstatus
+from humanoidverse.envs.base_task.term import base
 
-class ASAPStatusRewards(robotstatus.StatusRewards):
+class ASAPStatusRewards(base.BaseManager):
     def __init__(self, _task):
         super(ASAPStatusRewards, self).__init__(_task)
 

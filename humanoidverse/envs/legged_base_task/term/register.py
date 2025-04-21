@@ -34,11 +34,9 @@ register.registry[evaluater_namespace] = evaluater_registry
 
 ############ REWARDS ############
 legged_base_rewards_registry = copy.deepcopy(register.rewards_registry[register.core_namespace])
-from humanoidverse.envs.legged_base_task.rewards import actuators, body, robotstatus
+from humanoidverse.envs.legged_base_task.rewards import actuators, body
 legged_base_rewards_registry['actuators_rewards'] = actuators.ActuatorsRewards
 
-
-legged_base_rewards_registry['robotstatus_rewards'] = robotstatus.StatusRewards
 legged_base_rewards_registry['body_rewards'] = body.UpperBodyRewards
 
 register.rewards_registry[trainer_namespace] = legged_base_rewards_registry
