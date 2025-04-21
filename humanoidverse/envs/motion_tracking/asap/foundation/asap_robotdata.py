@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from humanoidverse.envs.base_task.term.foundation import robotdata
 
-from motion_lib import motion_lib_robot
+from motion_lib.aosp import motion_lib_robot
 from loguru import logger
 
 def _small_random_quaternions(obj, n, max_angle):

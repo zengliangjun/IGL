@@ -5,9 +5,9 @@ import joblib
 import torch
 import random
 
-from motion_lib.motion_utils.flags import flags
+from motion_lib.aosp.motion_utils.flags import flags
 from enum import Enum
-from motion_lib.skeleton import SkeletonTree
+from motion_lib.aosp.skeleton import SkeletonTree
 from pathlib import Path
 from easydict import EasyDict
 from loguru import logger
