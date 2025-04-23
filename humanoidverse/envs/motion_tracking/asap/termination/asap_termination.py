@@ -25,6 +25,8 @@ class TrackTermination(base.BaseManager):
         _dif_global_body_pos = ref_body_pos - robotstatus_manager._rigid_body_pos
 
         reset_buf_motion_far = torch.any(torch.norm(_dif_global_body_pos, dim=-1) > self.terminate_when_motion_far_threshold, dim=-1)
+        # TODO
+        # self.reset_buf_motion_far = torch.sum(reset_buf_motion_far.float()).item()
         return reset_buf_motion_far
         # log current motion far threshold
 

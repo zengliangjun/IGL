@@ -330,6 +330,7 @@ robot:
     left_foot_name: "left_ankle_link"
 
     #### Config for extension
+    nums_extend_bodies: 2
     extend_config:
       - joint_name: "left_hand_link"
         parent_name: "left_elbow_link"
