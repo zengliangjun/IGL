@@ -398,16 +398,16 @@ h1 asap train
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
-+simulator=isaacgym \
++simulator=isaacsim45 \
 +exp=asap_motion_tracking \
 +domain_rand=NO_domain_rand \
 +rewards=asap_motion_tracking/reward_motion_tracking_dm_2real \
 +robot=h1/OmniH2Oh1 \
 +terrain=terrain_locomotion_plane \
-+obs=asap_motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history_extends2 \
++obs=asap_motion_tracking/motion_tracking \
 project_name=ASAP \
 experiment_name=OmniH2Oh1 \
-robot.motion.motion_file=data/motions/OmniH2O/stable_punch.pkl \
+robot.motion.motion_file=data/motions/OmniH2O/amass_phc_filtered.pkl \
 rewards.reward_penalty_curriculum=True \
 rewards.reward_penalty_degree=0.00001 \
 env.config.termination.terminate_when_motion_far=True \
