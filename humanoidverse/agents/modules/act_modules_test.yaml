@@ -1,0 +1,15 @@
+input_dim:  256
+output_dim:  16
+layer_config:
+    type: ACT
+    chunk_size: 10
+    history_steps: 80  ## history steps
+
+    pre_norm: false
+    dim_model: 512
+    n_heads: 8
+    dim_feedforward: 3200
+    activation: relu
+    n_encoder_layers: 4
+    n_decoder_layers: 1
+    dropout: 0.1
