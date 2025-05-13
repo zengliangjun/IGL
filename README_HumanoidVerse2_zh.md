@@ -13,6 +13,7 @@
 <summary>BaseManager代码 .</summary>
 ```python
 class BaseManager():
+
     def __init__(self, _task):
         self.task = _task                 # 任务/环境实例对像 （BaseTask 子类）
         self.num_envs = _task.num_envs    # 环境实例数
@@ -302,7 +303,7 @@ class BaseComponent():
 - storage 回放封装子模块
 </details>
 
-h1 locomotion train  
+h1 locomotion train
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
@@ -322,11 +323,11 @@ HYDRA_FULL_ERROR=1 python humanoidverse/eval_agent.py \
 +checkpoint=logs/HumanoidLocomotion/isaacgym/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt
 
 ```
-  
 
-g1 locomotion train  
 
-  
+g1 locomotion train
+
+
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
 +simulator=isaacgym \
@@ -344,9 +345,9 @@ rewards.reward_penalty_curriculum=True \
 rewards.reward_initial_penalty_scale=0.1 \
 rewards.reward_penalty_degree=0.00003
 ```
-  
-g1 asap train  
-  
+
+g1 asap train
+
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
@@ -375,8 +376,8 @@ HYDRA_FULL_ERROR=1 python humanoidverse/eval_agent.py \
 
 ```
 
-g1 motion file play  
-  
+g1 motion file play
+
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/play_agent.py \
@@ -394,7 +395,7 @@ robot.motion.motion_file=data/motions/asap/g1_29dof_anneal_23dof/TairanTestbed/s
 ```
 
 
-h1 asap train  
+h1 asap train
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/train_agent.py \
@@ -418,7 +419,7 @@ robot.asset.self_collisions=0
 
 ```
 
-h1 motion file play  
+h1 motion file play
 
 ```bash
 HYDRA_FULL_ERROR=1 python humanoidverse/play_agent.py \
