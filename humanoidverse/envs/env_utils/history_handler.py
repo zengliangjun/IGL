@@ -4,7 +4,7 @@ from termcolor import colored
 from loguru import logger
 
 class HistoryHandler:
-    
+
     def __init__(self, num_envs, history_config, obs_dims, device):
         self.obs_dims = obs_dims
         self.device = device
@@ -18,7 +18,7 @@ class HistoryHandler:
                     self.buffer_config[obs_key] = max(self.buffer_config[obs_key], obs_num)
                 else:
                     self.buffer_config[obs_key] = obs_num
-        
+
         for key in self.buffer_config.keys():
             self.history[key] = torch.zeros(num_envs, self.buffer_config[key], obs_dims[key], device=self.device)
 
@@ -38,7 +38,34 @@ class HistoryHandler:
         val = self.history[key].clone()
         self.history[key][:, 1:] = val[:, :-1]
         self.history[key][:, 0] = value.clone()
-        
+
     def query(self, key: str):
         assert key in self.history.keys(), f"Key {key} not found in history"
         return self.history[key].clone()
+
+    def post_compute(self):
+        pass
+
+class HistoryWithMask(HistoryHandler):
+
+    def __init__(self, num_envs, history_config, obs_dims, device):
+        super(HistoryWithMask, self).__init__(num_envs, history_config, obs_dims, device)
+
+        for key in self.buffer_config.keys():
+            self.history_mask = torch.zeros(num_envs, self.buffer_config[key], device=self.device, dtype = torch.float32)  ## history len
+            break
+
+    def reset(self, reset_ids):
+        super(HistoryWithMask, self).reset(reset_ids)
+        if len(reset_ids)==0:
+            return
+
+        self.history_mask[reset_ids] *= 0.
+
+    def post_compute(self):
+        val = self.history_mask.clone()
+        self.history_mask[:, 1:] = val[:, :-1]
+        self.history_mask[:, 0] = 1
+
+    def query_mask(self):
+        return self.history_mask.clone()

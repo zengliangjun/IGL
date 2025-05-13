@@ -30,6 +30,7 @@ from torch import Tensor, nn
 
 '''
 actor:
+    type: ACT
     input_dim:
     - actor_obs
     output_dim:

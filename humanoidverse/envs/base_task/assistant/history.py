@@ -1,5 +1,5 @@
 from humanoidverse.envs.base_task.term import base
-from humanoidverse.envs.env_utils.history_handler import HistoryHandler
+from humanoidverse.envs.env_utils import history_handler
 import torch
 
 '''
@@ -10,7 +10,7 @@ is 0bservations manager's member.
 class HistoryManager(base.BaseManager):
     def __init__(self, _task):
         super(HistoryManager, self).__init__(_task)
-        self.history_handler = HistoryHandler(self.num_envs,
+        self.history_handler = history_handler.HistoryHandler(self.num_envs,
                                               self.config.obs.obs_auxiliary,
                                               self.config.obs.obs_dims,
                                               self.device)
@@ -65,3 +65,26 @@ class HistoryManager(base.BaseManager):
             history_tensor = history_tensor.reshape(history_tensor.shape[0], -1)  # _b, _ndims * history_length
             history_tensors.append(history_tensor)
         return torch.cat(history_tensors, dim=1)
+
+
+class HistoryManagerWithMask(HistoryManager):
+    def __init__(self, _task):
+        super(HistoryManagerWithMask, self).__init__(_task)
+        self.history_handler = history_handler.HistoryWithMask(self.num_envs,
+                                              self.config.obs.obs_auxiliary,
+                                              self.config.obs.obs_dims,
+                                              self.device)
+
+    ######################### Observations #########################
+    def _get_history(self, history_config):
+        '''
+        the first element is mask, so the shape is [b, history_length, _mask + obs]
+        '''
+        _mask = self.history_handler.query_mask()
+        history_tensors = [ _mask.unsqueeze(2) ]  ## Shape: [b, history_length, 1]
+        for key in sorted(history_config.keys()):
+            history_length = history_config[key]
+            history_tensor = self.history_handler.query(key)[:, :history_length]  ## Shape: [b, history_length, obs_dim]
+            history_tensors.append(history_tensor)
+        return torch.cat(history_tensors, dim=1)
+

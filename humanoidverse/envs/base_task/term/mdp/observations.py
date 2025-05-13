@@ -7,10 +7,54 @@ import torch
 class BaseObservations(base.BaseManager):
     def __init__(self, _task):
         super(BaseObservations, self).__init__(_task)
+
+        _isact = False
+        for _key, _value in self.config.robot.algo_obs_dim_dict:
+            if isinstance(_value, tuple) or isinstance(_value, list):
+                _isact = True
+            break
+
+        if _isact:
+            self.proxy = ObservationsWithToken(_task)
+        else:
+            self.proxy = GeneralObservations(_task)
+
+    def init(self):
+        self.proxy.init()
+
+    def post_init(self):
+        self.proxy.post_init()
+
+    def pre_step(self):
+        self.proxy.pre_step()
+
+    def reset(self, env_ids):
+        self.proxy.reset(env_ids)
+
+    def compute(self):
+        self.proxy.compute()
+
+    def post_compute(self):
+        self.proxy.post_compute()
+
+    @property
+    def obs_buf_dict(self):
+        return self.proxy.obs_buf_dict()
+
+    @property
+    def obs_buf_dict_raw(self):
+        return self.proxy.obs_buf_dict_raw()
+
+    @property
+    def hist_obs_dict(self):
+        return self.proxy.hist_obs_dict()
+
+class GeneralObservations(base.BaseManager):
+    def __init__(self, _task):
+        super(GeneralObservations, self).__init__(_task)
         self.dim_obs = self.config.robot.policy_obs_dim
         self.dim_critic_obs = self.config.robot.critic_obs_dim
         self.noise_scales = copy.deepcopy(self.config.obs.noise_scales)
-
 
     def init(self):
         self.obs_buf_dict = {}
@@ -19,7 +63,7 @@ class BaseObservations(base.BaseManager):
         self.history_manager = history.HistoryManager(self.task)
 
     def post_init(self):
-        super(BaseObservations, self).init()
+        super(GeneralObservations, self).init()
         self._collect_observationss()
 
     # stage 3
@@ -79,3 +123,36 @@ class BaseObservations(base.BaseManager):
             if _item.startswith("_get_obs_"):
                 _obs_function = getattr(_manager, _item)
                 setattr(self, _item, _obs_function)
+
+class ObservationsWithToken(GeneralObservations):
+    def __init__(self, _task):
+        super(ObservationsWithToken, self).__init__(_task)
+
+    def init(self):
+        self.obs_buf_dict = {}
+        self.obs_buf_dict_raw = {}
+        self.hist_obs_dict = {}
+        self.history_manager = history.HistoryManagerWithMask(self.task)
+
+    # helper functions
+    def _post_config_observation_callback(self):
+        self.obs_buf_dict = dict()
+
+        for obs_key, obs_config in self.config.obs.obs_dict.items():
+
+            _history_buf_dict = {}
+
+            obs_keys = sorted(obs_config)
+            # print("obs_keys", obs_keys)
+            dict_raw = self.obs_buf_dict_raw[obs_key]
+            obs_bufs = []
+            for key in obs_keys:
+                if key.startswith('history'):
+                    _history_buf_dict[key] = dict_raw[key]
+                else:
+                    obs_bufs.append(dict_raw[key])
+
+            if len(_history_buf_dict):
+                self.obs_buf_dict[obs_key] = [torch.cat(obs_bufs, dim=-1), _history_buf_dict]
+            else:
+                self.obs_buf_dict[obs_key] = torch.cat(obs_bufs, dim=-1)

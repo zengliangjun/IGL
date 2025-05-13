@@ -27,11 +27,64 @@ def class_to_dict(obj) -> dict:
     return result
 
 def pre_process_config(config) -> None:
+    if "MLP" == config.algo.config.module_dict.actor.layer_config.type:
+        pre_process_mlp_config(config)
 
-    # compute observation_dim
-    # config.robot.policy_obs_dim = -1
-    # config.robot.critic_obs_dim = -1
+    if "ACT" == config.algo.config.module_dict.actor.layer_config.type:
+        pre_process_act_config(config)
 
+
+def pre_process_act_config(config) -> None:
+    obs_dim_dict = dict()
+    _obs_key_list = config.env.config.obs.obs_dict
+    _aux_obs_key_list = config.env.config.obs.obs_auxiliary
+
+    assert set(config.env.config.obs.noise_scales.keys()) == set(config.env.config.obs.obs_scales.keys())
+
+    # convert obs_dims to list of dicts
+    each_dict_obs_dims = {k: v for d in config.env.config.obs.obs_dims for k, v in d.items()}
+    config.env.config.obs.obs_dims = each_dict_obs_dims
+    logger.info(f"obs_dims: {each_dict_obs_dims}")
+    auxiliary_obs_dims = {}
+    auxiliary_obs_length = {}
+    for aux_obs_key, aux_config in _aux_obs_key_list.items():
+        auxiliary_obs_dims[aux_obs_key] = 0
+        for _key, _num in aux_config.items():
+            assert _key in config.env.config.obs.obs_dims.keys()
+            auxiliary_obs_dims[aux_obs_key] += config.env.config.obs.obs_dims[_key]# * _num
+            if aux_obs_key in auxiliary_obs_length:
+                assert auxiliary_obs_length[aux_obs_key] == _num
+            else:
+                auxiliary_obs_length[aux_obs_key] = _num
+
+    logger.info(f"auxiliary_obs_dims: {auxiliary_obs_dims}")
+    for obs_key, obs_config in _obs_key_list.items():
+        _auxiliary_dims_dict = {}
+        _auxiliary_dims_length = {}
+        _obs_dim = 0
+
+        for key in obs_config:
+            if key.endswith("_raw"): key = key[:-4]
+            if key in config.env.config.obs.obs_dims.keys():
+                _obs_dim += config.env.config.obs.obs_dims[key]
+                logger.info(f"{obs_key}: {key} has dim: {config.env.config.obs.obs_dims[key]}")
+            else:
+                _auxiliary_dims_dict[key] = auxiliary_obs_dims[key]
+                _auxiliary_dims_length[key] = auxiliary_obs_length[key]
+                logger.info(f"{obs_key}: {key} has dim: {auxiliary_obs_dims[key]}  length: {auxiliary_obs_length[key]}")
+
+        if len(_auxiliary_dims_dict):
+            obs_dim_dict[obs_key] = [_obs_dim, _auxiliary_dims_dict, _auxiliary_dims_length]
+        else:
+            obs_dim_dict[obs_key] = _obs_dim
+
+
+
+    config.robot.algo_obs_dim_dict = obs_dim_dict
+    logger.info(f"algo_obs_dim_dict: {config.robot.algo_obs_dim_dict}")
+
+
+def pre_process_mlp_config(config) -> None:
     obs_dim_dict = dict()
     _obs_key_list = config.env.config.obs.obs_dict
     _aux_obs_key_list = config.env.config.obs.obs_auxiliary
