@@ -1,6 +1,7 @@
 from humanoidverse.agents.base_algo import register
 from humanoidverse.agents.ppo.logic import rollout, trainer, statistics, evaluater
 from humanoidverse.agents.ppo.component import envwarp, modules, optimizer, storage
+import copy
 
 ppo_trainer_registry: dict = {}
 ppo_evaluater_registry: dict = {}
@@ -25,3 +26,9 @@ evaluater_namespace: str  = "ppo_evaluater"
 ################################################
 register.registry[trainer_namespace] = ppo_trainer_registry
 register.registry[evaluater_namespace] = ppo_evaluater_registry
+
+trainer_chunk_namespace: str  = "chunk_trainer"
+evaluater_chunk_namespace: str  = "chunk_evaluater"
+################################################
+chunk_trainer_registry = copy.deepcopy(ppo_trainer_registry)
+register.registry[trainer_chunk_namespace] = chunk_trainer_registry

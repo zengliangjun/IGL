@@ -206,3 +206,15 @@ class PPOEvaluater(BasePPO):
     def namespace(self):
         from humanoidverse.agents.ppo import register
         return register.evaluater_namespace
+
+
+## for trainer
+class ChunkTrainer(BasePPO):
+
+    def __init__(self, env: BaseTask, config, log_dir=None, device='cpu'):
+        super(ChunkTrainer, self).__init__(env, config, log_dir, device)
+
+    @property
+    def namespace(self):
+        from humanoidverse.agents.ppo import register
+        return register.trainer_chunk_namespace
