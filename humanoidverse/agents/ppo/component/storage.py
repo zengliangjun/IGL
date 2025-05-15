@@ -6,8 +6,8 @@ import torch
 class Storage(base.BaseComponent):
     def __init__(self, _algo: base_algo.BaseAlgo):
         super(Storage, self).__init__(_algo)
-        self.num_steps_per_env = self.config.num_steps_per_env
-        self.algo_obs_dim_dict = self.algo.env.config.robot.algo_obs_dim_dict
+        #self.num_steps_per_env = self.config.num_steps_per_env
+        #self.algo_obs_dim_dict = self.algo.env.config.robot.algo_obs_dim_dict
         self.num_act = self.algo.env.config.robot.actions_dim
 
         self.gamma = self.config.gamma
@@ -16,12 +16,17 @@ class Storage(base.BaseComponent):
         self.num_learning_epochs = self.config.num_learning_epochs
         self.num_mini_batches = self.config.num_mini_batches
 
+    def _preinitobs(self):
+        ## Register obs keys
+        ## please read humanoidverse/utils/helpers.py
+        self.storage = RolloutStorage(self.algo)
+        # for obs_key, obs_dim in self.algo_obs_dim_dict.items():
+        for obs_key, obs_dim in self.algo.env.config.robot.algo_obs_dim_dict.items():
+            self.storage.register_key(obs_key, shape=(obs_dim,), dtype=torch.float)
+
     # stage 1
     def pre_init(self):
-        self.storage = RolloutStorage(self.num_envs, self.num_steps_per_env)
-        ## Register obs keys
-        for obs_key, obs_dim in self.algo_obs_dim_dict.items():
-            self.storage.register_key(obs_key, shape=(obs_dim,), dtype=torch.float)
+        self._preinitobs()
 
         ## Register others
         self.storage.register_key('actions', shape=(self.num_act,), dtype=torch.float)

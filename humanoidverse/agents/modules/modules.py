@@ -25,7 +25,7 @@ class BaseModule(nn.Module):
             else:
                 current_function_name = inspect.currentframe().f_code.co_name
                 raise ValueError(f"{current_function_name} - Unknown input type: {each_input}")
-        
+
         self.input_dim = input_dim
 
     def _calculate_output_dim(self):
@@ -41,9 +41,12 @@ class BaseModule(nn.Module):
     def _build_network_layer(self, layer_config):
         if layer_config['type'] == 'MLP':
             self._build_mlp_layer(layer_config)
+        elif layer_config['type'] == 'ACT':
+            from agents.modules.act_modules import ACTActor
+            self.module = ACTActor(self.input_dim, self.output_dim, layer_config)
         else:
             raise NotImplementedError(f"Unsupported layer type: {layer_config['type']}")
-        
+
     def _build_mlp_layer(self, layer_config):
         layers = []
         hidden_dims = layer_config['hidden_dims']

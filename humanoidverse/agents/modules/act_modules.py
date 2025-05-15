@@ -50,6 +50,26 @@ actor:
         n_encoder_layers: 4
         n_decoder_layers: 1
         dropout: 0.1
+
+critic:
+    type: ACT
+    input_dim:
+    - critic_obs
+    output_dim:
+    - 1
+    layer_config:
+        type: ACT
+        chunk_size: 1
+        history_steps: 100  ## history steps
+
+        pre_norm: false
+        dim_model: 512
+        n_heads: 8
+        dim_feedforward: 3200
+        activation: relu
+        n_encoder_layers: 4
+        n_decoder_layers: 1
+        dropout: 0.1
 '''
 
 class ACTModule(nn.Module):

@@ -34,7 +34,7 @@ class PPOActor(nn.Module):
     @property
     def actor(self):
         return self.actor_module
-    
+
     @staticmethod
     # not used at the moment
     def init_weights(sequential, scales):
@@ -46,7 +46,7 @@ class PPOActor(nn.Module):
 
     def forward(self):
         raise NotImplementedError
-    
+
     @property
     def action_mean(self):
         return self.distribution.mean
@@ -54,7 +54,7 @@ class PPOActor(nn.Module):
     @property
     def action_std(self):
         return self.distribution.stddev
-    
+
     @property
     def entropy(self):
         return self.distribution.entropy().sum(dim=-1)
@@ -66,19 +66,17 @@ class PPOActor(nn.Module):
     def act(self, actor_obs, **kwargs):
         self.update_distribution(actor_obs)
         return self.distribution.sample()
-    
+
     def get_actions_log_prob(self, actions):
         return self.distribution.log_prob(actions).sum(dim=-1)
 
     def act_inference(self, actor_obs):
         actions_mean = self.actor(actor_obs)
         return actions_mean
-    
+
     def to_cpu(self):
         self.actor = deepcopy(self.actor).to('cpu')
         self.std.to('cpu')
-
-
 
 class PPOCritic(nn.Module):
     def __init__(self,
@@ -91,10 +89,10 @@ class PPOCritic(nn.Module):
     @property
     def critic(self):
         return self.critic_module
-    
+
     def reset(self, dones=None):
         pass
-    
+
     def evaluate(self, critic_obs, **kwargs):
         value = self.critic(critic_obs)
         return value

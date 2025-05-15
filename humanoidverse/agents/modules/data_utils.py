@@ -18,17 +18,16 @@ def compute_returns(self, rewards, values, dones, last_values, gamma, lam):
     # Compute and normalize the advantages
     advantages = returns - values
     advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        
-class RolloutStorage(nn.Module):
 
-    def __init__(self, num_envs, num_transitions_per_env, device='cpu'):
-        
-        super().__init__()
+from agents.base_algo import base
+from agents.base_algo import base_algo
 
+class RolloutStorage(base.BaseComponent):
+
+    def __init__(self, _algo: base_algo.BaseAlgo, device='cpu'):
+        super(RolloutStorage, self).__init__(_algo)
         self.device = device
-
-        self.num_transitions_per_env = num_transitions_per_env
-        self.num_envs = num_envs
+        self.num_transitions_per_env = self.config.num_steps_per_env
 
         # rnn
         # self.saved_hidden_states_a = None
@@ -36,7 +35,7 @@ class RolloutStorage(nn.Module):
 
         self.step = 0
         self.stored_keys = list()
-        
+
     def register_key(self, key: str, shape=(), dtype=torch.float):
         # This class was partially copied from https://github.com/NVlabs/ProtoMotions/blob/94059259ba2b596bf908828cc04e8fc6ff901114/phys_anim/agents/utils/data_utils.py
         assert not hasattr(self, key), key
@@ -44,9 +43,9 @@ class RolloutStorage(nn.Module):
         buffer = torch.zeros(
             (self.num_transitions_per_env, self.num_envs) + shape, dtype=dtype, device=self.device
         )
-        self.register_buffer(key, buffer, persistent=False)
+        setattr(self, key, buffer)
         self.stored_keys.append(key)
-    
+
     def increment_step(self):
         self.step += 1
 
@@ -55,7 +54,7 @@ class RolloutStorage(nn.Module):
         assert not data.requires_grad
         assert self.step < self.num_transitions_per_env, "Rollout buffer overflow"
         getattr(self, key)[self.step].copy_(data)
-        
+
     def batch_update_data(self, key: str, data: Tensor):
         # This class was partially copied from https://github.com/NVlabs/ProtoMotions/blob/94059259ba2b596bf908828cc04e8fc6ff901114/phys_anim/agents/utils/data_utils.py
         assert not data.requires_grad
@@ -70,7 +69,7 @@ class RolloutStorage(nn.Module):
         hid_a = hidden_states[0] if isinstance(hidden_states[0], tuple) else (hidden_states[0],)
         hid_c = hidden_states[1] if isinstance(hidden_states[1], tuple) else (hidden_states[1],)
 
-        # initialize if needed 
+        # initialize if needed
         if self.saved_hidden_states_a is None:
             self.saved_hidden_states_a = [torch.zeros(self.observations.shape[0], *hid_a[i].shape, device=self.device) for i in range(len(hid_a))]
             self.saved_hidden_states_c = [torch.zeros(self.observations.shape[0], *hid_c[i].shape, device=self.device) for i in range(len(hid_c))]
@@ -91,7 +90,7 @@ class RolloutStorage(nn.Module):
         done_indices = torch.cat((flat_dones.new_tensor([-1], dtype=torch.int64), flat_dones.nonzero(as_tuple=False)[:, 0]))
         trajectory_lengths = (done_indices[1:] - done_indices[:-1])
         return trajectory_lengths.float().mean(), self.rewards.mean()
-    
+
     def query_key(self, key: str):
         assert hasattr(self, key), key
         return getattr(self, key)
@@ -100,7 +99,7 @@ class RolloutStorage(nn.Module):
         batch_size = self.num_envs * self.num_transitions_per_env
         mini_batch_size = batch_size // num_mini_batches
         indices = torch.randperm(num_mini_batches*mini_batch_size, requires_grad=False, device=self.device)
-        
+
         _buffer_dict = {key: getattr(self, key)[:].flatten(0, 1) for key in self.stored_keys}
 
         for epoch in range(num_epochs):
@@ -112,3 +111,5 @@ class RolloutStorage(nn.Module):
 
                 _batch_buffer_dict = {key: _buffer_dict[key][batch_idx] for key in self.stored_keys}
                 yield _batch_buffer_dict
+
+                # ['actor_obs', 'critic_obs', 'actions', 'rewards', 'dones', 'values', 'returns', 'advantages', 'actions_log_prob', 'action_mean', 'action_sigma']
