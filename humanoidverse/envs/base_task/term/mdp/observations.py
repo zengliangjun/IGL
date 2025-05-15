@@ -15,7 +15,7 @@ class BaseObservations(base.BaseManager):
             break
 
         if _isact:
-            self.proxy = ObservationsWithToken(_task)
+            self.proxy = ChunkObservations(_task)
         else:
             self.proxy = GeneralObservations(_task)
 
@@ -124,9 +124,9 @@ class GeneralObservations(base.BaseManager):
                 _obs_function = getattr(_manager, _item)
                 setattr(self, _item, _obs_function)
 
-class ObservationsWithToken(GeneralObservations):
+class ChunkObservations(GeneralObservations):
     def __init__(self, _task):
-        super(ObservationsWithToken, self).__init__(_task)
+        super(ChunkObservations, self).__init__(_task)
 
     def init(self):
         self.obs_buf_dict = {}
