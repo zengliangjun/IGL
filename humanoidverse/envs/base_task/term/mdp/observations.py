@@ -9,7 +9,7 @@ class BaseObservations(base.BaseManager):
         super(BaseObservations, self).__init__(_task)
 
         _isact = False
-        for _key, _value in self.config.robot.algo_obs_dim_dict:
+        for _key, _value in self.config.robot.algo_obs_dim_dict.items():
             if isinstance(_value, tuple) or isinstance(_value, list):
                 _isact = True
             break
@@ -39,15 +39,15 @@ class BaseObservations(base.BaseManager):
 
     @property
     def obs_buf_dict(self):
-        return self.proxy.obs_buf_dict()
+        return self.proxy.obs_buf_dict
 
     @property
     def obs_buf_dict_raw(self):
-        return self.proxy.obs_buf_dict_raw()
+        return self.proxy.obs_buf_dict_raw
 
     @property
     def hist_obs_dict(self):
-        return self.proxy.hist_obs_dict()
+        return self.proxy.hist_obs_dict
 
 class GeneralObservations(base.BaseManager):
     def __init__(self, _task):
