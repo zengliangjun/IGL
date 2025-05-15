@@ -38,7 +38,23 @@ class Trainer(base.BaseComponent):
         entropy_loss = entropy_batch.mean()
         self._update_loss('Entropy', entropy_loss.item())
 
-        actor_loss = surrogate_loss - self.entropy_coef * entropy_loss
+        actor_loss0 = torch.abs(surrogate_loss - self.entropy_coef * entropy_loss)
+
+        # chunk loss
+        if 'chunk_actions_batch' in _inputs:
+            chunk_batch = _inputs['chunk_actions_batch']
+            policy_state_dict = _inputs['policy_state_dict']
+            chunk_actions = policy_state_dict['chunk_actions']
+            chunk_dones = policy_state_dict['chunk_dones']
+            chunk_work = torch.logical_not(chunk_dones)
+            _diff = (chunk_batch - chunk_actions)  ** 2
+            _diff = torch.mean(_diff, dim = -1)[chunk_work]
+            _diff = torch.mean(_diff)
+            self._update_loss('Chunk', _diff.item())
+            actor_loss =  actor_loss0 + self.entropy_coef * _diff
+        else:
+            actor_loss =  actor_loss0
+
         # critic loss
         value_loss = self._calcute_critic_loss(_inputs)
         self._update_loss('Value', value_loss.item())
@@ -52,6 +68,7 @@ class Trainer(base.BaseComponent):
         ##
         actor_loss.backward()
         critic_loss.backward()
+        self._update_loss('actor0', actor_loss0.item())
         self._update_loss('actor', actor_loss.item())
         self._update_loss('critic', critic_loss.item())
 

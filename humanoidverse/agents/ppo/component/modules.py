@@ -116,6 +116,9 @@ class Modules(base.BaseComponent):
         entropy_batch = self.actor.entropy
 
         # record for train
+        if hasattr(self.actor, 'chunk_actions'):
+            _inputs['chunk_actions_batch'] = self.actor.chunk_actions
+
         _inputs['actions_log_prob_batch'] = actions_log_prob_batch
         _inputs['value_batch'] = value_batch
         _inputs['mu_batch'] = mu_batch
