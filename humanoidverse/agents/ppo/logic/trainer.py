@@ -38,7 +38,8 @@ class Trainer(base.BaseComponent):
         entropy_loss = entropy_batch.mean()
         self._update_loss('Entropy', entropy_loss.item())
 
-        actor_loss0 = torch.abs(surrogate_loss - self.entropy_coef * entropy_loss)
+        #actor_loss0 = torch.abs(surrogate_loss - self.entropy_coef * entropy_loss)
+        actor_loss0 = surrogate_loss - self.entropy_coef * entropy_loss
 
         # chunk loss
         if 'chunk_actions_batch' in _inputs:
@@ -51,7 +52,7 @@ class Trainer(base.BaseComponent):
             _diff = torch.mean(_diff, dim = -1)[chunk_work]
             _diff = torch.mean(_diff)
             self._update_loss('Chunk', _diff.item())
-            actor_loss =  actor_loss0 + self.entropy_coef * _diff
+            actor_loss =  actor_loss0 # - self.entropy_coef * _diff
         else:
             actor_loss =  actor_loss0
 

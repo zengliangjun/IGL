@@ -102,6 +102,10 @@ class Modules(base.BaseComponent):
         policy_state_dict = self._actor_rollout_step(obs_dict, policy_state_dict)
         values = self._critic_eval_step(obs_dict).detach()
         policy_state_dict["values"] = values
+
+        if hasattr(self.actor, 'chunk_actions'): # roolout chunk_actions
+            policy_state_dict["chunk_actions"] =  self.actor.chunk_actions
+
         _inputs['policy_state_dict'] = policy_state_dict
 
     ##
