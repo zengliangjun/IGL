@@ -63,13 +63,21 @@ class RolloutStorageForACt(RolloutStorage):
 
                     _actions_steps.append(_step_batch_actions)
 
-                    print("step: ", _steps, torch.sum(_step_batch_dones.float()), torch.sum(_steps_done.float()))
+                    #print("step: ", _steps, torch.sum(_step_batch_dones.float()), torch.sum(_steps_done.float()))
                     _dones_steps.append(_step_batch_dones)
 
                 _actions_steps = torch.stack(_actions_steps, dim = 1)
                 _dones_steps = torch.cat(_dones_steps, dim = -1)
                 _batch_buffer_dict['chunk_actions'] = _actions_steps   # b * chunk * dims
                 _batch_buffer_dict['chunk_dones'] = _dones_steps       # b * chunk
+
+                #'actor_obs', 'critic_obs'
+                actor_obs = _batch_buffer_dict.pop('actor_obs')
+                critic_obs = _batch_buffer_dict.pop('critic_obs')
+                history_actor = _batch_buffer_dict.pop('actor_obs.history_actor')
+                history_critic = _batch_buffer_dict.pop('critic_obs.history_critic')
+                _batch_buffer_dict['actor_obs'] = [actor_obs, {'history_actor': history_actor}]
+                _batch_buffer_dict['critic_obs'] = [critic_obs, {'history_critic': history_critic}]
 
                 yield _batch_buffer_dict
                 # ['actor_obs', 'critic_obs', 'actions', 'rewards', 'dones', 'values', 'returns', 'advantages', 'actions_log_prob', 'action_mean', 'action_sigma']

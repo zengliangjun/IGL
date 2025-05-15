@@ -61,6 +61,10 @@ class PPOActor(nn.Module):
 
     def update_distribution(self, actor_obs):
         mean = self.actor(actor_obs)
+        if 3 == len(mean.shape):
+            self.chunk_actions = mean[:, 1:, :]
+            mean = mean[:, 0, :]
+
         self.distribution = Normal(mean, mean*0. + self.std)
 
     def act(self, actor_obs, **kwargs):

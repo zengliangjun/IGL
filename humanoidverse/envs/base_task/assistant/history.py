@@ -86,5 +86,5 @@ class HistoryManagerWithMask(HistoryManager):
             history_length = history_config[key]
             history_tensor = self.history_handler.query(key)[:, :history_length]  ## Shape: [b, history_length, obs_dim]
             history_tensors.append(history_tensor)
-        return torch.cat(history_tensors, dim=1)
+        return torch.cat(history_tensors, dim = -1)
 

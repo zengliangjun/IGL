@@ -10,7 +10,7 @@ class BaseObservations(base.BaseManager):
 
         _isact = False
         for _key, _value in self.config.robot.algo_obs_dim_dict.items():
-            if isinstance(_value, tuple) or isinstance(_value, list):
+            if not isinstance(_value, (int, float)):
                 _isact = True
             break
 
@@ -75,6 +75,12 @@ class GeneralObservations(base.BaseManager):
             return
         self.history_manager.reset(env_ids)
 
+    def _clip_obs(self):
+        # return clipped obs, clipped states (None), rewards, dones and infos
+        clip_obs = self.config.normalization.clip_observations
+        for obs_key, obs_val in self.obs_buf_dict.items():
+            self.obs_buf_dict[obs_key] = torch.clip(obs_val, -clip_obs, clip_obs)
+
     def compute(self):
         """ Computes observations
         """
@@ -91,10 +97,8 @@ class GeneralObservations(base.BaseManager):
 
         self._post_config_observation_callback()
 
-        # return clipped obs, clipped states (None), rewards, dones and infos
-        clip_obs = self.config.normalization.clip_observations
-        for obs_key, obs_val in self.obs_buf_dict.items():
-            self.obs_buf_dict[obs_key] = torch.clip(obs_val, -clip_obs, clip_obs)
+        self._clip_obs()
+
 
     def post_compute(self):
         self.history_manager.post_compute()
@@ -156,3 +160,20 @@ class ChunkObservations(GeneralObservations):
                 self.obs_buf_dict[obs_key] = [torch.cat(obs_bufs, dim=-1), _history_buf_dict]
             else:
                 self.obs_buf_dict[obs_key] = torch.cat(obs_bufs, dim=-1)
+
+    def _clip_obs(self):
+        # return clipped obs, clipped states (None), rewards, dones and infos
+        clip_obs = self.config.normalization.clip_observations
+        for obs_key, obs_val in self.obs_buf_dict.items():
+            if isinstance(obs_val, torch.Tensor):
+                self.obs_buf_dict[obs_key] = torch.clip(obs_val, -clip_obs, clip_obs)
+            else:
+
+                for _item in obs_val:
+                    if isinstance(_item, torch.Tensor):
+                        torch.clip_(_item, -clip_obs, clip_obs)
+                    else:
+                        for _key, _value in _item.items():
+                            torch.clip_(_value, - clip_obs, clip_obs)
+
+                self.obs_buf_dict[obs_key] = obs_val #

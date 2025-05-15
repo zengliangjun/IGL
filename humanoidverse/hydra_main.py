@@ -66,21 +66,21 @@ def main(
                 if "base" == config_name:
                     args.overrides = [
                         '+simulator=isaacgym',
-                        '+exp=locomotion',
+                        '+exp=chunk_locomotion',  #'+exp=locomotion',
                         '+domain_rand=NO_domain_rand',
                         '+rewards=loco/reward_h1_locomotion',
                         '+robot=h1/h1_10dof',
                         '+terrain=terrain_locomotion_plane',
-                        '+obs=loco/leggedloco_obs_singlestep_withlinvel',
+                        '+obs=loco/leggedloco_obs_singlestep_wolinvel_chunk',  #'+obs=loco/leggedloco_obs_singlestep_withlinvel',
                         'experiment_name=H110dof_loco_IsaacGym',
                         'headless=True',
 
                         #'num_envs=1',
                         #'project_name=TESTInstallation',
 
-                        'num_envs=4096',
-                        'project_name=HumanoidLocomotion',
-                        'checkpoint=logs/HumanoidLocomotion/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt'
+                        'num_envs=1024',
+                        'project_name=HumanoidChunkLocomotion',
+                        #'checkpoint=logs/HumanoidLocomotion/20250411_214128-H110dof_loco_IsaacGym-locomotion-h1_10dof/model_19700.pt'
                     ]
                 elif "base_play" == config_name:
                     args.overrides = [

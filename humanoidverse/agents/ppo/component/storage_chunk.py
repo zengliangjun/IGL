@@ -11,7 +11,7 @@ class Storage(storage.Storage):
         self.storage = RolloutStorageForACt(self.algo)
         ## Register obs keys
         ## please read humanoidverse/utils/helpers.py
-        for obs_key, _value in self.algo_obs_dim_dict.items():
+        for obs_key, _value in self.algo.env.config.robot.algo_obs_dim_dict.items():
             if isinstance(_value, int):
                 self.storage.register_key(obs_key, shape=(_value,), dtype = torch.float)
             else:
@@ -19,7 +19,7 @@ class Storage(storage.Storage):
                 self.storage.register_key(obs_key, shape=(_obs_dim,), dtype = torch.float)
                 for _key, _dims in _auxiliary_dims_dict.items():
                     _length = _auxiliary_dims_length[_key]
-                    self.storage.register_key(f'{obs_key}.{_key}', shape=(_length, _dims), dtype = torch.float)
+                    self.storage.register_key(f'{obs_key}.{_key}', shape=(_length, _dims + 1), dtype = torch.float)
 
     ## help functions
     def _step_rollout(self, _inputs):

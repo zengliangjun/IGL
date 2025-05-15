@@ -137,8 +137,21 @@ class BasePPO(base_algo.BaseAlgo):
 
         for policy_state_dict in generator:
             # Move everything to the device
-            for policy_state_key in policy_state_dict.keys():
-                policy_state_dict[policy_state_key] = policy_state_dict[policy_state_key].to(self.device)
+            for policy_state_key, _value in policy_state_dict.items():
+                if isinstance(_value, torch.Tensor):
+                    policy_state_dict[policy_state_key] = _value.to(self.device)
+                else:
+                    _results = []
+                    for _item in _value:
+                        if isinstance(_item, torch.Tensor):
+                            _item = _item.to(self.device)
+                        else:
+                            for _key, _value in _item.items():
+                                _item[_key] = _value.to(self.device)
+
+                        _results.append(_item)
+
+                    policy_state_dict[policy_state_key] = _results
 
             _inputs = {'context': base.Context.TRAIN.value }
             _inputs['policy_state_dict'] = policy_state_dict

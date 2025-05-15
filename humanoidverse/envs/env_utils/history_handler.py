@@ -52,7 +52,7 @@ class HistoryWithMask(HistoryHandler):
         super(HistoryWithMask, self).__init__(num_envs, history_config, obs_dims, device)
 
         for key in self.buffer_config.keys():
-            self.history_mask = torch.zeros(num_envs, self.buffer_config[key], device=self.device, dtype = torch.float32)  ## history len
+            self.history_mask = torch.ones(num_envs, self.buffer_config[key], device=self.device, dtype = torch.float32)  ## history len
             break
 
     def reset(self, reset_ids):
@@ -60,12 +60,12 @@ class HistoryWithMask(HistoryHandler):
         if len(reset_ids)==0:
             return
 
-        self.history_mask[reset_ids] *= 0.
+        self.history_mask[reset_ids] = 1
 
     def post_compute(self):
         val = self.history_mask.clone()
         self.history_mask[:, 1:] = val[:, :-1]
-        self.history_mask[:, 0] = 1
+        self.history_mask[:, 0] = 0
 
     def query_mask(self):
         return self.history_mask.clone()

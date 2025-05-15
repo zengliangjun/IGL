@@ -91,7 +91,12 @@ class ACTModule(nn.Module):
 
         # Transformer decoder.
         # Learnable positional embedding for the transformer's decoder (in the style of DETR object queries).
-        self.decoder_pos_embed = nn.Embedding(_layer_config.chunk_size, _layer_config.dim_model)
+        if 1 == _layer_config.chunk_size: # this is for critic
+            _chunk = 1
+        else:
+            _chunk = _layer_config.chunk_size + 1
+
+        self.decoder_pos_embed = nn.Embedding(_chunk, _layer_config.dim_model)
 
         # Final action regression head on the output of the transformer's decoder.
         self.action_head = nn.Linear(_layer_config.dim_model, _output_dim)
@@ -106,8 +111,23 @@ class ACTModule(nn.Module):
 
     def forward(self, _batch):
         # Prepare transformer encoder inputs.
-        _inputs = _batch["observation"]
-        _padding_mask = _batch["masks"]
+        assert 2 == len(_batch)
+        _inputs = _batch[0]
+        for _key, _value in _batch[1].items():
+            _history = _value
+            break
+
+        _padding_mask = _history[..., 0]
+        _history = _history[..., 1: ]
+
+        _padding_mask = torch.cat((_padding_mask[:, :1], _padding_mask), dim = -1)
+        _padding_mask[:, :1] = 0
+
+
+        _inputs = _inputs.unsqueeze(1)
+        _inputs = torch.cat((_inputs, _history), dim = 1)
+
+
         encoder_in_tokens = self.encoder_input_proj(_inputs)
         encoder_in_pos_embed = self.encoder_1d_feature_pos_embed.weight.unsqueeze(1)
 
@@ -116,8 +136,14 @@ class ACTModule(nn.Module):
                                    pos_embed=encoder_in_pos_embed,
                                    key_padding_mask=_padding_mask)
         # TODO(rcadene, alexander-soare): remove call to `device` ; precompute and use buffer
+
+        if 1 == self.layer_config.chunk_size: # this is for critic
+            _chunk = 1
+        else:
+            _chunk = self.layer_config.chunk_size + 1
+
         decoder_in = torch.zeros(
-            (self.layer_config.chunk_size, _inputs.shape[0], self.layer_config.dim_model),
+            (_chunk, _inputs.shape[0], self.layer_config.dim_model),
             dtype=encoder_in_pos_embed.dtype,
             device=encoder_in_pos_embed.device,
         )
@@ -132,6 +158,9 @@ class ACTModule(nn.Module):
         decoder_out = decoder_out.transpose(0, 1)                                                         # [100, 8, 512]
 
         actions = self.action_head(decoder_out)
+        if 1 == self.layer_config.chunk_size: # this is for critic
+            actions = actions.squeeze(1)
+
         return actions                                                                                   # [8, 100, 14]
 
 
@@ -382,11 +411,11 @@ def main(config: OmegaConf):
     _output_dim = config.output_dim,
     _layer_config = config.layer_config)
 
-    observation = torch.randn((1,  config.layer_config.history_steps + 1, config.input_dim))
-    masks = torch.randn((1,  config.layer_config.history_steps + 1)) > 0.01
+    _input = torch.randn((1,  config.input_dim))
+    _history = torch.randn((1,  config.layer_config.history_steps,  config.input_dim + 1))
 
-    _inputs = {"observation": observation,
-               "masks": masks}
+    _inputs = [_input,
+               {"history": _history}]
 
     _outputs =  _act(_inputs)
     print(_outputs.shape)

@@ -31,4 +31,6 @@ trainer_chunk_namespace: str  = "chunk_trainer"
 evaluater_chunk_namespace: str  = "chunk_evaluater"
 ################################################
 chunk_trainer_registry = copy.deepcopy(ppo_trainer_registry)
+from humanoidverse.agents.ppo.component import storage_chunk
+chunk_trainer_registry["storage_component"] = storage_chunk.Storage
 register.registry[trainer_chunk_namespace] = chunk_trainer_registry

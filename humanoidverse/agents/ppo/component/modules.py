@@ -130,7 +130,7 @@ class Modules(base.BaseComponent):
     ## rollout
     def _actor_rollout_step(self, obs_dict, policy_state_dict):
         actions = self._actor_act_step(obs_dict)
-        policy_state_dict["actions"] = actions
+        policy_state_dict["actions"] = actions.detach()
 
         action_mean = self.actor.action_mean.detach()
         action_sigma = self.actor.action_std.detach()

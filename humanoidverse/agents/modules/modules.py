@@ -18,7 +18,12 @@ class BaseModule(nn.Module):
         for each_input in self.module_config_dict['input_dim']:
             if each_input in self.obs_dim_dict:
                 # atomic observation type
-                input_dim += self.obs_dim_dict[each_input]
+                _obs = self.obs_dim_dict[each_input]
+                if isinstance(_obs, (int, float)):
+                    input_dim += _obs
+                else:
+                    input_dim += _obs[0]
+
             elif isinstance(each_input, (int, float)):
                 # direct numeric input
                 input_dim += each_input
@@ -42,8 +47,8 @@ class BaseModule(nn.Module):
         if layer_config['type'] == 'MLP':
             self._build_mlp_layer(layer_config)
         elif layer_config['type'] == 'ACT':
-            from agents.modules.act_modules import ACTActor
-            self.module = ACTActor(self.input_dim, self.output_dim, layer_config)
+            from agents.modules.act_modules import ACTModule
+            self.module = ACTModule(self.input_dim, self.output_dim, layer_config)
         else:
             raise NotImplementedError(f"Unsupported layer type: {layer_config['type']}")
 
