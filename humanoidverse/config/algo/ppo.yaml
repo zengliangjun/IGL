@@ -1,5 +1,6 @@
 # @package _global_
 
+
 algo:
   _target_: humanoidverse.agents.ppo.ppo.PPO
   _recursive_: False
@@ -30,14 +31,14 @@ algo:
     eval_callbacks: null
 
     module_dict:
-      actor: 
+      actor:
         input_dim: [actor_obs]
         output_dim: [robot_action_dim]
         layer_config:
           type: MLP
           hidden_dims: [512, 256, 128]
           activation: ELU
-      critic: 
+      critic:
         type: MLP
         input_dim: [critic_obs]
         output_dim: [1]

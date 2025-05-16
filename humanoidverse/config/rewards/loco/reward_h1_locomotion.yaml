@@ -27,7 +27,7 @@ rewards:
       feet_air_time: 1.0
       base_height: -100.0
       penalty_feet_height: -5.
-      # termination: -500.0
+      termination: -500.0
       # penalty_in_the_air: -100.0
       # feet_max_height_for_this_air: -100.0
 

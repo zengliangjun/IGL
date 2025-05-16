@@ -36,15 +36,15 @@ algo:
         output_dim: [robot_action_dim]
         layer_config:
           type: ACT
-          chunk_size: 10
-          history_steps: 20  ## history steps
+          chunk_size: 8
+          history_steps: 8  ## history steps
 
           pre_norm: false
-          dim_model: 128
-          n_heads: 4
-          dim_feedforward: 128
+          dim_model: 256
+          n_heads: 2
+          dim_feedforward: 256
           activation: relu
-          n_encoder_layers: 2
+          n_encoder_layers: 3
           n_decoder_layers: 1
           dropout: 0.1
 
@@ -55,13 +55,13 @@ algo:
         layer_config:
           type: ACT
           chunk_size: 1
-          history_steps: 20  ## history steps
+          history_steps: 8  ## history steps
 
           pre_norm: false
-          dim_model: 128
-          n_heads: 4
-          dim_feedforward: 128
+          dim_model: 256
+          n_heads: 2
+          dim_feedforward: 256
           activation: relu
-          n_encoder_layers: 2
+          n_encoder_layers: 3
           n_decoder_layers: 1
           dropout: 0.1

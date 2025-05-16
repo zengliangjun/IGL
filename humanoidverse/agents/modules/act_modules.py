@@ -131,6 +131,8 @@ class ACTModule(nn.Module):
         encoder_in_tokens = self.encoder_input_proj(_inputs)
         encoder_in_pos_embed = self.encoder_1d_feature_pos_embed.weight.unsqueeze(1)
 
+        _padding_mask = _padding_mask > 0
+
         # Forward pass through the transformer modules.
         encoder_out = self.encoder(encoder_in_tokens.permute(1, 0, 2),
                                    pos_embed=encoder_in_pos_embed,
